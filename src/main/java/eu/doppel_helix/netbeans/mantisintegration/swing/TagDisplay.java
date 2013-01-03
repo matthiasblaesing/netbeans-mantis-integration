@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import org.netbeans.modules.bugtracking.util.LinkButton;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 
 public class TagDisplay extends DelegatingBaseLineJPanel implements ActionListener {
     private final String COMMAND_DELETE = "deleteString";
@@ -40,7 +42,13 @@ public class TagDisplay extends DelegatingBaseLineJPanel implements ActionListen
             issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
                 @Override
                 public void run() {
-                    issue.removeTag(tag);
+                    try {
+                        issue.removeTag(tag);
+                    } catch (Exception ex) {
+                        NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                                "Failed to remove tag from issue");
+                        DialogDisplayer.getDefault().notifyLater(nd);
+                    }
                 }
             }); 
         }

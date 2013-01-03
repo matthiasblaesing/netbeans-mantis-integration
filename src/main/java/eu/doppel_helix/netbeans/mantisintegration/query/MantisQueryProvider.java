@@ -4,9 +4,11 @@ package eu.doppel_helix.netbeans.mantisintegration.query;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.Collections;
 import org.netbeans.modules.bugtracking.spi.QueryController;
 import org.netbeans.modules.bugtracking.spi.QueryProvider;
-
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 
 public class MantisQueryProvider extends QueryProvider<MantisQuery, MantisIssue> {
 
@@ -37,7 +39,14 @@ public class MantisQueryProvider extends QueryProvider<MantisQuery, MantisIssue>
 
     @Override
     public Collection<MantisIssue> getIssues(MantisQuery q) {
-        return q.getIssues();
+        try {
+            return q.getIssues();
+        } catch (Exception ex) {
+            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                    "Failed to retrieve issues");
+            DialogDisplayer.getDefault().notifyLater(nd);
+            return Collections.EMPTY_LIST;
+        }
     }
 
     @Override
@@ -47,7 +56,13 @@ public class MantisQueryProvider extends QueryProvider<MantisQuery, MantisIssue>
 
     @Override
     public void refresh(MantisQuery query) {
-        query.refresh();
+        try {
+            query.refresh();
+        } catch (Exception ex) {
+            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                    "Failed to refresh buglist");
+            DialogDisplayer.getDefault().notifyLater(nd);
+        }
     }
 
     @Override

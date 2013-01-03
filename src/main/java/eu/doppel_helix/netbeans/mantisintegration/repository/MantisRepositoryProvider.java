@@ -5,9 +5,12 @@ import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
 import java.awt.Image;
 import java.util.Collection;
+import java.util.Collections;
 import org.netbeans.modules.bugtracking.spi.RepositoryController;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 import org.netbeans.modules.bugtracking.spi.RepositoryProvider;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Lookup;
 
 public class MantisRepositoryProvider extends RepositoryProvider<MantisRepository,MantisQuery,MantisIssue> {
@@ -24,7 +27,14 @@ public class MantisRepositoryProvider extends RepositoryProvider<MantisRepositor
 
     @Override
     public MantisIssue[] getIssues(MantisRepository r, String... ids) {
-        return r.getIssues(ids);
+        try {
+            return r.getIssues(ids);
+        } catch (Exception ex) {
+            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                    "Failed to get issues");
+            DialogDisplayer.getDefault().notifyLater(nd);
+            return new MantisIssue[0];
+        }
     }
 
     @Override
@@ -59,7 +69,14 @@ public class MantisRepositoryProvider extends RepositoryProvider<MantisRepositor
 
     @Override
     public Collection<MantisIssue> simpleSearch(MantisRepository r, String criteria) {
-        return r.simpleSearch(criteria);
+        try {
+            return r.simpleSearch(criteria);
+        } catch (Exception ex) {
+            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                    "Failed to do simplesearch ");
+            DialogDisplayer.getDefault().notifyLater(nd);
+            return Collections.EMPTY_LIST;
+        }
     }
     
 }

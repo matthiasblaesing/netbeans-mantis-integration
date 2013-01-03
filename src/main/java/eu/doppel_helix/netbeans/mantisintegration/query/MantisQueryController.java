@@ -27,6 +27,8 @@ import org.netbeans.modules.bugtracking.issuetable.ColumnDescriptor;
 import org.netbeans.modules.bugtracking.issuetable.IssueNode;
 import org.netbeans.modules.bugtracking.issuetable.IssueTable;
 import org.netbeans.modules.bugtracking.spi.QueryController;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.RequestProcessor;
@@ -173,10 +175,16 @@ public class MantisQueryController extends QueryController implements ActionList
     private void updateFilterList() {
         ProjectData selected = (ProjectData) projectModel1.getSelectedItem();
         if (selected != null) {
-            FilterData[] filter = mr.getFilters(selected.getId());
-            if (filter != null) {
-                filterModel1.setBackingList(Arrays.asList(filter));
-                filterModel1.addElement(0, null);
+            try {
+                FilterData[] filter = mr.getFilters(selected.getId());
+                if (filter != null) {
+                    filterModel1.setBackingList(Arrays.asList(filter));
+                    filterModel1.addElement(0, null);
+                }
+            } catch (Exception ex) {
+                NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                        "Failed to retrieve filterlist");
+                DialogDisplayer.getDefault().notifyLater(nd);
             }
         }
     }
@@ -255,15 +263,20 @@ public class MantisQueryController extends QueryController implements ActionList
         Runnable r = new Runnable() {
             @Override
             public void run() {
+                try {
+                    Repository r = Mantis.getInstance().getBugtrackingFactory().getRepository(
+                            MantisConnector.ID,
+                            mq.getMantisRepository().getInfo().getId());
 
-                Repository r = Mantis.getInstance().getBugtrackingFactory().getRepository(
-                        MantisConnector.ID,
-                        mq.getMantisRepository().getInfo().getId());
+                    MantisIssue mi = mq.getMantisRepository().
+                            getIssues(mqp.gotoIssueTextField.getText())[0];
 
-                MantisIssue mi = mq.getMantisRepository().
-                        getIssues(mqp.gotoIssueTextField.getText())[0];
-
-                Mantis.getInstance().getBugtrackingFactory().openIssue(r, mi);
+                    Mantis.getInstance().getBugtrackingFactory().openIssue(r, mi);
+                } catch (Exception ex) {
+                    NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                            "Failed to open issue");
+                    DialogDisplayer.getDefault().notifyLater(nd);
+                }
             }
         };
 

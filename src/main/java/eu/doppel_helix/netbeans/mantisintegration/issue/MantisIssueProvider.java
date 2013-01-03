@@ -5,6 +5,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import org.netbeans.modules.bugtracking.spi.BugtrackingController;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 
 public class MantisIssueProvider extends IssueProvider<MantisIssue> {
 
@@ -45,17 +47,36 @@ public class MantisIssueProvider extends IssueProvider<MantisIssue> {
 
     @Override
     public boolean refresh(MantisIssue data) {
-        return data.refresh();
+        try {
+            return data.refresh();
+        } catch (Exception ex) {
+            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                    "Failed to refresh issue");
+            DialogDisplayer.getDefault().notifyLater(nd);
+            return false;
+        }
     }
 
     @Override
     public void addComment(MantisIssue data, String comment, boolean closeAsFixed) {
-        data.addComment(comment, closeAsFixed);
+        try {
+            data.addComment(comment, closeAsFixed);
+        } catch (Exception ex) {
+            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                    "Failed to add comment to issue");
+            DialogDisplayer.getDefault().notifyLater(nd);
+        }
     }
 
     @Override
     public void attachPatch(MantisIssue data, File file, String description) {
-        data.attachPatch(file, description);
+        try {
+            data.attachPatch(file, description);
+        } catch (Exception ex) {
+            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                    "Failed to add patch to issue");
+            DialogDisplayer.getDefault().notifyLater(nd);
+        }
     }
 
     @Override

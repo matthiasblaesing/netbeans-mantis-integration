@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import org.netbeans.modules.bugtracking.util.LinkButton;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 
 public class RelationshipDisplay extends DelegatingBaseLineJPanel implements ActionListener {
     private final String COMMAND_DELETE = "deleteString";
@@ -41,7 +43,13 @@ public class RelationshipDisplay extends DelegatingBaseLineJPanel implements Act
             issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
                 @Override
                 public void run() {
-                    issue.removeRelationship(rd);
+                    try {
+                        issue.removeRelationship(rd);
+                    } catch (Exception ex) {
+                        NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                                "Failed to remove relationship from issue");
+                        DialogDisplayer.getDefault().notifyLater(nd);
+                    }
                 }
             });
         }

@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,9 +36,12 @@ import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultCaret;
+import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.BugtrackingController;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
 import org.netbeans.modules.bugtracking.util.LinkButton;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.HelpCtx;
 import org.openide.windows.WindowManager;
 
@@ -71,40 +75,54 @@ public class MantisIssueController extends BugtrackingController implements Prop
         List<ObjectRef> priorities;
         List<ObjectRef> states;
         List<ObjectRef> etas;
-        List<ObjectRef> projections;        
+        List<ObjectRef> projections;
+        private Throwable t;
 
         @Override
-        protected Object doInBackground() throws Exception {
-            MantisRepository mr = issue.getMantisRepository();
-            viewStates = Arrays.asList(mr.getViewStates());
-            projects = new ArrayList<ProjectData>();
-            projects.add(null);
-            projects.addAll(Arrays.asList(mr.getProjects()));
-            severities = Arrays.asList(mr.getSeverities());
-            reproducibilities = Arrays.asList(mr.getReproducibilities());
-            resolutions = Arrays.asList(mr.getResolutions());
-            priorities = Arrays.asList(mr.getPriorities());
-            states = new ArrayList<ObjectRef>(Arrays.asList(mr.getStates()));
-            states.add(0, null);
-            etas = Arrays.asList(mr.getEtas());
-            projections = Arrays.asList(mr.getProjections());
+        protected Object doInBackground() {
+            try {
+                MantisRepository mr = issue.getMantisRepository();
+                viewStates = Arrays.asList(mr.getViewStates());
+                projects = new ArrayList<ProjectData>();
+                projects.add(null);
+                projects.addAll(Arrays.asList(mr.getProjects()));
+                severities = Arrays.asList(mr.getSeverities());
+                reproducibilities = Arrays.asList(mr.getReproducibilities());
+                resolutions = Arrays.asList(mr.getResolutions());
+                priorities = Arrays.asList(mr.getPriorities());
+                states = new ArrayList<ObjectRef>(Arrays.asList(mr.getStates()));
+                states.add(0, null);
+                etas = Arrays.asList(mr.getEtas());
+                projections = Arrays.asList(mr.getProjections());
+            } catch (ServiceException ex) {
+                t = ex;
+            } catch (RemoteException ex) {
+                t = ex;
+            }
             return null;
         }
         
         @Override
         protected void done() {
-            projectModel.setBackingList(projects);
-            viewstatesModel.setBackingList(viewStates);
-            viewstatesModel2.setBackingList(viewStates);
-            severitiesModel.setBackingList(severities);
-            reproducibilitiesModel.setBackingList(reproducibilities);
-            prioritiesModel.setBackingList(priorities);
-            resolutionsModel.setBackingList(resolutions);
-            statesModel.setBackingList(states);
-            etasModel.setBackingList(etas);
-            projectionsModel.setBackingList(projections);
-            updateInfo(null);
+            if (t != null) {
+                NotifyDescriptor nd = new NotifyDescriptor.Exception(t,
+                        "Failed to update ");
+                DialogDisplayer.getDefault().notifyLater(nd);
+            } else {
+                projectModel.setBackingList(projects);
+                viewstatesModel.setBackingList(viewStates);
+                viewstatesModel2.setBackingList(viewStates);
+                severitiesModel.setBackingList(severities);
+                reproducibilitiesModel.setBackingList(reproducibilities);
+                prioritiesModel.setBackingList(priorities);
+                resolutionsModel.setBackingList(resolutions);
+                statesModel.setBackingList(states);
+                etasModel.setBackingList(etas);
+                projectionsModel.setBackingList(projections);
+                updateInfo(null);
+            }
             issue.setBusy(false);
+
         }
     };
     
@@ -434,16 +452,29 @@ public class MantisIssueController extends BugtrackingController implements Prop
     @Override
     public void applyChanges() {
         issue.setBusy(true);
-        if (isValid()) {
-            if (issue.getId() == null) {
-                MantisRepository mr = issue.getMantisRepository();
-                mr.addIssue(issue, getUpdateData());
-            } else {
-                MantisRepository mr = issue.getMantisRepository();
-                mr.updateIssue(issue, getUpdateData());
+        try {
+            if (isValid()) {
+                if (issue.getId() == null) {
+                    MantisRepository mr = issue.getMantisRepository();
+                    mr.addIssue(issue, getUpdateData());
+                } else {
+                    MantisRepository mr = issue.getMantisRepository();
+                    mr.updateIssue(issue, getUpdateData());
+                }
             }
+        } catch (Exception ex) {
+            if(ex instanceof RemoteException || ex instanceof ServiceException) {
+                NotifyDescriptor nd = new NotifyDescriptor.Exception(ex, 
+                        "Failed to create/add issue");
+                DialogDisplayer.getDefault().notifyLater(nd);
+            } else if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex;
+            } else {
+                assert false : "Should never be reached";
+            }
+        } finally {
+            issue.setBusy(false);
         }
-        issue.setBusy(false);
     }
 
     @Override
@@ -471,28 +502,51 @@ public class MantisIssueController extends BugtrackingController implements Prop
             panel.addNoteEditorPane.setText("");
             issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
                 public void run() {
-                    issue.addComment(comment, viewState);
+                    try {
+                        issue.addComment(comment, viewState);
+                    } catch (Exception ex) {
+                        NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                                "Failed to comment to issue");
+                        DialogDisplayer.getDefault().notifyLater(nd);
+                    }
                 }
             });
         } else if ("selectProject".equals(e.getActionCommand())) {
-            AccountData oldAssigned = (AccountData) assignedModel.getSelectedItem();
-            List<String> categories = new ArrayList<String>();
-            List<AccountData> users = new ArrayList<AccountData>();
-            ProjectData p = (ProjectData) panel.projectComboBox.getSelectedItem();
-            if (p != null) {
-                MantisRepository mr = issue.getMantisRepository();
-                categories.add(null);
-                categories.addAll(Arrays.asList(mr.getCategories(p.getId())));
-                users.add(null);
-                users.addAll(Arrays.asList(mr.getUsers(p.getId())));
+            try {
+                List<String> categories = new ArrayList<String>();
+                List<AccountData> users = new ArrayList<AccountData>();
+                ProjectData p = (ProjectData) panel.projectComboBox.getSelectedItem();
+                if (p != null) {
+                    MantisRepository mr = issue.getMantisRepository();
+                    categories.add(null);
+                    categories.addAll(Arrays.asList(mr.getCategories(p.getId())));
+                    users.add(null);
+                    users.addAll(Arrays.asList(mr.getUsers(p.getId())));
+                }
+                categoriesModel.setBackingList(categories);
+                assignedModel.setBackingList(users);
+            } catch (Exception ex) {
+                if (ex instanceof RemoteException || ex instanceof ServiceException) {
+                    NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                            "Failed to create/add issue");
+                    DialogDisplayer.getDefault().notifyLater(nd);
+                } else if (ex instanceof RuntimeException) {
+                    throw (RuntimeException) ex;
+                } else {
+                    assert false : "Should never be reached";
+                }
             }
-            categoriesModel.setBackingList(categories);
-            assignedModel.setBackingList(users);
         } else if ("refreshIssue".equals(e.getActionCommand())) {
             if (issue.getId() != null) {
                 issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
                     public void run() {
-                        issue.refresh();
+                        try {
+                            issue.refresh();
+                        } catch (Exception ex) {
+                            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                                    "Failed to refresh issue");
+                            DialogDisplayer.getDefault().notifyLater(nd);
+                        }
                     }
                 });
             }
@@ -516,7 +570,13 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
                     @Override
                     public void run() {
-                        issue.addFile(fileChooser.getSelectedFile(), null);
+                        try {
+                            issue.addFile(fileChooser.getSelectedFile(), null);
+                        } catch (Exception ex) {
+                            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                                    "Failed to add file to issue");
+                            DialogDisplayer.getDefault().notifyLater(nd);
+                        }
                     }
                 });
             }

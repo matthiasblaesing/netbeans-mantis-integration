@@ -3,12 +3,19 @@ package eu.doppel_helix.netbeans.mantisintegration.issue;
 import biz.futureware.mantisconnect.TagData;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.xml.rpc.ServiceException;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.util.Exceptions;
 
 public class AddTagDialog extends javax.swing.JDialog implements ActionListener {
-
+    private final static Logger logger = Logger.getLogger(AddTagDialog.class.getName());
     private MantisIssue issue;
 
     public AddTagDialog(java.awt.Frame parent, final MantisIssue issue) {
@@ -17,8 +24,16 @@ public class AddTagDialog extends javax.swing.JDialog implements ActionListener 
         initComponents();
         this.issue = issue;
         DefaultComboBoxModel<String> types = new DefaultComboBoxModel<String>();
-        for(TagData tag: issue.getMantisRepository().getTags()) {
-            types.addElement(tag.getName());
+        try {
+            for(TagData tag: issue.getMantisRepository().getTags()) {
+                types.addElement(tag.getName());
+            }
+        } catch (ServiceException ex) {
+            // Log on Level Info => don't force display, as situation is not fatal
+            // though it will surely get fatal ...
+            logger.log(Level.INFO, "Failed to retrieve taglist", ex);
+        } catch (RemoteException ex) {
+            logger.log(Level.INFO, "Failed to retrieve taglist", ex);
         }
         tagsComboBox.setModel(types);
         tagsComboBox.setSelectedItem("");
@@ -44,7 +59,13 @@ public class AddTagDialog extends javax.swing.JDialog implements ActionListener 
                 }
                 issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
                     public void run() {
-                        issue.addTag(tags.toArray(new String[0]));
+                        try {
+                            issue.addTag(tags.toArray(new String[0]));
+                        } catch (Exception ex) {
+                            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                                    "Failed to add tag to issue");
+                            DialogDisplayer.getDefault().notifyLater(nd);
+                        }
                     }
                 });
             }

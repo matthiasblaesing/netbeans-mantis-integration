@@ -8,6 +8,7 @@ import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.math.BigInteger;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.SwingUtilities;
+import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.QueryController;
 
 public class MantisQuery {
@@ -70,7 +72,7 @@ public class MantisQuery {
         matchingIds.clear();
     }
 
-    public Collection<MantisIssue> getIssues() {
+    public Collection<MantisIssue> getIssues() throws ServiceException, RemoteException {
         return Arrays.asList(
                 mr.getIssues(matchingIds.toArray(new String[matchingIds.size()])));
     }
@@ -79,7 +81,7 @@ public class MantisQuery {
         return matchingIds.contains(id);
     }
 
-    public void refresh() {
+    public void refresh() throws ServiceException, RemoteException {
         setBusy(true);
         matchingIds.clear();
         for (MantisIssue mi : mr.findIssues(this)) {

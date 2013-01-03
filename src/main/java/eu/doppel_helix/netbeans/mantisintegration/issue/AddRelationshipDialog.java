@@ -9,6 +9,8 @@ import java.math.BigInteger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 
 public class AddRelationshipDialog extends javax.swing.JDialog {
     private ActionListener okEnabler = new ActionListener() {
@@ -58,7 +60,13 @@ public class AddRelationshipDialog extends javax.swing.JDialog {
                 }
                 issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
                     public void run() {
-                        issue.addRelationship((ObjectRef) typeComboBox.getSelectedItem(), new BigInteger(idTextField.getText()));
+                        try {
+                            issue.addRelationship((ObjectRef) typeComboBox.getSelectedItem(), new BigInteger(idTextField.getText()));
+                        } catch (Exception ex) {
+                            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                                    "Failed add relationship to issue");
+                            DialogDisplayer.getDefault().notifyLater(nd);
+                        }
                     }
                 });
                 AddRelationshipDialog.this.dispose();

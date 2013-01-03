@@ -11,15 +11,19 @@ import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
+import org.openide.util.Exceptions;
 
 public class MantisIssue {
     private final static Logger logger = Logger.getLogger(MantisIssue.class.getName());
@@ -95,7 +99,7 @@ public class MantisIssue {
         return result.toArray(new String[result.size()]);
     }
 
-    public boolean refresh() {
+    public boolean refresh() throws ServiceException, RemoteException {
         setBusy(true);
         boolean result = mr.updateIssueFromRepository(MantisIssue.this);
         setBusy(false);
@@ -150,13 +154,13 @@ public class MantisIssue {
         return BigInteger.valueOf(80).compareTo(issueData.getStatus().getId()) <= 0;
     }
 
-    public void attachPatch(File file, String description) {
+    public void attachPatch(File file, String description) throws ServiceException, RemoteException, IOException {
         setBusy(true);
         mr.addFile(this, file, description);
         setBusy(false);
     }
 
-    public void addComment(String comment, boolean closeAsFixed) {
+    public void addComment(String comment, boolean closeAsFixed) throws ServiceException, RemoteException {
         setBusy(true);
         mr.checkin(this, comment, closeAsFixed);
         setBusy(false);
@@ -170,47 +174,47 @@ public class MantisIssue {
         return this.issueData;
     }
 
-    public void removeRelationship(RelationshipData rd) {
+    public void removeRelationship(RelationshipData rd) throws ServiceException, RemoteException {
         setBusy(true);
         mr.removeRelationship(this, rd);
         setBusy(false);
     }
 
-    public void removeFile(AttachmentData ad) {
+    public void removeFile(AttachmentData ad) throws ServiceException, RemoteException {
         setBusy(true);
         mr.removeFile(this, ad);
         setBusy(false);
     }
 
-    public byte[] getFile(AttachmentData ad) {
+    public byte[] getFile(AttachmentData ad) throws ServiceException, RemoteException {
         return mr.getFile(this, ad);
     }
 
-    public void addFile(File f, String comment) {
+    public void addFile(File f, String comment) throws ServiceException, RemoteException, IOException {
         setBusy(true);
         mr.addFile(this, f, comment);
         setBusy(false);
     }
 
-    public void addComment(String comment, ObjectRef viewState) {
+    public void addComment(String comment, ObjectRef viewState) throws ServiceException, RemoteException {
         setBusy(true);
         mr.addComment(this, comment, viewState);
         setBusy(false);
     }
 
-    public void addRelationship(ObjectRef type, BigInteger target) {
+    public void addRelationship(ObjectRef type, BigInteger target) throws ServiceException, RemoteException {
         setBusy(true);
         mr.addRelationship(this, type, target);
         setBusy(false);
     }
 
-    public void addTag(String... tagString) {
+    public void addTag(String... tagString) throws ServiceException, RemoteException {
         setBusy(true);
         mr.addTag(this, tagString);
         setBusy(false);
     }
 
-    public void removeTag(ObjectRef... tag) {
+    public void removeTag(ObjectRef... tag) throws ServiceException, RemoteException {
         setBusy(true);
         mr.removeTag(this, tag);
         setBusy(false);
@@ -231,7 +235,13 @@ public class MantisIssue {
      */
     public boolean canUpdate() {
         if(canUpdate == null) {
-            BigInteger userAccessLevel = mr.getAccount().getAccess_level();
+            BigInteger userAccessLevel;
+            try {
+                userAccessLevel = mr.getAccount().getAccess_level();
+            } catch (Exception ex) {
+                logger.log(Level.INFO, "Failed to retrieve account data", ex);
+                return false;
+            }
             // 40 is the access level for "updater"
             BigInteger requiredAccesslevel = BigInteger.valueOf(40);
             if(userAccessLevel.compareTo(requiredAccesslevel) >= 0) {

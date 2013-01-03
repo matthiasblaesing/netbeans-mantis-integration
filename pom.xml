@@ -138,6 +138,11 @@
             <artifactId>axis-wsdl4j</artifactId>
             <version>1.5.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-dialogs</artifactId>
+            <version>RELEASE721</version>
+        </dependency>
     </dependencies>
 
     <build>
