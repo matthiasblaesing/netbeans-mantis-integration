@@ -1,0 +1,224 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>eu.doppel_helix.netbeans</groupId>
+    <artifactId>MantisIntegration</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>nbm</packaging>
+
+    <name>MantisIntegration</name>
+
+    <developers>
+        <developer>
+            <name>Matthias Bläsing</name>
+            <id>mb</id>
+            <email>mblaesing@doppel-helix.eu</email>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <netbeans.run.params.ide/>
+        <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
+    </properties>
+
+    <repositories>
+        <!--
+        Repository hosting NetBeans modules, especially APIs.
+        Versions are based on IDE releases, e.g.: RELEASE691
+        To create your own repository, use: nbm:populate-repository
+        -->
+        <repository>
+            <id>netbeans</id>
+            <name>NetBeans</name>
+            <url>http://bits.netbeans.org/maven2/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>netbeans-snapshot</id>
+            <name>NetBeans Snapshots</name>
+            <url>http://bits.netbeans.org/netbeans/trunk/maven-snapshot/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-bugtracking</artifactId>
+            <version>RELEASE721</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util-lookup</artifactId>
+            <version>RELEASE721</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+            <version>RELEASE721</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-awt</artifactId>
+            <version>RELEASE721</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-windows</artifactId>
+            <version>RELEASE721</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-libs-swingx</artifactId>
+            <version>RELEASE721</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-nodes</artifactId>
+            <version>RELEASE721</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>twelvemonkeys-imageio-ico</artifactId>
+            <version>2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-modules</artifactId>
+            <version>RELEASE72</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-websvc-jaxws21</artifactId>
+            <version>RELEASE721</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-xml-jaxb</artifactId>
+            <version>RELEASE721</version>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-jaxrpc</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-libs-commons_logging</artifactId>
+            <version>RELEASE701</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wsdl4j</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>axistools-maven-plugin</artifactId>
+                <version>1.4</version>
+                <configuration>
+                    <serverSide>false</serverSide>
+                    <namespaceToPackage>true</namespaceToPackage>
+                    <outputDirectory>${project.build.directory}/generated-sources/axistools</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <version>3.8.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <verifyRuntime>warn</verifyRuntime>
+                    <moduleDependencies>
+                        <dependency>
+                            <id>org.netbeans.modules:org-netbeans-libs-swingx</id>
+                            <type>impl</type>
+                            <explicitValue>org.netbeans.libs.swingx/1 = 201210100934</explicitValue>
+                        </dependency>
+                        <dependency>
+                            <id>org.netbeans.modules:org-netbeans-modules-bugtracking</id>
+                            <type>impl</type>
+                            <explicitValue>org.netbeans.modules.bugtracking = 201210100934</explicitValue>
+                        </dependency>
+                        <dependency>
+                            <id>org.netbeans.modules:org-netbeans-libs-commons_logging</id>
+                            <type>impl</type>
+                            <explicitValue>org.apache.commons.logging = 1.1.0</explicitValue>
+                        </dependency>
+                        <dependency>
+                            <id>org.netbeans.api:org-netbeans-modules-xml-jaxb-api</id>
+                            <type>impl</type>
+                        </dependency>
+                        <dependency>
+                            <id>org.netbeans.modules:org-netbeans-modules-websvc-jaxws21</id>
+                            <type>impl</type>
+                            <explicitValue>org.netbeans.modules.websvc.jaxws21/1 = 201210100934</explicitValue>
+                        </dependency>
+                    </moduleDependencies>
+                    <licenseName>Apache License, Version 2.0 (+additional Information)</licenseName>
+                    <licenseFile>src/main/nbm/license.txt</licenseFile>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <!-- NetBeans 6.9+ requires JDK 6 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <!-- to have the jar plugin pickup the nbm generated manifest -->
+                    <useDefaultManifestFile>true</useDefaultManifestFile>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <description>Integrate the Mantis bugtracker system into netbeans</description>
+</project>
