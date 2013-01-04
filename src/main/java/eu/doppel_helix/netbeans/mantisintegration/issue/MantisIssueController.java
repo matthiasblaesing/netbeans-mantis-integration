@@ -112,6 +112,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 projectModel.setBackingList(projects);
                 viewstatesModel.setBackingList(viewStates);
                 viewstatesModel2.setBackingList(viewStates);
+                viewstatesModel2.setSelectedItem(viewStates.get(0));
                 severitiesModel.setBackingList(severities);
                 reproducibilitiesModel.setBackingList(reproducibilities);
                 prioritiesModel.setBackingList(priorities);
