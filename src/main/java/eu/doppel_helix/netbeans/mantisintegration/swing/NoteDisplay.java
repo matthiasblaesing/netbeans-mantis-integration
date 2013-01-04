@@ -6,10 +6,12 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import javax.swing.text.DefaultCaret;
 
 public class NoteDisplay extends javax.swing.JPanel {
+    private final static BigInteger privateVal = BigInteger.valueOf(50);
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     private IssueNoteData noteData;
     private LayoutManager layout = new LayoutManager() {
@@ -56,6 +58,7 @@ public class NoteDisplay extends javax.swing.JPanel {
             double height = reporterLabel.getMinimumSize().getHeight();
             height += submitDateLabel.getMinimumSize().getHeight();
             height += editDateLabel.getMinimumSize().getHeight();
+            height += privateLabel.getMinimumSize().getHeight();
             height += 20; // Somewhere my calculation is off
             return (int) height;
         }
@@ -64,6 +67,7 @@ public class NoteDisplay extends javax.swing.JPanel {
             double height = reporterLabel.getPreferredSize().getHeight();
             height += submitDateLabel.getPreferredSize().getHeight();
             height += editDateLabel.getPreferredSize().getHeight();
+            height += privateLabel.getPreferredSize().getHeight();
             height += 20; // Somewhere my calculation is off
             return (int) height;
         }
@@ -90,6 +94,11 @@ public class NoteDisplay extends javax.swing.JPanel {
             editDateLabel.setVisible(false);
             editDateLabel.setText("");
         }
+        if(privateVal.equals(noteData.getView_state().getId())) {
+            privateLabel.setText("[private]");
+        } else {
+            privateLabel.setText("");
+        }
         DefaultCaret dc = (DefaultCaret) noteTextPane.getCaret();
         dc.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         noteTextPane.setText(noteData.getText());
@@ -109,6 +118,7 @@ public class NoteDisplay extends javax.swing.JPanel {
         reporterLabel = new javax.swing.JLabel();
         submitDateLabel = new javax.swing.JLabel();
         editDateLabel = new javax.swing.JLabel();
+        privateLabel = new javax.swing.JLabel();
         noteTextPane = new javax.swing.JTextPane();
 
         setAlignmentX(0.0F);
@@ -133,6 +143,10 @@ public class NoteDisplay extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(editDateLabel, org.openide.util.NbBundle.getMessage(NoteDisplay.class, "NoteDisplay.editDateLabel.text")); // NOI18N
         leftPanel.add(editDateLabel);
 
+        privateLabel.setFont(privateLabel.getFont().deriveFont(privateLabel.getFont().getStyle() & ~java.awt.Font.BOLD, privateLabel.getFont().getSize()-1));
+        org.openide.awt.Mnemonics.setLocalizedText(privateLabel, org.openide.util.NbBundle.getMessage(NoteDisplay.class, "NoteDisplay.privateLabel.text")); // NOI18N
+        leftPanel.add(privateLabel);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -152,6 +166,7 @@ public class NoteDisplay extends javax.swing.JPanel {
     private javax.swing.JLabel editDateLabel;
     private javax.swing.JPanel leftPanel;
     private javax.swing.JTextPane noteTextPane;
+    private javax.swing.JLabel privateLabel;
     private javax.swing.JLabel reporterLabel;
     private javax.swing.JLabel submitDateLabel;
     // End of variables declaration//GEN-END:variables
