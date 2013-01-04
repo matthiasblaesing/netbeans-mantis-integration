@@ -18,6 +18,10 @@ import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.math.BigInteger;
 import java.util.Map;
@@ -100,14 +104,24 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
                 g2.fillRect((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight());
                 super.paintComponent(g);
             }
+
+            @Override
+            public void setVisible(boolean aFlag) {
+                super.setVisible(aFlag);
+                requestFocus();
+            }
         };
-        waitPanel.setOpaque(false);
         JLabel label = new JLabel("Busy");
         label.setFont(label.getFont().deriveFont(label.getFont().getStyle() & java.awt.Font.BOLD,
                 AffineTransform.getScaleInstance(4, 4)));
         label.setHorizontalAlignment(SwingConstants.CENTER);
         waitPanel.add(label);
+        waitPanel.setFocusable(true);
+        waitPanel.setOpaque(false);
         waitPanel.setVisible(false);
+        // Swallow Mouse + Keyboard events
+        waitPanel.addMouseListener(noopListener);
+        waitPanel.addKeyListener(noopListener);
         this.add(waitPanel, JLayeredPane.MODAL_LAYER);
         setLayout(fullSize);
 //        super.
@@ -619,4 +633,50 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
     javax.swing.JComboBox viewStatusComboBox;
     javax.swing.JLabel viewStatusLabel;
     // End of variables declaration//GEN-END:variables
+
+    // Swallow Mouseevents
+    private static final NoopListener noopListener = new NoopListener();
+            
+    private static class NoopListener implements MouseListener, KeyListener {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            e.consume();
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            e.consume();
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            e.consume();
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            e.consume();
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            e.consume();
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+            e.consume();
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            e.consume();
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            e.consume();
+        }
+    };
 }
