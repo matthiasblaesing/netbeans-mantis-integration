@@ -711,6 +711,7 @@ public class MantisIssuePanel extends javax.swing.JPanel {
         notesOuterPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.notesOuterPanel.border.title"))); // NOI18N
         notesOuterPanel.setLayout(new javax.swing.BoxLayout(notesOuterPanel, javax.swing.BoxLayout.PAGE_AXIS));
 
+        notesPanel.setBackground(new java.awt.Color(255, 255, 255));
         notesPanel.setOpaque(false);
         notesPanel.setLayout(new javax.swing.BoxLayout(notesPanel, javax.swing.BoxLayout.PAGE_AXIS));
         notesOuterPanel.add(notesPanel);

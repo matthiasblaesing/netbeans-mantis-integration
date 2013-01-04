@@ -15,6 +15,7 @@ import eu.doppel_helix.netbeans.mantisintegration.swing.RelationshipDisplay;
 import eu.doppel_helix.netbeans.mantisintegration.swing.TagDisplay;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -380,9 +382,17 @@ public class MantisIssueController extends BugtrackingController implements Prop
             }
             if (property == null || "notes".equals(property)) {
                 panel.notesPanel.removeAll();
+                Dimension fixedDim = new Dimension(1, 5);
                 if (issue.getNotes() != null) {
+                    boolean first = true;
                     for (IssueNoteData ind : issue.getNotes()) {
+                        if (!first) {
+                            panel.notesPanel.add(new Box.Filler(fixedDim, fixedDim, fixedDim));
+                        }
                         panel.notesPanel.add(new NoteDisplay(ind));
+                        if (first) {
+                            first = false;
+                        }
                     }
                 }
             }

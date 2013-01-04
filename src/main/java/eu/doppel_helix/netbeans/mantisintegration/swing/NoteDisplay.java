@@ -51,7 +51,7 @@ public class NoteDisplay extends javax.swing.JPanel {
         @Override
         public void layoutContainer(Container parent) {
             leftPanel.setBounds(0, 0, 200, parent.getHeight());
-            noteTextPane.setBounds(200, 0, parent.getWidth() - 200, parent.getHeight());
+            noteTextPane.setBounds(202, 0, parent.getWidth() - 202, parent.getHeight());
         }
         
         private int getMinimumHeight() {
@@ -121,6 +121,7 @@ public class NoteDisplay extends javax.swing.JPanel {
         privateLabel = new javax.swing.JLabel();
         noteTextPane = new javax.swing.JTextPane();
 
+        setBackground(new java.awt.Color(255, 255, 255));
         setAlignmentX(0.0F);
         setOpaque(false);
         setLayout(new java.awt.GridBagLayout());
@@ -156,6 +157,7 @@ public class NoteDisplay extends javax.swing.JPanel {
         add(leftPanel, gridBagConstraints);
 
         noteTextPane.setEditable(false);
+        noteTextPane.setBackground(leftPanel.getBackground());
         noteTextPane.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
