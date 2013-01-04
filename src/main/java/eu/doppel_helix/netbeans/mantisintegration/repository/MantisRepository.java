@@ -99,6 +99,27 @@ public class MantisRepository {
     private HashMap<BigInteger, FilterData[]> filters = new HashMap<BigInteger, FilterData[]>();
     private UserData account = null;
 
+    public static Version checkConnection(String url, String username, String password) throws ServiceException, RemoteException {
+        String baseUrl = cleanUpUrl(url);
+
+        if (!baseUrl.endsWith("/api/soap/mantisconnect.php")) {
+            baseUrl += "/api/soap/mantisconnect.php";
+        }
+
+        MantisConnectLocator mcl = new MantisConnectLocator(
+                baseUrl + "?wsdl",
+                new QName("http://futureware.biz/mantisconnect", "MantisConnect"));
+        try {
+            MantisConnectPortType mcpt = mcl.getMantisConnectPort(new URL(baseUrl));
+            // Test Authentication information
+            mcpt.mc_login(username, password);
+            // Return version for user information
+            return new Version(mcpt.mc_version());
+        } catch (MalformedURLException ex) {
+            throw new ServiceException("Broken client url:" + baseUrl, ex);
+        }
+    }
+    
     public MantisRepository() {
         info = new RepositoryInfo(
                 MantisConnector.ID + System.currentTimeMillis(),
@@ -307,6 +328,10 @@ public class MantisRepository {
 
     protected String getBaseUrl() {
         String baseUrl = info.getUrl();
+        return cleanUpUrl(baseUrl);
+    }
+
+    private static String cleanUpUrl(String baseUrl) {
         if (baseUrl.endsWith("/api/soap/mantisconnect.php")) {
             baseUrl = baseUrl.replaceAll("/api/soap/mantisconnect.php$", "");
         }
@@ -315,7 +340,7 @@ public class MantisRepository {
         }
         return baseUrl;
     }
-
+    
     private void updateIcon() throws IOException {
         if (!iconLoaded) {
             URL url = new URL(getBaseUrl() + "/images/favicon.ico");
@@ -352,15 +377,15 @@ public class MantisRepository {
     
     protected MantisConnectPortType getClient() throws ServiceException {
         if (client == null) {
-                String baseUrl = getBaseUrl();
+            String baseUrl = getBaseUrl();
 
-                if (!baseUrl.endsWith("/api/soap/mantisconnect.php")) {
-                    baseUrl += "/api/soap/mantisconnect.php";
-                }
-                
-                MantisConnectLocator mcl = new MantisConnectLocator(
-                        baseUrl + "?wsdl",
-                        new QName("http://futureware.biz/mantisconnect", "MantisConnect"));
+            if (!baseUrl.endsWith("/api/soap/mantisconnect.php")) {
+                baseUrl += "/api/soap/mantisconnect.php";
+            }
+
+            MantisConnectLocator mcl = new MantisConnectLocator(
+                    baseUrl + "?wsdl",
+                    new QName("http://futureware.biz/mantisconnect", "MantisConnect"));
             try {
                 client = mcl.getMantisConnectPort(new URL(baseUrl));
             } catch (MalformedURLException ex) {

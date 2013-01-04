@@ -27,6 +27,8 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
         urlTextField = new javax.swing.JTextField();
         usernameTextField = new javax.swing.JTextField();
         passwordTextField = new javax.swing.JTextField();
+        checkResult = new javax.swing.JLabel();
+        checkButton = new javax.swing.JButton();
 
         nameLabel.setText("Name:");
 
@@ -38,23 +40,30 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
 
         urlTextField.setText("http://");
 
+        checkResult.setFont(checkResult.getFont().deriveFont(checkResult.getFont().getStyle() & ~java.awt.Font.BOLD));
+
+        checkButton.setText("Check");
+        checkButton.setEnabled(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(urlLabel)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(urlLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(nameLabel)
                     .addComponent(usernameLabel)
-                    .addComponent(passwordLabel))
+                    .addComponent(passwordLabel)
+                    .addComponent(checkButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(urlTextField)
                     .addComponent(usernameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
                     .addComponent(passwordTextField)
-                    .addComponent(nameTextField))
+                    .addComponent(nameTextField)
+                    .addComponent(checkResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -76,11 +85,17 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(passwordLabel)
                     .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(checkButton)
+                    .addComponent(checkResult))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    javax.swing.JButton checkButton;
+    javax.swing.JLabel checkResult;
     javax.swing.JLabel nameLabel;
     javax.swing.JTextField nameTextField;
     javax.swing.JLabel passwordLabel;

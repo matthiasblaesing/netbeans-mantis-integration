@@ -2,20 +2,31 @@
 package eu.doppel_helix.netbeans.mantisintegration.repository;
 
 import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
+import eu.doppel_helix.netbeans.mantisintegration.entity.Version;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.RepositoryController;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
 
-public class MantisRepositoryController implements RepositoryController, DocumentListener {
+public class MantisRepositoryController implements RepositoryController, DocumentListener, ChangeListener, ActionListener {
+    private final static Logger logger = Logger.getLogger(MantisRepositoryController.class.getName());
+    private final static String COMMAND_CHECKCONNECTION = "checkConnection";
     private final MantisRepository repository;
     private MantisRepositoryPanel panel;
     private final List<String> errorMessages = new ArrayList<String>();
@@ -33,6 +44,9 @@ public class MantisRepositoryController implements RepositoryController, Documen
             panel.urlTextField.getDocument().addDocumentListener(this);
             panel.usernameTextField.getDocument().addDocumentListener(this);
             panel.passwordTextField.getDocument().addDocumentListener(this);
+            cs.addChangeListener(this);
+            panel.checkButton.addActionListener(this);
+            panel.checkButton.setActionCommand(COMMAND_CHECKCONNECTION);
             populate();
         }
         return panel;
@@ -91,7 +105,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
         }
         return message.toString();
     }
-
+    
     @Override
     public void applyChanges() throws IOException {
         String name = panel.nameTextField.getText();
@@ -110,7 +124,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
         ri = new RepositoryInfo(id, MantisConnector.ID, url, name, "", username, "", password.toCharArray(), "".toCharArray());
         repository.setInfo(ri);
     }
-
+    
     @Override
     public void addChangeListener(ChangeListener l) {
         cs.addChangeListener(l);
@@ -134,6 +148,37 @@ public class MantisRepositoryController implements RepositoryController, Documen
     @Override
     public void changedUpdate(DocumentEvent e) {
         cs.fireChange();
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        if(isValid()) {
+            panel.checkButton.setEnabled(true);
+        } else {
+            panel.checkButton.setEnabled(false);
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (COMMAND_CHECKCONNECTION.equals(e.getActionCommand())) {
+            try {
+                Version v = MantisRepository.checkConnection(
+                        panel.urlTextField.getText(),
+                        panel.usernameTextField.getText(),
+                        panel.passwordTextField.getText());
+                panel.checkResult.setText("Successfully connected (version: " + v.getVersionString() + ")");
+                panel.checkResult.setForeground(Color.GREEN);
+            } catch (ServiceException ex) {
+                logger.log(Level.INFO, "", ex);
+                panel.checkResult.setText("Failed create client - check URL");
+                panel.checkResult.setForeground(Color.RED);
+            } catch (RemoteException ex) {
+                logger.log(Level.INFO, "", ex);
+                panel.checkResult.setText("Failed request - check username/password");
+                panel.checkResult.setForeground(Color.RED);
+            }
+        }
     }
     
 }

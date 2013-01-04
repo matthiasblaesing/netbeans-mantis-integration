@@ -25,6 +25,10 @@ public class Version implements Comparable<Version> {
             }
         }
     }
+
+    public String getVersionString() {
+        return versionString;
+    }
     
     public List<Integer> getVersionParts() {
         return Collections.unmodifiableList(levels);
