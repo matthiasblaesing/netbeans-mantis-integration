@@ -29,9 +29,9 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="urlTextField" max="32767" attributes="0"/>
                   <Component id="usernameTextField" pref="290" max="32767" attributes="0"/>
-                  <Component id="passwordTextField" max="32767" attributes="0"/>
                   <Component id="nameTextField" alignment="0" max="32767" attributes="0"/>
                   <Component id="checkResult" alignment="0" max="32767" attributes="0"/>
+                  <Component id="passwordTextField" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -92,15 +92,22 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="nameTextField">
+      <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="selectAllOnFocusGain"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="urlTextField">
       <Properties>
         <Property name="text" type="java.lang.String" value="http://"/>
       </Properties>
+      <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="selectAllOnFocusGain"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="usernameTextField">
-    </Component>
-    <Component class="javax.swing.JTextField" name="passwordTextField">
+      <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="selectAllOnFocusGain"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="checkResult">
       <Properties>
@@ -116,6 +123,14 @@
         <Property name="text" type="java.lang.String" value="Check"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JPasswordField" name="passwordTextField">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jPasswordField1"/>
+      </Properties>
+      <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="selectAllOnFocusGain"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

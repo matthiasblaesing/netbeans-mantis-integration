@@ -1,5 +1,7 @@
-
 package eu.doppel_helix.netbeans.mantisintegration.repository;
+
+import java.awt.TextComponent;
+import javax.swing.text.JTextComponent;
 
 public class MantisRepositoryPanel extends javax.swing.JPanel {
 
@@ -26,9 +28,9 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
         nameTextField = new javax.swing.JTextField();
         urlTextField = new javax.swing.JTextField();
         usernameTextField = new javax.swing.JTextField();
-        passwordTextField = new javax.swing.JTextField();
         checkResult = new javax.swing.JLabel();
         checkButton = new javax.swing.JButton();
+        passwordTextField = new javax.swing.JPasswordField();
 
         nameLabel.setText("Name:");
 
@@ -38,12 +40,36 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
 
         passwordLabel.setText("Password:");
 
+        nameTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                selectAllOnFocusGain(evt);
+            }
+        });
+
         urlTextField.setText("http://");
+        urlTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                selectAllOnFocusGain(evt);
+            }
+        });
+
+        usernameTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                selectAllOnFocusGain(evt);
+            }
+        });
 
         checkResult.setFont(checkResult.getFont().deriveFont(checkResult.getFont().getStyle() & ~java.awt.Font.BOLD));
 
         checkButton.setText("Check");
         checkButton.setEnabled(false);
+
+        passwordTextField.setText("jPasswordField1");
+        passwordTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                selectAllOnFocusGain(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -61,9 +87,9 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(urlTextField)
                     .addComponent(usernameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
-                    .addComponent(passwordTextField)
                     .addComponent(nameTextField)
-                    .addComponent(checkResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(checkResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(passwordTextField))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -93,13 +119,20 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void selectAllOnFocusGain(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_selectAllOnFocusGain
+        if (evt.getComponent() instanceof JTextComponent) {
+            ((JTextComponent) evt.getComponent()).selectAll();
+        } else if (evt.getComponent() instanceof TextComponent) {
+            ((TextComponent) evt.getComponent()).selectAll();
+        }
+    }//GEN-LAST:event_selectAllOnFocusGain
     // Variables declaration - do not modify//GEN-BEGIN:variables
     javax.swing.JButton checkButton;
     javax.swing.JLabel checkResult;
     javax.swing.JLabel nameLabel;
     javax.swing.JTextField nameTextField;
     javax.swing.JLabel passwordLabel;
-    javax.swing.JTextField passwordTextField;
+    javax.swing.JPasswordField passwordTextField;
     javax.swing.JLabel urlLabel;
     javax.swing.JTextField urlTextField;
     javax.swing.JLabel usernameLabel;
