@@ -162,6 +162,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
             panel.projectComboBox.addActionListener(stateMonitor);
             panel.descriptionEditorPane.getDocument().addDocumentListener(stateMonitor);
             panel.summaryTextField.getDocument().addDocumentListener(stateMonitor);
+            panel.waitPanel.setVisible(issue.isBusy());
             updateInfo(null);
         }
         return panel;
@@ -491,10 +492,14 @@ public class MantisIssueController extends BugtrackingController implements Prop
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         String propertyName = evt.getPropertyName();
-        if (IssueProvider.EVENT_ISSUE_REFRESHED.equals(propertyName)) {
-            propertyName = null;
+        if ("busy".equals(propertyName) && panel != null) {
+            panel.waitPanel.setVisible((Boolean) evt.getNewValue());
+        } else {
+            if (IssueProvider.EVENT_ISSUE_REFRESHED.equals(propertyName)) {
+                propertyName = null;
+            }
+            updateInfo(propertyName);
         }
-        updateInfo(propertyName);
     }
 
     @Override

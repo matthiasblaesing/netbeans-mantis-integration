@@ -5,28 +5,69 @@ import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.Mantis;
 import eu.doppel_helix.netbeans.mantisintegration.swing.AccountDataListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.DelegatingBaseLineJPanel;
+import eu.doppel_helix.netbeans.mantisintegration.swing.FullSizeLayout;
+import eu.doppel_helix.netbeans.mantisintegration.swing.NoopListener;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ObjectRefListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ProjectListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.StringNullSaveListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.VerticalScrollPane;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.math.BigInteger;
 import java.util.Map;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
-public class MantisIssuePanel extends javax.swing.JPanel {
+public class MantisIssuePanel extends javax.swing.JLayeredPane {
 
     private Map<BigInteger, Color> colorMap = Mantis.getInstance().getStatusColorMap();
-
+    private NoopListener noopListener = new NoopListener();
+    JPanel waitPanel;
+    
     public MantisIssuePanel() {
         initComponents();
         scrollablePane.getVerticalScrollBar().setUnitIncrement(20);
+        waitPanel = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(new Color(0.5f, 0.5f, 0.5f, 0.5f));
+                Rectangle r = getBounds();
+                g2.fillRect((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight());
+                super.paintComponent(g);
+            }
+
+            @Override
+            public void setVisible(boolean aFlag) {
+                super.setVisible(aFlag);
+                requestFocus();
+            }
+        };
+        JLabel label = new JLabel("Busy");
+        label.setFont(label.getFont().deriveFont(label.getFont().getStyle() & java.awt.Font.BOLD,
+                AffineTransform.getScaleInstance(4, 4)));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        waitPanel.add(label);
+        waitPanel.setFocusable(true);
+        waitPanel.setOpaque(false);
+        waitPanel.setVisible(false);
+        // Swallow Mouse + Keyboard events
+        waitPanel.addMouseListener(noopListener);
+        waitPanel.addKeyListener(noopListener);
+        this.setLayout(new FullSizeLayout());
+        this.add(waitPanel, JLayeredPane.MODAL_LAYER);
     }
 
     /**

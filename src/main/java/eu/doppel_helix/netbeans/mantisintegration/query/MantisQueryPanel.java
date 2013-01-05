@@ -4,24 +4,19 @@ import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.Mantis;
 import eu.doppel_helix.netbeans.mantisintegration.swing.AccountDataListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.FilterDataListCellRenderer;
+import eu.doppel_helix.netbeans.mantisintegration.swing.FullSizeLayout;
+import eu.doppel_helix.netbeans.mantisintegration.swing.NoopListener;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ObjectRefListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ProjectListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.StringNullSaveListCellRenderer;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.math.BigInteger;
 import java.util.Map;
@@ -33,67 +28,9 @@ import javax.swing.SwingConstants;
 public class MantisQueryPanel extends javax.swing.JPanel {
 
     private Map<BigInteger, Color> colorMap = Mantis.getInstance().getStatusColorMap();
+    // Swallow Mouseevents
+    private static final NoopListener noopListener = new NoopListener();
     JPanel waitPanel;
-    private LayoutManager fullSize = new LayoutManager() {
-        @Override
-        public void addLayoutComponent(String name, Component comp) {
-        }
-
-        @Override
-        public void removeLayoutComponent(Component comp) {
-        }
-
-        @Override
-        public Dimension preferredLayoutSize(Container parent) {
-            synchronized (parent.getTreeLock()) {
-                JLayeredPane pane = (JLayeredPane) parent;
-                int maxX = 0;
-                int maxY = 0;
-                for (Component c : pane.getComponents()) {
-                    Dimension d = c.getPreferredSize();
-                    if (d.getHeight() > maxY) {
-                        maxY = (int) d.getHeight();
-                    }
-                    if (d.getWidth() > maxX) {
-                        maxX = (int) d.getWidth();
-                    }
-                }
-                return new Dimension(maxX, maxY);
-            }
-        }
-
-        @Override
-        public Dimension minimumLayoutSize(Container parent) {
-            synchronized (parent.getTreeLock()) {
-                JLayeredPane pane = (JLayeredPane) parent;
-                int maxX = 0;
-                int maxY = 0;
-                for (Component c : pane.getComponents()) {
-                    Dimension d = c.getMinimumSize();
-                    if (d.getHeight() > maxY) {
-                        maxY = (int) d.getHeight();
-                    }
-                    if (d.getWidth() > maxX) {
-                        maxX = (int) d.getWidth();
-                    }
-                }
-                return new Dimension(maxX, maxY);
-            }
-        }
-
-        @Override
-        public void layoutContainer(Container parent) {
-            synchronized (parent.getTreeLock()) {
-                Rectangle innerBounds = parent.getBounds();
-                innerBounds.setLocation(0, 0);
-                JLayeredPane pane = (JLayeredPane) parent;
-                for (Component c : pane.getComponents()) {
-                    c.setBounds(innerBounds);
-                    c.doLayout();
-                }
-            }
-        }
-    };
 
     public MantisQueryPanel() {
         initComponents();
@@ -125,7 +62,7 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         waitPanel.addMouseListener(noopListener);
         waitPanel.addKeyListener(noopListener);
         innerQuery.add(waitPanel, JLayeredPane.MODAL_LAYER);
-        innerQuery.setLayout(fullSize);
+        innerQuery.setLayout(new FullSizeLayout());
     }
 
     /**
@@ -636,49 +573,4 @@ public class MantisQueryPanel extends javax.swing.JPanel {
     javax.swing.JLabel viewStatusLabel;
     // End of variables declaration//GEN-END:variables
 
-    // Swallow Mouseevents
-    private static final NoopListener noopListener = new NoopListener();
-            
-    private static class NoopListener implements MouseListener, KeyListener {
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            e.consume();
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            e.consume();
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            e.consume();
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            e.consume();
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-            e.consume();
-        }
-
-        @Override
-        public void keyTyped(KeyEvent e) {
-            e.consume();
-        }
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            e.consume();
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-            e.consume();
-        }
-    };
 }
