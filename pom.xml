@@ -125,7 +125,7 @@
             <version>RELEASE721</version>
         </dependency>
         <dependency>
-            <groupId>axis</groupId>
+            <groupId>org.apache.axis</groupId>
             <artifactId>axis-jaxrpc</artifactId>
             <version>1.4</version>
         </dependency>
