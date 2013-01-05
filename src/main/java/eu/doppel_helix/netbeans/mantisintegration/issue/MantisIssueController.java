@@ -172,6 +172,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
         panel.addIssueButton.setVisible(false);
         panel.notesOuterPanel.setVisible(false);
         panel.statusComboBox.setEnabled(false);
+        panel.resolutionComboBox.setEnabled(false);
         panel.headerPanel.setVisible(false);
         panel.relationsLabel.setVisible(false);
         panel.relationsPanel.setVisible(false);
@@ -188,6 +189,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
             if(issue.canUpdate()) {
                 panel.updateIssueButton.setVisible(true);
                 panel.statusComboBox.setEnabled(true);
+                panel.resolutionComboBox.setEnabled(true);
             }
             setUpdateEnabledFields(issue.canUpdate());
             panel.notesOuterPanel.setVisible(true);
@@ -209,8 +211,6 @@ public class MantisIssueController extends BugtrackingController implements Prop
         panel.severityComboBox.setEnabled(enabled);
         panel.reproducibilityComboBox.setEnabled(enabled);
         panel.priorityComboBox.setEnabled(enabled);
-        panel.resolutionComboBox.setEnabled(enabled);
-        panel.statusComboBox.setEnabled(enabled);
         panel.projectionComboBox.setEnabled(enabled);
         panel.etaComboBox.setEnabled(enabled);
         panel.platformTextField.setEditable(enabled);
