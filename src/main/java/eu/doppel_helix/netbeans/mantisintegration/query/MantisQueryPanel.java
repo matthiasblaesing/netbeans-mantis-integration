@@ -30,7 +30,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-public class MantisQueryPanel extends javax.swing.JLayeredPane {
+public class MantisQueryPanel extends javax.swing.JPanel {
 
     private Map<BigInteger, Color> colorMap = Mantis.getInstance().getStatusColorMap();
     JPanel waitPanel;
@@ -84,9 +84,11 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         @Override
         public void layoutContainer(Container parent) {
             synchronized (parent.getTreeLock()) {
+                Rectangle innerBounds = parent.getBounds();
+                innerBounds.setLocation(0, 0);
                 JLayeredPane pane = (JLayeredPane) parent;
                 for (Component c : pane.getComponents()) {
-                    c.setBounds(parent.getBounds());
+                    c.setBounds(innerBounds);
                     c.doLayout();
                 }
             }
@@ -122,9 +124,8 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         // Swallow Mouse + Keyboard events
         waitPanel.addMouseListener(noopListener);
         waitPanel.addKeyListener(noopListener);
-        this.add(waitPanel, JLayeredPane.MODAL_LAYER);
-        setLayout(fullSize);
-//        super.
+        innerQuery.add(waitPanel, JLayeredPane.MODAL_LAYER);
+        innerQuery.setLayout(fullSize);
     }
 
     /**
@@ -137,12 +138,13 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        mainPanel = new javax.swing.JPanel();
         gotoIssuePanel = new javax.swing.JPanel();
         gotoIssueLabel = new javax.swing.JLabel();
         gotoIssueTextField = new javax.swing.JFormattedTextField();
         gotoIssueButton = new javax.swing.JButton();
-        clientsideFilterPanel = new javax.swing.JPanel();
+        innerQuery = new javax.swing.JLayeredPane();
+        mainPanel = new javax.swing.JPanel();
+        filterPanel = new javax.swing.JPanel();
         reporterLabel = new javax.swing.JLabel();
         reporterComboBox = new javax.swing.JComboBox();
         assignedToLabel = new javax.swing.JLabel();
@@ -179,9 +181,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         issueTablePanel = new javax.swing.JPanel();
 
         setBackground(new java.awt.Color(255, 255, 255));
-
-        mainPanel.setOpaque(false);
-        mainPanel.setLayout(new java.awt.GridBagLayout());
+        setLayout(new java.awt.BorderLayout());
 
         java.awt.FlowLayout flowLayout1 = new java.awt.FlowLayout(java.awt.FlowLayout.LEFT);
         flowLayout1.setAlignOnBaseline(true);
@@ -200,14 +200,13 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         org.openide.awt.Mnemonics.setLocalizedText(gotoIssueButton, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.gotoIssueButton.text")); // NOI18N
         gotoIssuePanel.add(gotoIssueButton);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        mainPanel.add(gotoIssuePanel, gridBagConstraints);
+        add(gotoIssuePanel, java.awt.BorderLayout.NORTH);
 
-        clientsideFilterPanel.setBackground(new java.awt.Color(255, 255, 255));
-        clientsideFilterPanel.setLayout(new java.awt.GridBagLayout());
+        mainPanel.setBackground(javax.swing.UIManager.getDefaults().getColor("TextArea.background"));
+        mainPanel.setLayout(new java.awt.GridBagLayout());
+
+        filterPanel.setBackground(new java.awt.Color(255, 255, 255));
+        filterPanel.setLayout(new java.awt.GridBagLayout());
 
         reporterLabel.setFont(reporterLabel.getFont().deriveFont(reporterLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(reporterLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.reporterLabel.text")); // NOI18N
@@ -216,7 +215,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(reporterLabel, gridBagConstraints);
+        filterPanel.add(reporterLabel, gridBagConstraints);
 
         reporterComboBox.setMinimumSize(new java.awt.Dimension(118, 23));
         reporterComboBox.setPreferredSize(new java.awt.Dimension(118, 23));
@@ -229,7 +228,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(reporterComboBox, gridBagConstraints);
+        filterPanel.add(reporterComboBox, gridBagConstraints);
 
         assignedToLabel.setFont(assignedToLabel.getFont().deriveFont(assignedToLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(assignedToLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.assignedToLabel.text")); // NOI18N
@@ -238,7 +237,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(assignedToLabel, gridBagConstraints);
+        filterPanel.add(assignedToLabel, gridBagConstraints);
 
         assignedToComboBox.setMinimumSize(new java.awt.Dimension(118, 23));
         assignedToComboBox.setPreferredSize(new java.awt.Dimension(118, 23));
@@ -251,7 +250,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(assignedToComboBox, gridBagConstraints);
+        filterPanel.add(assignedToComboBox, gridBagConstraints);
 
         categoryLabel.setFont(categoryLabel.getFont().deriveFont(categoryLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(categoryLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.categoryLabel.text")); // NOI18N
@@ -260,7 +259,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(categoryLabel, gridBagConstraints);
+        filterPanel.add(categoryLabel, gridBagConstraints);
 
         categoryComboBox.setMinimumSize(new java.awt.Dimension(118, 23));
         categoryComboBox.setPreferredSize(new java.awt.Dimension(118, 23));
@@ -273,7 +272,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(categoryComboBox, gridBagConstraints);
+        filterPanel.add(categoryComboBox, gridBagConstraints);
 
         severityLabel.setFont(severityLabel.getFont().deriveFont(severityLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(severityLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.severityLabel.text")); // NOI18N
@@ -282,7 +281,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(severityLabel, gridBagConstraints);
+        filterPanel.add(severityLabel, gridBagConstraints);
 
         severityComboBox.setMinimumSize(new java.awt.Dimension(118, 23));
         severityComboBox.setPreferredSize(new java.awt.Dimension(118, 23));
@@ -295,7 +294,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(severityComboBox, gridBagConstraints);
+        filterPanel.add(severityComboBox, gridBagConstraints);
 
         resolutionLabel.setFont(resolutionLabel.getFont().deriveFont(resolutionLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(resolutionLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.resolutionLabel.text")); // NOI18N
@@ -304,7 +303,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(resolutionLabel, gridBagConstraints);
+        filterPanel.add(resolutionLabel, gridBagConstraints);
 
         resolutionComboBox.setMinimumSize(new java.awt.Dimension(118, 23));
         resolutionComboBox.setPreferredSize(new java.awt.Dimension(118, 23));
@@ -317,7 +316,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(resolutionComboBox, gridBagConstraints);
+        filterPanel.add(resolutionComboBox, gridBagConstraints);
 
         statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(statusLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.statusLabel.text")); // NOI18N
@@ -326,7 +325,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(statusLabel, gridBagConstraints);
+        filterPanel.add(statusLabel, gridBagConstraints);
 
         statusComboBox.setMinimumSize(new java.awt.Dimension(118, 23));
         statusComboBox.setPreferredSize(new java.awt.Dimension(118, 23));
@@ -339,7 +338,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(statusComboBox, gridBagConstraints);
+        filterPanel.add(statusComboBox, gridBagConstraints);
         statusComboBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Object value = statusComboBox.getSelectedItem();
@@ -369,7 +368,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(priorityLabel, gridBagConstraints);
+        filterPanel.add(priorityLabel, gridBagConstraints);
 
         priorityComboBox.setMinimumSize(new java.awt.Dimension(118, 23));
         priorityComboBox.setPreferredSize(new java.awt.Dimension(118, 23));
@@ -382,7 +381,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(priorityComboBox, gridBagConstraints);
+        filterPanel.add(priorityComboBox, gridBagConstraints);
 
         viewStatusLabel.setFont(viewStatusLabel.getFont().deriveFont(viewStatusLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(viewStatusLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.viewStatusLabel.text")); // NOI18N
@@ -391,7 +390,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(viewStatusLabel, gridBagConstraints);
+        filterPanel.add(viewStatusLabel, gridBagConstraints);
 
         viewStatusComboBox.setMinimumSize(new java.awt.Dimension(118, 23));
         viewStatusComboBox.setPreferredSize(new java.awt.Dimension(118, 23));
@@ -404,7 +403,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(viewStatusComboBox, gridBagConstraints);
+        filterPanel.add(viewStatusComboBox, gridBagConstraints);
 
         lastUpdateAfterLabel.setFont(lastUpdateAfterLabel.getFont().deriveFont(lastUpdateAfterLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(lastUpdateAfterLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.lastUpdateAfterLabel.text")); // NOI18N
@@ -413,7 +412,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(lastUpdateAfterLabel, gridBagConstraints);
+        filterPanel.add(lastUpdateAfterLabel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 8;
@@ -421,7 +420,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(lastUpdateAfterDatePicker, gridBagConstraints);
+        filterPanel.add(lastUpdateAfterDatePicker, gridBagConstraints);
 
         lastUpdateBeforeLabel.setFont(lastUpdateBeforeLabel.getFont().deriveFont(lastUpdateBeforeLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(lastUpdateBeforeLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.lastUpdateBeforeLabel.text")); // NOI18N
@@ -430,7 +429,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(lastUpdateBeforeLabel, gridBagConstraints);
+        filterPanel.add(lastUpdateBeforeLabel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 8;
@@ -438,7 +437,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(lastUpdateBeforeDatePicker, gridBagConstraints);
+        filterPanel.add(lastUpdateBeforeDatePicker, gridBagConstraints);
 
         summaryLabel.setFont(summaryLabel.getFont().deriveFont(summaryLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(summaryLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.summaryLabel.text")); // NOI18N
@@ -447,7 +446,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 9;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(summaryLabel, gridBagConstraints);
+        filterPanel.add(summaryLabel, gridBagConstraints);
 
         summaryTextField.setText(org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.summaryTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -457,7 +456,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(summaryTextField, gridBagConstraints);
+        filterPanel.add(summaryTextField, gridBagConstraints);
 
         matchTypeLabel.setFont(matchTypeLabel.getFont().deriveFont(matchTypeLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(matchTypeLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.matchTypeLabel.text")); // NOI18N
@@ -466,7 +465,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(matchTypeLabel, gridBagConstraints);
+        filterPanel.add(matchTypeLabel, gridBagConstraints);
 
         matchTypeComboBox.setFont(matchTypeComboBox.getFont().deriveFont(matchTypeComboBox.getFont().getStyle() & ~java.awt.Font.BOLD));
         matchTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All conditions", "Any conditions" }));
@@ -481,7 +480,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(matchTypeComboBox, gridBagConstraints);
+        filterPanel.add(matchTypeComboBox, gridBagConstraints);
 
         projectLabel.setFont(projectLabel.getFont().deriveFont(projectLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(projectLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.projectLabel.text")); // NOI18N
@@ -490,7 +489,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(projectLabel, gridBagConstraints);
+        filterPanel.add(projectLabel, gridBagConstraints);
 
         projectComboBox.setActionCommand(org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.projectComboBox.actionCommand")); // NOI18N
         projectComboBox.setMinimumSize(new java.awt.Dimension(100, 24));
@@ -503,7 +502,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(projectComboBox, gridBagConstraints);
+        filterPanel.add(projectComboBox, gridBagConstraints);
 
         filterComboBox.setActionCommand(org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.filterComboBox.actionCommand")); // NOI18N
         filterComboBox.setMinimumSize(new java.awt.Dimension(100, 24));
@@ -516,7 +515,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(filterComboBox, gridBagConstraints);
+        filterPanel.add(filterComboBox, gridBagConstraints);
 
         filterLabel.setFont(filterLabel.getFont().deriveFont(filterLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(filterLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.filterLabel.text")); // NOI18N
@@ -525,14 +524,14 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(filterLabel, gridBagConstraints);
+        filterPanel.add(filterLabel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(jSeparator1, gridBagConstraints);
+        filterPanel.add(jSeparator1, gridBagConstraints);
 
         jLabel1.setFont(jLabel1.getFont().deriveFont(jLabel1.getFont().getStyle() | java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.jLabel1.text")); // NOI18N
@@ -543,7 +542,7 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(jLabel1, gridBagConstraints);
+        filterPanel.add(jLabel1, gridBagConstraints);
 
         jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getStyle() | java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.jLabel2.text")); // NOI18N
@@ -554,13 +553,11 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        clientsideFilterPanel.add(jLabel2, gridBagConstraints);
+        filterPanel.add(jLabel2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        mainPanel.add(clientsideFilterPanel, gridBagConstraints);
+        mainPanel.add(filterPanel, gridBagConstraints);
 
         buttonsPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
         buttonsPanel.setOpaque(false);
@@ -574,22 +571,26 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_TRAILING;
         mainPanel.add(buttonsPanel, gridBagConstraints);
 
+        issueTablePanel.setMinimumSize(new java.awt.Dimension(20, 20));
         issueTablePanel.setOpaque(false);
+        issueTablePanel.setPreferredSize(new java.awt.Dimension(20, 20));
         issueTablePanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         mainPanel.add(issueTablePanel, gridBagConstraints);
 
-        mainPanel.setBounds(0, 0, 1010, 280);
-        add(mainPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        mainPanel.setBounds(0, 0, 913, 267);
+        innerQuery.add(mainPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        add(innerQuery, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     javax.swing.JComboBox assignedToComboBox;
@@ -597,14 +598,15 @@ public class MantisQueryPanel extends javax.swing.JLayeredPane {
     javax.swing.JPanel buttonsPanel;
     javax.swing.JComboBox categoryComboBox;
     javax.swing.JLabel categoryLabel;
-    javax.swing.JPanel clientsideFilterPanel;
     javax.swing.JButton executeQueryButton;
     javax.swing.JComboBox filterComboBox;
     javax.swing.JLabel filterLabel;
+    javax.swing.JPanel filterPanel;
     javax.swing.JButton gotoIssueButton;
     javax.swing.JLabel gotoIssueLabel;
     javax.swing.JPanel gotoIssuePanel;
     javax.swing.JFormattedTextField gotoIssueTextField;
+    javax.swing.JLayeredPane innerQuery;
     javax.swing.JPanel issueTablePanel;
     javax.swing.JLabel jLabel1;
     javax.swing.JLabel jLabel2;
