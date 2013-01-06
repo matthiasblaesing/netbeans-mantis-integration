@@ -237,5 +237,14 @@
             </plugin>
         </plugins>
     </build>
-    <description>Integrate the Mantis bugtracker system into netbeans</description>
+    <description>&lt;p&gt;Integrate the Mantis bugtracker system into netbeans&lt;/p&gt;
+
+&lt;p&gt;Note for installation - to make the "Add patch" and "Checking" comment
+functions work correctly the mantis system has to configured correctly
+please check these options, if you encounter problems:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;source_control_notes_view_status (default private, integer value 10 -&gt; public)&lt;/li&gt;
+&lt;li&gt;source_control_set_resolution_to (integer value 80-&gt;resolved, 90-&gt;closed)&lt;/li&gt;
+&lt;li&gt;source_control_set_status_to (20-&gt;fixed)&lt;/li&gt;
+&lt;/ul&gt;</description>
 </project>
