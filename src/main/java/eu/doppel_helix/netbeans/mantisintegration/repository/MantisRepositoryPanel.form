@@ -98,7 +98,7 @@
     </Component>
     <Component class="javax.swing.JTextField" name="urlTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="http://"/>
+        <Property name="text" type="java.lang.String" value="http://&lt;host&gt;/&lt;mantis-basepath&gt;"/>
       </Properties>
       <Events>
         <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="selectAllOnFocusGain"/>

@@ -46,7 +46,7 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
             }
         });
 
-        urlTextField.setText("http://");
+        urlTextField.setText("http://<host>/<mantis-basepath>");
         urlTextField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 selectAllOnFocusGain(evt);

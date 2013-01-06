@@ -124,7 +124,7 @@ public class MantisRepository {
         info = new RepositoryInfo(
                 MantisConnector.ID + System.currentTimeMillis(),
                 MantisConnector.ID,
-                "http://",
+                "http://<host>/<mantis-basepath>",
                 "",
                 "");
         ic = new InstanceContent();
