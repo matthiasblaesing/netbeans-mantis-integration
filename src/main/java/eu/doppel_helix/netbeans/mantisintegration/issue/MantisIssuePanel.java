@@ -157,7 +157,6 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 32767));
 
         setBackground(javax.swing.UIManager.getDefaults().getColor("TextArea.background"));
-        setLayout(new java.awt.BorderLayout());
 
         scrollablePane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollablePane.setOpaque(false);
@@ -283,7 +282,6 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         descriptionScrollPane.setPreferredSize(new java.awt.Dimension(10, 100));
 
         descriptionEditorPane.setMinimumSize(new java.awt.Dimension(6, 95));
-        descriptionEditorPane.setPreferredSize(new java.awt.Dimension(6, 95));
         descriptionEditorPane.setScrollableTracksViewportWidth(true);
         descriptionScrollPane.setViewportView(descriptionEditorPane);
 
@@ -302,7 +300,6 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         stepsToReproduceScrollPane.setPreferredSize(new java.awt.Dimension(10, 75));
 
         stepsToReproduceEditorPane.setMinimumSize(new java.awt.Dimension(6, 70));
-        stepsToReproduceEditorPane.setPreferredSize(new java.awt.Dimension(6, 70));
         stepsToReproduceEditorPane.setScrollableTracksViewportWidth(true);
         stepsToReproduceScrollPane.setViewportView(stepsToReproduceEditorPane);
 
@@ -321,7 +318,6 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         additionalInformationScrollPane.setPreferredSize(new java.awt.Dimension(10, 75));
 
         additionalInformationEditorPane.setMinimumSize(new java.awt.Dimension(6, 70));
-        additionalInformationEditorPane.setPreferredSize(new java.awt.Dimension(6, 70));
         additionalInformationEditorPane.setScrollableTracksViewportWidth(true);
         additionalInformationScrollPane.setViewportView(additionalInformationEditorPane);
 
@@ -825,7 +821,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
 
         scrollablePane.setViewportView(innerPanel);
 
-        add(scrollablePane, java.awt.BorderLayout.CENTER);
+        add(scrollablePane, javax.swing.JLayeredPane.DEFAULT_LAYER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     javax.swing.JButton addIssueButton;

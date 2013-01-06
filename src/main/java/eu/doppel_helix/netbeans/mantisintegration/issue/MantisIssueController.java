@@ -316,6 +316,11 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
                 panel.descriptionEditorPane.setText(issue.getDescription());
                 caret.setUpdatePolicy(oldPolicy);
+                panel.descriptionScrollPane.setPreferredSize(new Dimension(
+                        10,
+                        Math.max(
+                            (int) panel.descriptionEditorPane.getPreferredSize().getHeight() + 10,
+                            95)));
             }
             if (property == null || "additional_information".equals(property)) {
                 DefaultCaret caret = (DefaultCaret) panel.additionalInformationEditorPane.getCaret();
@@ -323,6 +328,11 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
                 panel.additionalInformationEditorPane.setText(issue.getAdditional_information());
                 caret.setUpdatePolicy(oldPolicy);
+                panel.additionalInformationScrollPane.setPreferredSize(new Dimension(
+                        10,
+                        Math.max(
+                            (int) panel.additionalInformationEditorPane.getPreferredSize().getHeight() + 10,
+                            70)));
             }
             if (property == null || "steps_to_reproduce".equals(property)) {
                 DefaultCaret caret = (DefaultCaret) panel.stepsToReproduceEditorPane.getCaret();
@@ -330,6 +340,11 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
                 panel.stepsToReproduceEditorPane.setText(issue.getSteps_to_reproduce());
                 caret.setUpdatePolicy(oldPolicy);
+                panel.stepsToReproduceScrollPane.setPreferredSize(new Dimension(
+                        10,
+                        Math.max(
+                            (int) panel.stepsToReproduceEditorPane.getPreferredSize().getHeight() + 10,
+                            70)));
             }
             if (property == null || "platform".equals(property)) {
                 panel.platformTextField.setText(issue.getPlatform());
