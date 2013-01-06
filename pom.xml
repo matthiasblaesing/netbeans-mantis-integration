@@ -3,7 +3,7 @@
 
     <groupId>eu.doppel_helix.netbeans</groupId>
     <artifactId>MantisIntegration</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
     <packaging>nbm</packaging>
 
     <name>MantisIntegration</name>
