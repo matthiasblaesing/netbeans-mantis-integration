@@ -30,6 +30,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide />
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
+        <mantisintegration.nbtarget>RELEASE721</mantisintegration.nbtarget>
+        <!-- 7.2.1 => 201210100934 -->
+        <mantisintegration.specver.swingx>201210100934</mantisintegration.specver.swingx>
+        <mantisintegration.specver.bugtracking>201210100934</mantisintegration.specver.bugtracking>
+        <mantisintegration.specver.jaxws21>201210100934</mantisintegration.specver.jaxws21>
+        <!-- 7.2.1 => 1.1.0 -->
+        <mantisintegration.specver.commons.logging>1.1.1</mantisintegration.specver.commons.logging>
     </properties>
 
     <repositories>
@@ -57,25 +64,69 @@
         <dependency>
             <groupId>org.netbeans.modules</groupId>
             <artifactId>org-netbeans-modules-bugtracking</artifactId>
-            <version>RELEASE721</version>
+            <version>${mantisintegration.nbtarget}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
-            <version>RELEASE721</version>
+            <version>${mantisintegration.nbtarget}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
-            <version>RELEASE721</version>
+            <version>${mantisintegration.nbtarget}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-awt</artifactId>
-            <version>RELEASE721</version>
+            <version>${mantisintegration.nbtarget}</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-windows</artifactId>
+            <version>${mantisintegration.nbtarget}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-libs-swingx</artifactId>
+            <version>${mantisintegration.nbtarget}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-nodes</artifactId>
+            <version>${mantisintegration.nbtarget}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-modules</artifactId>
+            <version>${mantisintegration.nbtarget}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-websvc-jaxws21</artifactId>
+            <version>${mantisintegration.nbtarget}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-xml-jaxb</artifactId>
+            <version>${mantisintegration.nbtarget}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-dialogs</artifactId>
+            <version>${mantisintegration.nbtarget}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-libs-commons_logging</artifactId>
+            <version>RELEASE701</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis-jaxrpc</artifactId>
+            <version>1.4</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
@@ -89,49 +140,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-windows</artifactId>
-            <version>RELEASE721</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-libs-swingx</artifactId>
-            <version>RELEASE721</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-nodes</artifactId>
-            <version>RELEASE721</version>
-        </dependency>
-        <dependency>
             <groupId>com.twelvemonkeys.imageio</groupId>
             <artifactId>twelvemonkeys-imageio-ico</artifactId>
             <version>2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-modules</artifactId>
-            <version>RELEASE72</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-modules-websvc-jaxws21</artifactId>
-            <version>RELEASE721</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-modules-xml-jaxb</artifactId>
-            <version>RELEASE721</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis-jaxrpc</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-libs-commons_logging</artifactId>
-            <version>RELEASE701</version>
         </dependency>
         <dependency>
             <groupId>commons-discovery</groupId>
@@ -142,11 +153,6 @@
             <groupId>axis</groupId>
             <artifactId>axis-wsdl4j</artifactId>
             <version>1.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-dialogs</artifactId>
-            <version>RELEASE721</version>
         </dependency>
     </dependencies>
 
@@ -182,17 +188,17 @@
                         <dependency>
                             <id>org.netbeans.modules:org-netbeans-libs-swingx</id>
                             <type>impl</type>
-                            <explicitValue>org.netbeans.libs.swingx/1 = 201210100934</explicitValue>
+                            <explicitValue>org.netbeans.libs.swingx/1 = ${mantisintegration.specver.swingx}</explicitValue>
                         </dependency>
                         <dependency>
                             <id>org.netbeans.modules:org-netbeans-modules-bugtracking</id>
                             <type>impl</type>
-                            <explicitValue>org.netbeans.modules.bugtracking = 201210100934</explicitValue>
+                            <explicitValue>org.netbeans.modules.bugtracking = ${mantisintegration.specver.bugtracking}</explicitValue>
                         </dependency>
                         <dependency>
                             <id>org.netbeans.modules:org-netbeans-libs-commons_logging</id>
                             <type>impl</type>
-                            <explicitValue>org.apache.commons.logging = 1.1.0</explicitValue>
+                            <explicitValue>org.apache.commons.logging = ${mantisintegration.specver.commons.logging}</explicitValue>
                         </dependency>
                         <dependency>
                             <id>org.netbeans.api:org-netbeans-modules-xml-jaxb-api</id>
@@ -201,7 +207,7 @@
                         <dependency>
                             <id>org.netbeans.modules:org-netbeans-modules-websvc-jaxws21</id>
                             <type>impl</type>
-                            <explicitValue>org.netbeans.modules.websvc.jaxws21/1 = 201210100934</explicitValue>
+                            <explicitValue>org.netbeans.modules.websvc.jaxws21/1 = ${mantisintegration.specver.jaxws21}</explicitValue>
                         </dependency>
                     </moduleDependencies>
                     <licenseName>Apache License, Version 2.0 (+additional Information)</licenseName>
