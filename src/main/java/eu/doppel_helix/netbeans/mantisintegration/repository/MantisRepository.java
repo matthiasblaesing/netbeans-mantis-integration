@@ -21,6 +21,8 @@ import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ImageIconWrapper;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -61,9 +63,16 @@ import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
+/**
+ * @todo: Implement the property change support correctly (checking in bugtracking
+ *        module, the pcs is only used as event delivery method and in version 7.3
+ *        only for Changes in the saved queries (RepositoryProvider.EVENT_QUERY_LIST_CHANGED)
+ *        this is currently not supported
+ */
 public class MantisRepository {
 
     private RequestProcessor requestProzessor = new RequestProcessor(MantisRepository.class);
+    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private final static Logger logger = Logger.getLogger(MantisRepository.class.getName());
     private final static Image ICON = ImageUtilities.loadImage(
             "eu/doppel_helix/netbeans/mantisintegration/icon.png");
@@ -848,6 +857,14 @@ public class MantisRepository {
     public List<TagData> getTags() throws ServiceException, RemoteException  {
         initTags(false);
         return new ArrayList<TagData>(tags.values());
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(listener);
     }
 
     public static byte[] fileGetContents(File f) throws IOException {

@@ -4,6 +4,7 @@ package eu.doppel_helix.netbeans.mantisintegration.repository;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
 import java.awt.Image;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Collections;
 import org.netbeans.modules.bugtracking.spi.RepositoryController;
@@ -78,5 +79,15 @@ public class MantisRepositoryProvider extends RepositoryProvider<MantisRepositor
             return Collections.EMPTY_LIST;
         }
     }
-    
+
+    @Override
+    public void removePropertyChangeListener(MantisRepository r, PropertyChangeListener pl) {
+        r.removePropertyChangeListener(pl);
+    }
+
+    @Override
+    public void addPropertyChangeListener(MantisRepository r, PropertyChangeListener pl) {
+        r.addPropertyChangeListener(pl);
+    }
+
 }
