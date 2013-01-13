@@ -30,13 +30,17 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide />
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
+        <!-- RELEASE721 -->
+        <!-- RELEASE73-BETA2 -->
         <mantisintegration.nbtarget>RELEASE721</mantisintegration.nbtarget>
         <!-- 7.2.1 => 201210100934 -->
+        <!-- 7.3-BETA2 => 201211062253 -->
         <mantisintegration.specver.swingx>201210100934</mantisintegration.specver.swingx>
         <mantisintegration.specver.bugtracking>201210100934</mantisintegration.specver.bugtracking>
         <mantisintegration.specver.jaxws21>201210100934</mantisintegration.specver.jaxws21>
         <!-- 7.2.1 => 1.1.0 -->
-        <mantisintegration.specver.commons.logging>1.1.1</mantisintegration.specver.commons.logging>
+        <!-- 7.3-BETA2 => 1.1.1 -->
+        <mantisintegration.specver.commons.logging>1.1.0</mantisintegration.specver.commons.logging>
     </properties>
 
     <repositories>
