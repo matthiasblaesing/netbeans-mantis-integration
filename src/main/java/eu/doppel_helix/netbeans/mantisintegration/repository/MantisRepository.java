@@ -386,19 +386,25 @@ public class MantisRepository {
     
     protected MantisConnectPortType getClient() throws ServiceException {
         if (client == null) {
-            String baseUrl = getBaseUrl();
-
-            if (!baseUrl.endsWith("/api/soap/mantisconnect.php")) {
-                baseUrl += "/api/soap/mantisconnect.php";
-            }
-
-            MantisConnectLocator mcl = new MantisConnectLocator(
-                    baseUrl + "?wsdl",
-                    new QName("http://futureware.biz/mantisconnect", "MantisConnect"));
+            ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
             try {
-                client = mcl.getMantisConnectPort(new URL(baseUrl));
-            } catch (MalformedURLException ex) {
-                throw new ServiceException("Broken client url:" + baseUrl, ex);
+                String baseUrl = getBaseUrl();
+                
+                if (!baseUrl.endsWith("/api/soap/mantisconnect.php")) {
+                    baseUrl += "/api/soap/mantisconnect.php";
+                }
+                
+                MantisConnectLocator mcl = new MantisConnectLocator(
+                        baseUrl + "?wsdl",
+                        new QName("http://futureware.biz/mantisconnect", "MantisConnect"));
+                try {
+                    client = mcl.getMantisConnectPort(new URL(baseUrl));
+                } catch (MalformedURLException ex) {
+                    throw new ServiceException("Broken client url:" + baseUrl, ex);
+                }
+            } finally {
+                Thread.currentThread().setContextClassLoader(origLoader);
             }
         }
         return client;

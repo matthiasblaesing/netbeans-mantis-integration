@@ -107,16 +107,6 @@
             <version>${mantisintegration.nbtarget}</version>
         </dependency>
         <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-modules-websvc-jaxws21</artifactId>
-            <version>${mantisintegration.nbtarget}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-modules-xml-jaxb</artifactId>
-            <version>${mantisintegration.nbtarget}</version>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-dialogs</artifactId>
             <version>${mantisintegration.nbtarget}</version>
@@ -203,15 +193,6 @@
                             <id>org.netbeans.modules:org-netbeans-libs-commons_logging</id>
                             <type>impl</type>
                             <explicitValue>org.apache.commons.logging = ${mantisintegration.specver.commons.logging}</explicitValue>
-                        </dependency>
-                        <dependency>
-                            <id>org.netbeans.api:org-netbeans-modules-xml-jaxb-api</id>
-                            <type>impl</type>
-                        </dependency>
-                        <dependency>
-                            <id>org.netbeans.modules:org-netbeans-modules-websvc-jaxws21</id>
-                            <type>impl</type>
-                            <explicitValue>org.netbeans.modules.websvc.jaxws21/1 = ${mantisintegration.specver.jaxws21}</explicitValue>
                         </dependency>
                     </moduleDependencies>
                     <licenseName>Apache License, Version 2.0 (+additional Information)</licenseName>
