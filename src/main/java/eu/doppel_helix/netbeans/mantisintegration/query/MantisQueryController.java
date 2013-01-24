@@ -75,43 +75,54 @@ public class MantisQueryController extends QueryController implements ActionList
         List<ObjectRef> states;
         List<ObjectRef> priorities;
         List<ObjectRef> viewstates;
+        private Exception exception;
 
         @Override
         protected Object doInBackground() throws Exception {
-            projects = new ArrayList<ProjectData>();
-            projects.add(pseudoProject);
-            projects.addAll(Arrays.asList(mr.getProjects()));
-            users = new ArrayList<AccountData>(Arrays.asList(mr.getUsers(BigInteger.ZERO)));
-            users.add(0, null);
-            categories = new ArrayList<String>(Arrays.asList(mr.getCategories(BigInteger.ZERO)));
-            categories.add(0, null);
-            severities = new ArrayList<ObjectRef>(Arrays.asList(mr.getSeverities()));
-            severities.add(0, null);
-            resolutions = new ArrayList<ObjectRef>(Arrays.asList(mr.getResolutions()));
-            resolutions.add(0, null);
-            states = new ArrayList<ObjectRef>(Arrays.asList(mr.getStates()));
-            states.add(0, null);
-            priorities = new ArrayList<ObjectRef>(Arrays.asList(mr.getPriorities()));
-            priorities.add(0, null);            
-            viewstates = new ArrayList<ObjectRef>(Arrays.asList(mr.getViewStates()));
-            viewstates.add(0, null);
+            try {
+                projects = new ArrayList<ProjectData>();
+                projects.add(pseudoProject);
+                projects.addAll(Arrays.asList(mr.getProjects()));
+                users = new ArrayList<AccountData>(Arrays.asList(mr.getUsers(BigInteger.ZERO)));
+                users.add(0, null);
+                categories = new ArrayList<String>(Arrays.asList(mr.getCategories(BigInteger.ZERO)));
+                categories.add(0, null);
+                severities = new ArrayList<ObjectRef>(Arrays.asList(mr.getSeverities()));
+                severities.add(0, null);
+                resolutions = new ArrayList<ObjectRef>(Arrays.asList(mr.getResolutions()));
+                resolutions.add(0, null);
+                states = new ArrayList<ObjectRef>(Arrays.asList(mr.getStates()));
+                states.add(0, null);
+                priorities = new ArrayList<ObjectRef>(Arrays.asList(mr.getPriorities()));
+                priorities.add(0, null);
+                viewstates = new ArrayList<ObjectRef>(Arrays.asList(mr.getViewStates()));
+                viewstates.add(0, null);
+            } catch (Exception ex) {
+                exception = ex;
+            }
             return null;
         }
-
+        
         @Override
         protected void done() {
-            reporterModel.setBackingList(users);
-            monitoredByModel.setBackingList(users);
-            assignedToModel.setBackingList(users);
-            categoryModel.setBackingList(categories);
-            severityModel.setBackingList(severities);
-            resolutionModel.setBackingList(resolutions);
-            statusModel.setBackingList(states);
-            priorityModel.setBackingList(priorities);
-            viewstatusModel.setBackingList(viewstates);
-            projectModel1.setBackingList(projects);
-            projectModel1.setSelectedItem(pseudoProject);
-            updateFilterList();
+            if (exception != null) {
+                NotifyDescriptor nd = new NotifyDescriptor.Exception(exception,
+                        "Failed to update ");
+                DialogDisplayer.getDefault().notifyLater(nd);
+            } else {
+                reporterModel.setBackingList(users);
+                monitoredByModel.setBackingList(users);
+                assignedToModel.setBackingList(users);
+                categoryModel.setBackingList(categories);
+                severityModel.setBackingList(severities);
+                resolutionModel.setBackingList(resolutions);
+                statusModel.setBackingList(states);
+                priorityModel.setBackingList(priorities);
+                viewstatusModel.setBackingList(viewstates);
+                projectModel1.setBackingList(projects);
+                projectModel1.setSelectedItem(pseudoProject);
+                updateFilterList();
+            }
             mq.setBusy(false);
         }
     };

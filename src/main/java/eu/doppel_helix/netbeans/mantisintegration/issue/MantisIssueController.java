@@ -78,7 +78,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
         List<ObjectRef> states;
         List<ObjectRef> etas;
         List<ObjectRef> projections;
-        private Throwable t;
+        private Throwable exception;
 
         @Override
         protected Object doInBackground() {
@@ -96,18 +96,16 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 states.add(0, null);
                 etas = Arrays.asList(mr.getEtas());
                 projections = Arrays.asList(mr.getProjections());
-            } catch (ServiceException ex) {
-                t = ex;
-            } catch (RemoteException ex) {
-                t = ex;
+            } catch (Exception ex) {
+                exception = ex;
             }
             return null;
         }
         
         @Override
         protected void done() {
-            if (t != null) {
-                NotifyDescriptor nd = new NotifyDescriptor.Exception(t,
+            if (exception != null) {
+                NotifyDescriptor nd = new NotifyDescriptor.Exception(exception,
                         "Failed to update ");
                 DialogDisplayer.getDefault().notifyLater(nd);
             } else {
