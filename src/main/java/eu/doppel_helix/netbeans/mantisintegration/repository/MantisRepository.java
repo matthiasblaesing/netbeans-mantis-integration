@@ -164,8 +164,8 @@ public class MantisRepository {
     public Image getIcon() {
         try {
             updateIcon();
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+        } catch (Exception ex) {
+            logger.log(Level.INFO, "Exception while retrieving icon for mantis bug tracker", ex);
         }
         try {
             if (icon == null) {
@@ -178,8 +178,8 @@ public class MantisRepository {
                     }
                 }
             }
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+        } catch (Exception ex) {
+            logger.log(Level.INFO, "Exception while retrieving icon for mantis bug tracker", ex);
         }
         if (icon == null) {
             return ICON;
@@ -351,28 +351,32 @@ public class MantisRepository {
     }
     
     private void updateIcon() throws IOException {
-        if (!iconLoaded) {
-            URL url = new URL(getBaseUrl() + "/images/favicon.ico");
-            InputStream is = url.openStream();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int read = 0;
+        try {
+            if (!iconLoaded) {
+                URL url = new URL(getBaseUrl() + "/images/favicon.ico");
+                InputStream is = url.openStream();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int read = 0;
 
-            while ((read = is.read(buffer)) > 0) {
-                baos.write(buffer, 0, read);
+                while ((read = is.read(buffer)) > 0) {
+                    baos.write(buffer, 0, read);
+                }
+
+                is.close();
+
+                byte[] iconData = baos.toByteArray();
+                BufferedImage tempImage = ImageIO.read(new ByteArrayInputStream(iconData));
+
+                if (tempImage != null) {
+                    icon = new ImageIconWrapper(tempImage);
+                    info.putValue("icon", Base64.encode(iconData));
+                }
+
+                iconLoaded = true;
             }
-
-            is.close();
-
-            byte[] iconData = baos.toByteArray();
-            BufferedImage tempImage = ImageIO.read(new ByteArrayInputStream(iconData));
-
-            if (tempImage != null) {
-                icon = new ImageIconWrapper(tempImage);
-                info.putValue("icon", Base64.encode(iconData));
-            }
-
-            iconLoaded = true;
+        } catch (RuntimeException ex) {
+            throw new IOException(ex);
         }
     }
 
