@@ -31,7 +31,7 @@
         <netbeans.run.params.ide />
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
         <mantisintegration.nbtarget>RELEASE72</mantisintegration.nbtarget>
-        <mantisintegration.specver.bugtracking>201210100934</mantisintegration.specver.bugtracking>
+        <mantisintegration.specver.bugtracking>201207171143</mantisintegration.specver.bugtracking>
     </properties>
 
     <repositories>
