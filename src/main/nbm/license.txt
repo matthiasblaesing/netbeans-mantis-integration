@@ -11,6 +11,9 @@ Common Public License 1.0 (CPL), http://sourceforge.net/projects/wsdl4j
 TwelveMonkeys ImageIO Plugins (ICO Support)
 2-Clause BSD-License, http://java.net/projects/twelvemonkeys-imageio
 
+SwingX: swingx-all-1.6.4.jar
+GNU LESSER GENERAL PUBLIC LICENSE 2.1 (LGPL 2.1)
+
 Netbeans IDE (http://netbeans.org)
 Common Development and Distribution License (CDDL) and 
 the GNU General Public License version 2 with Classpath exception
