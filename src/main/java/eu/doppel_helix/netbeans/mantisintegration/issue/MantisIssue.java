@@ -32,7 +32,6 @@ public class MantisIssue {
     private IssueData issueData = new IssueData();
     private MantisIssueController mic;
     private Integer busy = 0;
-    private Boolean canUpdate = null;
 
     public MantisIssue(MantisRepository mr) {
         this.mr = mr;
@@ -234,23 +233,7 @@ public class MantisIssue {
      * @todo: Implement a better strategy to check
      */
     public boolean canUpdate() {
-        if(canUpdate == null) {
-            BigInteger userAccessLevel;
-            try {
-                userAccessLevel = mr.getAccount().getAccess_level();
-            } catch (Exception ex) {
-                logger.log(Level.INFO, "Failed to retrieve account data", ex);
-                return false;
-            }
-            // 40 is the access level for "updater"
-            BigInteger requiredAccesslevel = BigInteger.valueOf(40);
-            if(userAccessLevel.compareTo(requiredAccesslevel) >= 0) {
-                canUpdate = true;
-            } else {
-                canUpdate = false;
-            }
-        }
-        return canUpdate == null ? false : canUpdate;
+        return mr.canUpdate(this);
     }
     
     // Property change support

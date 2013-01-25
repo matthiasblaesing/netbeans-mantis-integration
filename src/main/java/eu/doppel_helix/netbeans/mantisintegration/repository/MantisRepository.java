@@ -35,6 +35,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,7 +57,6 @@ import org.apache.axis.encoding.Base64;
 import org.netbeans.modules.bugtracking.api.Repository;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 import org.netbeans.modules.bugtracking.ui.issue.cache.IssueCache;
-import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
@@ -107,6 +107,9 @@ public class MantisRepository {
     private HashMap<BigInteger, AccountData[]> users = new HashMap<BigInteger, AccountData[]>();
     private HashMap<BigInteger, FilterData[]> filters = new HashMap<BigInteger, FilterData[]>();
     private UserData account = null;
+    private HashMap<BigInteger,Boolean> projectUpdater = new HashMap<BigInteger, Boolean>();
+    private boolean userIsUpdaterChecked = false;
+    private Boolean userIsUpdater = false;
 
     public static Version checkConnection(String url, String username, String password) throws ServiceException, RemoteException {
         String baseUrl = cleanUpUrl(url);
@@ -125,7 +128,7 @@ public class MantisRepository {
             try {
                 MantisConnectPortType mcpt = mcl.getMantisConnectPort(new URL(baseUrl));
                 // Test Authentication information
-                mcpt.mc_login(username, password);
+                mcpt.mc_projects_get_user_accessible(username, password);
                 // Return version for user information
                 return new Version(mcpt.mc_version());
             } catch (MalformedURLException ex) {
@@ -387,6 +390,13 @@ public class MantisRepository {
         }
     }
 
+    /**
+     * Note! Only present in mantis 1.2.12 or later
+     * 
+     * @return
+     * @throws ServiceException
+     * @throws RemoteException 
+     */
     public UserData getAccount() throws ServiceException, RemoteException {
         if (account == null) {
             account = getClient().mc_login(info.getUsername(),
@@ -710,7 +720,11 @@ public class MantisRepository {
                 users.put(projectID, new AccountData[0]);
             }
         }
-        return users.get(projectID);
+        AccountData[] result = users.get(projectID);
+        if(result == null) {
+            result = new AccountData[0];
+        }
+        return result;
     }
 
     public FilterData[] getFilters(BigInteger projectID) throws ServiceException, RemoteException  {
@@ -876,6 +890,73 @@ public class MantisRepository {
         return new ArrayList<TagData>(tags.values());
     }
 
+    public boolean canUpdate(MantisIssue mi) {
+        BigInteger projectId = mi.getProject().getId();
+        
+        // Try project specific variant first (will fail on large resultsets)
+        
+        // Check cached value -- BEWARE! NULL _is_ a valid user => unknown
+        if(projectUpdater.containsKey(projectId) && projectUpdater.get(projectId) != null) {
+            return projectUpdater.get(projectId);
+        }
+        
+        // 40 is the access level for "updater"
+        final BigInteger requiredAccesslevel = BigInteger.valueOf(40);
+        
+        // Only try this once => takes potentially extremely long
+        if (projectUpdater.containsKey(projectId)) {
+            try {
+                AccountData[] validUsers = getClient().mc_project_get_users(
+                        info.getUsername(),
+                        new String(info.getPassword()),
+                        projectId,
+                        requiredAccesslevel);
+                for (AccountData ac : validUsers) {
+                    if (info.getUsername().equals(ac.getName())) {
+                        projectUpdater.put(projectId, true);
+                    }
+                }
+                projectUpdater.put(projectId, false);
+            } catch (Exception ex) {
+                logger.log(Level.INFO, MessageFormat.format(
+                        "Failed to retrieve updaters for project {0}",
+                        projectId), ex);
+                // Prevent multiple tries to retrieve users
+                projectUpdater.put(projectId, null);
+            }
+        }
+        
+        
+        
+        // Fallback to user role
+        if(userIsUpdaterChecked && userIsUpdater != null) {
+            return userIsUpdater;
+        }
+        
+        // Try this only once ...
+        if(! userIsUpdaterChecked) {
+            userIsUpdaterChecked = true;
+            
+            BigInteger userAccessLevel;
+            try {
+                userAccessLevel = getAccount().getAccess_level();
+                if (userAccessLevel.compareTo(requiredAccesslevel) >= 0) {
+                    userIsUpdater = true;
+                } else {
+                    userIsUpdater = false;
+                }
+                return userIsUpdater;
+            } catch (Exception ex) {
+                logger.log(Level.INFO, "Failed to retrieve accesslevel for user", ex);
+                userIsUpdater = null;
+            }
+        }
+            
+        // *arg* -> we can't know so asume the developer (our targetgroup)
+        // knows what he is doing and allowed
+        return true;
+    }
+    
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
     }
