@@ -2,7 +2,7 @@
 package eu.doppel_helix.netbeans.mantisintegration.repository;
 
 import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
-import eu.doppel_helix.netbeans.mantisintegration.entity.Version;
+import eu.doppel_helix.netbeans.mantisintegration.data.Version;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

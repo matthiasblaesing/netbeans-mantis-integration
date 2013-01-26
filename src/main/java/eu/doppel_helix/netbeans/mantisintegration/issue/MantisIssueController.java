@@ -7,6 +7,7 @@ import biz.futureware.mantisconnect.IssueNoteData;
 import biz.futureware.mantisconnect.ObjectRef;
 import biz.futureware.mantisconnect.ProjectData;
 import biz.futureware.mantisconnect.RelationshipData;
+import eu.doppel_helix.netbeans.mantisintegration.data.FlattenedProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.swing.AttachmentDisplay;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
@@ -52,7 +53,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
     private static final Logger logger = Logger.getLogger(MantisIssueController.class.getName());
     private static File lastDirectory;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private ListBackedComboBoxModel<ProjectData> projectModel = new ListBackedComboBoxModel<ProjectData>(ProjectData.class);
+    private ListBackedComboBoxModel<FlattenedProjectData> projectModel = new ListBackedComboBoxModel<FlattenedProjectData>(FlattenedProjectData.class);
     private ListBackedComboBoxModel<ObjectRef> viewstatesModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
     private ListBackedComboBoxModel<ObjectRef> viewstatesModel2 = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
     private ListBackedComboBoxModel<ObjectRef> severitiesModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
@@ -69,7 +70,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
     private StateMonitor stateMonitor = new StateMonitor();
 
     private final SwingWorker updateModel = new SwingWorker() {
-        List<ProjectData> projects;
+        List<FlattenedProjectData> projects;
         List<ObjectRef> viewStates;
         List<ObjectRef> severities;
         List<ObjectRef> reproducibilities;
@@ -85,9 +86,13 @@ public class MantisIssueController extends BugtrackingController implements Prop
             try {
                 MantisRepository mr = issue.getMantisRepository();
                 viewStates = Arrays.asList(mr.getViewStates());
-                projects = new ArrayList<ProjectData>();
+                
+                projects = new ArrayList<FlattenedProjectData>();
                 projects.add(null);
-                projects.addAll(Arrays.asList(mr.getProjects()));
+                for(ProjectData pd: mr.getProjects()) {
+                    projects.addAll(FlattenedProjectData.buildList(pd));
+                }
+                
                 severities = Arrays.asList(mr.getSeverities());
                 reproducibilities = Arrays.asList(mr.getReproducibilities());
                 resolutions = Arrays.asList(mr.getResolutions());
@@ -260,13 +265,13 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 }
             }
             if (property == null || "project".equals(property)) {
-                ProjectData current = null;
+                FlattenedProjectData current = null;
                 if (issue.getProject() != null) {
                     BigInteger id = issue.getProject().getId();
                     for (int i = 0; i < projectModel.getSize(); i++) {
                         if (projectModel.getElementAt(i) == null) {
                             continue;
-                        } else if (projectModel.getElementAt(i).getId().equals(id)) {
+                        } else if (projectModel.getElementAt(i).getProjectData().getId().equals(id)) {
                             current = projectModel.getElementAt(i);
                             break;
                         }
@@ -432,11 +437,12 @@ public class MantisIssueController extends BugtrackingController implements Prop
         updateData.setOs_build(panel.osVersionTextField.getText());
         updateData.setPlatform(panel.platformTextField.getText());
         updateData.setPriority((ObjectRef) panel.priorityComboBox.getSelectedItem());
-        ProjectData pd = (ProjectData) panel.projectComboBox.getSelectedItem();
+        FlattenedProjectData pd = (FlattenedProjectData) panel.projectComboBox.getSelectedItem();
         if (pd == null) {
             updateData.setProject(null);
         } else {
-            ObjectRef project = new ObjectRef(pd.getId(), pd.getName());
+            ObjectRef project = new ObjectRef(pd.getProjectData().getId(), 
+                    pd.getProjectData().getName());
             updateData.setProject(project);
         }
         updateData.setProjection((ObjectRef) panel.projectionComboBox.getSelectedItem());
@@ -544,13 +550,13 @@ public class MantisIssueController extends BugtrackingController implements Prop
             try {
                 List<String> categories = new ArrayList<String>();
                 List<AccountData> users = new ArrayList<AccountData>();
-                ProjectData p = (ProjectData) panel.projectComboBox.getSelectedItem();
-                if (p != null) {
+                FlattenedProjectData fpd = (FlattenedProjectData) panel.projectComboBox.getSelectedItem();
+                if (fpd != null) {
                     MantisRepository mr = issue.getMantisRepository();
                     categories.add(null);
-                    categories.addAll(Arrays.asList(mr.getCategories(p.getId())));
+                    categories.addAll(Arrays.asList(mr.getCategories(fpd.getProjectData().getId())));
                     users.add(null);
-                    users.addAll(Arrays.asList(mr.getUsers(p.getId())));
+                    users.addAll(Arrays.asList(mr.getUsers(fpd.getProjectData().getId())));
                 }
                 categoriesModel.setBackingList(categories);
                 assignedModel.setBackingList(users);

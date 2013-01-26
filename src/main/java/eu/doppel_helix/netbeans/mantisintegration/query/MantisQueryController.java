@@ -6,6 +6,7 @@ import biz.futureware.mantisconnect.ObjectRef;
 import biz.futureware.mantisconnect.ProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.Mantis;
 import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
+import eu.doppel_helix.netbeans.mantisintegration.data.FlattenedProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
@@ -41,7 +42,7 @@ public class MantisQueryController extends QueryController implements ActionList
     private final static Logger logger = Logger.getLogger(MantisQueryController.class.getName());
     RequestProcessor rp = new RequestProcessor("MantisQueryController");
     private final IssueTable issueTable;
-    private ListBackedComboBoxModel<ProjectData> projectModel1 = new ListBackedComboBoxModel<ProjectData>(ProjectData.class);
+    private ListBackedComboBoxModel<FlattenedProjectData> projectModel1 = new ListBackedComboBoxModel<FlattenedProjectData>(FlattenedProjectData.class);
     private ListBackedComboBoxModel<FilterData> filterModel1 = new ListBackedComboBoxModel<FilterData>(FilterData.class);
     private ListBackedComboBoxModel<AccountData> reporterModel = new ListBackedComboBoxModel<AccountData>(AccountData.class);;
     private ListBackedComboBoxModel<AccountData> monitoredByModel = new ListBackedComboBoxModel<AccountData>(AccountData.class);;
@@ -67,7 +68,7 @@ public class MantisQueryController extends QueryController implements ActionList
     private QueryMode mode = QueryMode.SHOW_ALL;
 
     private SwingWorker initialize = new SwingWorker() {
-        List<ProjectData> projects;
+        List<FlattenedProjectData> projects;
         List<AccountData> users;
         List<String> categories;
         List<ObjectRef> severities;
@@ -80,9 +81,11 @@ public class MantisQueryController extends QueryController implements ActionList
         @Override
         protected Object doInBackground() throws Exception {
             try {
-                projects = new ArrayList<ProjectData>();
-                projects.add(pseudoProject);
-                projects.addAll(Arrays.asList(mr.getProjects()));
+                projects = new ArrayList<FlattenedProjectData>();
+                projects.add(new FlattenedProjectData(pseudoProject, 0));
+                for(ProjectData pd: mr.getProjects()) {
+                    projects.addAll(FlattenedProjectData.buildList(pd));
+                }
                 users = new ArrayList<AccountData>(Arrays.asList(mr.getUsers(BigInteger.ZERO)));
                 users.add(0, null);
                 categories = new ArrayList<String>(Arrays.asList(mr.getCategories(BigInteger.ZERO)));
@@ -120,7 +123,7 @@ public class MantisQueryController extends QueryController implements ActionList
                 priorityModel.setBackingList(priorities);
                 viewstatusModel.setBackingList(viewstates);
                 projectModel1.setBackingList(projects);
-                projectModel1.setSelectedItem(pseudoProject);
+                projectModel1.setSelectedItem(new FlattenedProjectData(pseudoProject, 0));
                 updateFilterList();
             }
             mq.setBusy(false);
@@ -184,10 +187,10 @@ public class MantisQueryController extends QueryController implements ActionList
     }
 
     private void updateFilterList() {
-        ProjectData selected = (ProjectData) projectModel1.getSelectedItem();
+        FlattenedProjectData selected = (FlattenedProjectData) projectModel1.getSelectedItem();
         if (selected != null) {
             try {
-                FilterData[] filter = mr.getFilters(selected.getId());
+                FilterData[] filter = mr.getFilters(selected.getProjectData().getId());
                 if (filter != null) {
                     filterModel1.setBackingList(Arrays.asList(filter));
                     filterModel1.addElement(0, null);
@@ -213,7 +216,7 @@ public class MantisQueryController extends QueryController implements ActionList
             updateFilterList();
         } else if (COMMAND_EXECUTE_QUERY.equals(e.getActionCommand())) {
             if(projectModel1.getSelectedItem() != null) {
-                mq.setProjectId(((ProjectData) projectModel1.getSelectedItem()).getId());
+                mq.setProjectId(((FlattenedProjectData) projectModel1.getSelectedItem()).getProjectData().getId());
             } else {
                 mq.setProjectId(null);
             }

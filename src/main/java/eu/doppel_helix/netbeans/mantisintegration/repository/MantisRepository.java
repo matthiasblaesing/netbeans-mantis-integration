@@ -15,7 +15,7 @@ import biz.futureware.mantisconnect.TagData;
 import biz.futureware.mantisconnect.UserData;
 import eu.doppel_helix.netbeans.mantisintegration.Mantis;
 import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
-import eu.doppel_helix.netbeans.mantisintegration.entity.Version;
+import eu.doppel_helix.netbeans.mantisintegration.data.Version;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ImageIconWrapper;

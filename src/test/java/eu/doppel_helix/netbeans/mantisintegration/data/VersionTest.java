@@ -1,6 +1,7 @@
 
-package eu.doppel_helix.netbeans.mantisintegration.entity;
+package eu.doppel_helix.netbeans.mantisintegration.data;
 
+import eu.doppel_helix.netbeans.mantisintegration.data.Version;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
