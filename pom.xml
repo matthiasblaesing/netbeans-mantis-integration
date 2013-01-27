@@ -31,7 +31,7 @@
         <netbeans.run.params.ide />
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
         <mantisintegration.nbtarget>RELEASE72</mantisintegration.nbtarget>
-        <mantisintegration.specver.bugtracking>201207171143</mantisintegration.specver.bugtracking>
+        <mantisintegration.bugtracking.implver>201207171143</mantisintegration.bugtracking.implver>
     </properties>
 
     <repositories>
@@ -173,7 +173,7 @@
                         <dependency>
                             <id>org.netbeans.modules:org-netbeans-modules-bugtracking</id>
                             <type>impl</type>
-                            <explicitValue>org.netbeans.modules.bugtracking = ${mantisintegration.specver.bugtracking}</explicitValue>
+                            <explicitValue>org.netbeans.modules.bugtracking = ${mantisintegration.bugtracking.implver}</explicitValue>
                         </dependency>
                     </moduleDependencies>
                     <licenseName>Apache License, Version 2.0 (+additional Information)</licenseName>
