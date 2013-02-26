@@ -19,15 +19,14 @@ BUILD Instructions:
 3. Run:
     mvn -Dmantisintegration.nbtarget=<RELEASE> -Dmantisintegration.bugtracking.implver=<BUGTRACKINGIMPL> package
     
-    You have to replace <RELEASE> with RELEASE72 (Netbeans 7.2 or 7.2.1) or RELEASE73-BETA2 (Netbeans 7.3 Beta 2)
+    You have to replace <RELEASE> with RELEASE72 (Netbeans 7.2 or 7.2.1) or RELEASE73 (Netbeans 7.3)
     You have to replace <BUGTRACKINGIMPL> with the value determined in step 2
 4. You find the installable module in: target/
 
 Known Kombinations:
 
-7.2: mvn -Dmantisintegration.nbtarget=RELEASE72 -Dmantisintegration.bugtracking.implver=201207171143 package
-7.2.1: mvn -Dmantisintegration.nbtarget=RELEASE72 -Dmantisintegration.bugtracking.implver=201210100934 package
-7.3-BETA2: mvn -Dmantisintegration.nbtarget=RELEASE73-BETA2  -Dmantisintegration.bugtracking.implver=201211062253 package
+7.2: mvn -Dmantisintegration.nbtarget=RELEASE72 -Dmantisintegration.bugtracking.implver=201301311716 package
+7.3: mvn -Dmantisintegration.nbtarget=RELEASE73 -Dmantisintegration.bugtracking.implver=201302132200 package
 
 The mantisintegration.nbtarget property is necessary because the RepositoryProvider
 interface received two new methods removePropertyChangeListerer and addPropertyChangeListener
