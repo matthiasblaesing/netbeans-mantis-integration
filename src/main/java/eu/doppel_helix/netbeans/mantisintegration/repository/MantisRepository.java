@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -57,6 +58,8 @@ import org.apache.axis.encoding.Base64;
 import org.netbeans.modules.bugtracking.api.Repository;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 import org.netbeans.modules.bugtracking.ui.issue.cache.IssueCache;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
@@ -70,19 +73,20 @@ import org.openide.util.lookup.InstanceContent;
  *        this is currently not supported
  */
 public class MantisRepository {
-
-    private RequestProcessor requestProzessor = new RequestProcessor(MantisRepository.class);
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private static final String BASE_CONFIG_PATH = "MantisIntegration"; // NOI18N
     private final static Logger logger = Logger.getLogger(MantisRepository.class.getName());
     private final static Image ICON = ImageUtilities.loadImage(
             "eu/doppel_helix/netbeans/mantisintegration/icon.png");
     private final static Version tagVersion = new Version("1.2.9");
+    
+    private final transient InstanceContent ic;
+    private RequestProcessor requestProzessor = new RequestProcessor(MantisRepository.class);
+    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private RepositoryInfo info;
     private MantisRepositoryController controller;
     private Lookup lookup;
     private boolean iconLoaded = false;
     private Image icon = null;
-    private final transient InstanceContent ic;
     private MantisConnectPortType client;
     private Cache cache;
     private Version version;
@@ -111,6 +115,19 @@ public class MantisRepository {
     private boolean userIsUpdaterChecked = false;
     private Boolean userIsUpdater = false;
 
+    String getBaseConfigPath() {
+        return String.format("%s/%s", BASE_CONFIG_PATH, getInfo().getId());
+    }
+    
+    FileObject getBaseConfigFileObject() {
+        FileObject root = FileUtil.getConfigRoot();
+        try {
+            return FileUtil.createFolder(root, getBaseConfigPath());
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     public static Version checkConnection(String url, String username, String password) throws ServiceException, RemoteException {
         String baseUrl = cleanUpUrl(url);
 
@@ -179,10 +196,10 @@ public class MantisRepository {
         }
         try {
             if (icon == null) {
-                String encoded = info.getValue("icon");
-                if (encoded != null) {
-                    byte[] iconData = Base64.decode(encoded);
-                    BufferedImage tempImage = ImageIO.read(new ByteArrayInputStream(iconData));
+                FileObject fo = getBaseConfigFileObject().getFileObject(
+                        "favicon.ico");
+                if (fo != null && fo.canRead()) {
+                    BufferedImage tempImage = ImageIO.read(fo.getInputStream());
                     if (tempImage != null) {
                         icon = new ImageIconWrapper(tempImage);
                     }
@@ -380,7 +397,10 @@ public class MantisRepository {
 
                 if (tempImage != null) {
                     icon = new ImageIconWrapper(tempImage);
-                    info.putValue("icon", Base64.encode(iconData));
+                    FileObject fo = FileUtil.createData(getBaseConfigFileObject(), "favicon.ico");
+                    OutputStream os = fo.getOutputStream();
+                    os.write(iconData);
+                    os.close();
                 }
 
                 iconLoaded = true;
