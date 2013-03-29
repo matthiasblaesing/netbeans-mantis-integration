@@ -200,20 +200,15 @@ public class MantisQueryController extends QueryController implements ActionList
 
         issueTable = new IssueTable(mq.getMantisRepository().getRepository(), mq,
                 new ColumnDescriptor[]{
-            new ColumnDescriptor("mantis.issue.id", BigInteger.class, "ID", "ID",
-            40, true, true),
-            new ColumnDescriptor("mantis.issue.noteCount", Integer.class, "#",
-            "Note count", 40),
-            new ColumnDescriptor("mantis.issue.category", String.class,
-            "Category", "Category", 80),
-            new ColumnDescriptor("mantis.issue.severity", ObjectRef.class,
-            "Severity", "Severity", 80),
-            new ColumnDescriptor("mantis.issue.status", ObjectRef.class,
-            "Status", "Status", 80),
-            new ColumnDescriptor("mantis.issue.updated", Calendar.class,
-            "Updated", "Updated", 80),
-            new ColumnDescriptor(IssueNode.LABEL_NAME_SUMMARY, String.class,
-            "Summary", "Summary"),}) {
+            new ColumnDescriptor("mantis.issue.id", BigInteger.class, "ID", "ID", 40, true, true),
+            new ColumnDescriptor("mantis.issue.noteCount", Integer.class, "#", "Note count", 40),
+            new ColumnDescriptor("mantis.issue.category", String.class, "Category", "Category", 80),
+            new ColumnDescriptor("mantis.issue.severity", ObjectRef.class, "Severity", "Severity", 80),
+            new ColumnDescriptor("mantis.issue.priority", ObjectRef.class, "Priority", "Priority", 80),
+            new ColumnDescriptor("mantis.issue.status", ObjectRef.class, "Status", "Status", 80),
+            new ColumnDescriptor("mantis.issue.updated", Calendar.class, "Updated", "Updated", 80),
+            new ColumnDescriptor(IssueNode.LABEL_NAME_SUMMARY, String.class, "Summary", "Summary"),
+         }) {
 
             @Override
             public void ancestorAdded(AncestorEvent event) {

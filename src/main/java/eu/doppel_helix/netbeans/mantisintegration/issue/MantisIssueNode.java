@@ -23,6 +23,7 @@ public class MantisIssueNode extends IssueNode<MantisIssue> {
                 new ReflectionProperty<Integer>("mantis.issue.noteCount", "#", "Note count", getIssueData(), Integer.class, "getNoteCount", null),
                 new ReflectionProperty<String>("mantis.issue.category", "Category", "Category", getIssueData(), String.class, "getCategory", null),
                 new ReflectionProperty<ObjectRef>("mantis.issue.severity", "Severity", "Severity", getIssueData(), ObjectRef.class, "getSeverity", null),
+                new ReflectionProperty<ObjectRef>("mantis.issue.priority", "Priority", "Priority", getIssueData(), ObjectRef.class, "getPriority", null),
                 new ReflectionProperty<ObjectRef>("mantis.issue.status", "Status", "Status", getIssueData(), ObjectRef.class, "getStatus", null),
                 new ReflectionProperty<Calendar>("mantis.issue.updated", "Updated", "Updated", getIssueData(), Calendar.class, "getLast_updated", null),
             };
