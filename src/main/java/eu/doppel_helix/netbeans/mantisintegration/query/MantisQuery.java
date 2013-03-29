@@ -13,12 +13,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.QueryController;
+import org.netbeans.modules.bugtracking.spi.QueryProvider;
+import org.openide.util.Mutex;
 
 public class MantisQuery {
     public enum Combination {
@@ -28,7 +33,7 @@ public class MantisQuery {
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private MantisQueryController mqc;
     private MantisRepository mr;
-    private int id = 0;
+    private String id = UUID.randomUUID().toString();
     private String name = "";
     private BigInteger projectId;
     private BigInteger serversideFilterId;
@@ -43,9 +48,10 @@ public class MantisQuery {
     private Date lastUpdateAfter;
     private Date lastUpdateBefore;
     private String summaryFilter;
-    private Combination combination;
+    private Combination combination = Combination.ALL;
     private List<String> matchingIds = new ArrayList<String>();
     private Integer busy = 0;
+    private boolean saved = false;
 
     public MantisQuery(MantisRepository mr) {
         this.mr = mr;
@@ -55,7 +61,11 @@ public class MantisQuery {
         return mr;
     }
 
-    public int getId() {
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
         return id;
     }
 
@@ -63,13 +73,30 @@ public class MantisQuery {
         return name;
     }
 
-    public boolean isSaved() {
-        return id != 0;
+    public void setName(String name) {
+        this.name = name;
     }
 
+    public boolean isSaved() {
+        return saved;
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
+        if(saved) {
+            firePropertyChanged(QueryProvider.EVENT_QUERY_SAVED, null, null);
+        }
+    }
+    
+    public void save() {
+        mr.saveQuery(this);
+        setSaved(true);
+    }
+    
     public void remove() {
-        id = 0;
         matchingIds.clear();
+        mr.deleteQuery(id);
+        firePropertyChanged(QueryProvider.EVENT_QUERY_REMOVED, null, null);
     }
 
     public Collection<MantisIssue> getIssues() throws ServiceException, RemoteException {
@@ -83,9 +110,13 @@ public class MantisQuery {
 
     public void refresh() throws ServiceException, RemoteException {
         setBusy(true);
+        Set<String> oldList = new HashSet<String>(matchingIds);
         matchingIds.clear();
         for (MantisIssue mi : mr.findIssues(this)) {
             matchingIds.add(mi.getIdAsString());
+        }
+        if(! oldList.equals(new HashSet<String>(matchingIds))) {
+            firePropertyChanged(QueryProvider.EVENT_QUERY_ISSUES_CHANGED, null, null);
         }
         setBusy(false);
     }
@@ -98,17 +129,7 @@ public class MantisQuery {
     }
 
     private void firePropertyChanged(final String property, final Object oldValue, final Object newValue) {
-        Runnable update = new Runnable() {
-            @Override
-            public void run() {
-                pcs.firePropertyChange(property, oldValue, newValue);
-            }
-        };
-        if (SwingUtilities.isEventDispatchThread()) {
-            update.run();
-        } else {
-            SwingUtilities.invokeLater(update);
-        }
+        pcs.firePropertyChange(property, oldValue, newValue);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -271,7 +292,10 @@ public class MantisQuery {
     }
 
     public void setCombination(Combination combination) {
-        Combination oldValue = combination;
+        if(combination == null) {
+            combination = Combination.ALL;
+        }
+        Combination oldValue = this.combination;
         this.combination = combination;
         pcs.firePropertyChange("combination", oldValue, combination);
     }

@@ -80,10 +80,12 @@ public class MantisRepositoryProvider extends RepositoryProvider<MantisRepositor
         }
     }
 
+    @Override
     public void removePropertyChangeListener(MantisRepository r, PropertyChangeListener pl) {
         r.removePropertyChangeListener(pl);
     }
 
+    @Override
     public void addPropertyChangeListener(MantisRepository r, PropertyChangeListener pl) {
         r.addPropertyChangeListener(pl);
     }

@@ -66,12 +66,6 @@ import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
-/**
- * @todo: Implement the property change support correctly (checking in bugtracking
- *        module, the pcs is only used as event delivery method and in version 7.3
- *        only for Changes in the saved queries (RepositoryProvider.EVENT_QUERY_LIST_CHANGED)
- *        this is currently not supported
- */
 public class MantisRepository {
     private static final String BASE_CONFIG_PATH = "MantisIntegration"; // NOI18N
     private final static Logger logger = Logger.getLogger(MantisRepository.class.getName());
@@ -114,6 +108,7 @@ public class MantisRepository {
     private HashMap<BigInteger,Boolean> projectUpdater = new HashMap<BigInteger, Boolean>();
     private boolean userIsUpdaterChecked = false;
     private Boolean userIsUpdater = false;
+    private MantisRepositoryQueryStore queryStore;
 
     String getBaseConfigPath() {
         return String.format("%s/%s", BASE_CONFIG_PATH, getInfo().getId());
@@ -157,18 +152,26 @@ public class MantisRepository {
     }
     
     public MantisRepository() {
-        info = new RepositoryInfo(
+        ic = new InstanceContent();
+        init(null);
+    }
+
+    public MantisRepository(RepositoryInfo ri) {
+        this();
+        init(ri);
+    }
+    
+    private void init(RepositoryInfo ri) {
+        if(ri == null) {
+            ri = new RepositoryInfo(
                 MantisConnector.ID + System.currentTimeMillis(),
                 MantisConnector.ID,
                 "http://<host>/<mantis-basepath>",
                 "",
                 "");
-        ic = new InstanceContent();
-    }
-
-    public MantisRepository(RepositoryInfo ri) {
-        this();
+        }
         setInfo(ri);
+        queryStore = new MantisRepositoryQueryStore(this, pcs);
     }
 
     public RequestProcessor getRequestProcessor() {
@@ -252,8 +255,8 @@ public class MantisRepository {
             if (issue == null) {
                 issue = new MantisIssue(this);
                 issue.setId(new BigInteger(issues[i]));
-                issue.refresh();
             }
+            issue.refresh();
             results[i] = issue;
         }
         return results;
@@ -329,12 +332,25 @@ public class MantisRepository {
         return new MantisQuery(this);
     }
 
+    public MantisQuery getQuery(String id) {
+        return queryStore.getMantisQuery(id);
+    }
+    
+    public void saveQuery(MantisQuery mq) {
+        queryStore.saveMantisQuery(mq);
+    }
+   
     public MantisIssue createIssue() {
         return new MantisIssue(this);
     }
 
     public Collection<MantisQuery> getQueries() {
-        return Collections.EMPTY_LIST;
+        return queryStore.getQueries();
+    }
+    
+    public void deleteQuery(String id) {
+        queryStore.removeMantisQuery(id);
+        getIssueCache().removeQuery(id);
     }
 
     public Version getVersion() throws ServiceException, RemoteException {
@@ -801,6 +817,15 @@ public class MantisRepository {
                 }
             }
         }
+        String ids[] = new String[matchingIds.size()];
+        int count = 0;
+        for(BigInteger bi: matchingIds) {
+            ids[count] = bi.toString();
+            count++;
+        }
+        if(mq.isSaved()) {
+            getIssueCache().storeQueryIssues(mq.getId(), ids);
+        }
         return Arrays.asList(getIssues(matchingIds.toArray(new BigInteger[0])));
     }
 
@@ -1050,8 +1075,9 @@ public class MantisRepository {
 
         @Override
         public Map<String, String> getAttributes(MantisIssue issue) {
-            // @todo: Implement methodc correctly
-            return Collections.EMPTY_MAP;
+            HashMap<String,String> result = new HashMap<String, String>();
+            result.put("issue.lastModified", issue.getLast_updated().toString());
+            return result;
         }
     }
 }

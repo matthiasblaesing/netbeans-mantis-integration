@@ -113,7 +113,10 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         jSeparator1 = new javax.swing.JSeparator();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        headerButtonsPanel = new javax.swing.JPanel();
+        deleteQueryLinkButton = new org.netbeans.modules.bugtracking.util.LinkButton();
         buttonsPanel = new javax.swing.JPanel();
+        saveQueryButton = new javax.swing.JButton();
         executeQueryButton = new javax.swing.JButton();
         issueTablePanel = new javax.swing.JPanel();
 
@@ -493,8 +496,23 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         filterPanel.add(jLabel2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         mainPanel.add(filterPanel, gridBagConstraints);
+
+        headerButtonsPanel.setAlignmentX(1.0F);
+        headerButtonsPanel.setOpaque(false);
+
+        deleteQueryLinkButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        org.openide.awt.Mnemonics.setLocalizedText(deleteQueryLinkButton, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.deleteQueryLinkButton.text")); // NOI18N
+        deleteQueryLinkButton.setActionCommand(org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.deleteQueryLinkButton.actionCommand")); // NOI18N
+        deleteQueryLinkButton.setFont(deleteQueryLinkButton.getFont().deriveFont(deleteQueryLinkButton.getFont().getStyle() & ~java.awt.Font.BOLD));
+        headerButtonsPanel.add(deleteQueryLinkButton);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        mainPanel.add(headerButtonsPanel, gridBagConstraints);
 
         buttonsPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
         buttonsPanel.setOpaque(false);
@@ -502,13 +520,17 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         flowLayout3.setAlignOnBaseline(true);
         buttonsPanel.setLayout(flowLayout3);
 
+        org.openide.awt.Mnemonics.setLocalizedText(saveQueryButton, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.saveQueryButton.text")); // NOI18N
+        saveQueryButton.setActionCommand(org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.saveQueryButton.actionCommand")); // NOI18N
+        buttonsPanel.add(saveQueryButton);
+
         org.openide.awt.Mnemonics.setLocalizedText(executeQueryButton, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.executeQueryButton.text")); // NOI18N
         executeQueryButton.setActionCommand(org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.executeQueryButton.actionCommand")); // NOI18N
         buttonsPanel.add(executeQueryButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_TRAILING;
         mainPanel.add(buttonsPanel, gridBagConstraints);
 
@@ -518,23 +540,25 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         issueTablePanel.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         mainPanel.add(issueTablePanel, gridBagConstraints);
 
-        mainPanel.setBounds(0, 0, 913, 267);
+        mainPanel.setBounds(0, 0, 913, 294);
         innerQuery.add(mainPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         add(innerQuery, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     javax.swing.JComboBox assignedToComboBox;
     javax.swing.JLabel assignedToLabel;
     javax.swing.JPanel buttonsPanel;
     javax.swing.JComboBox categoryComboBox;
     javax.swing.JLabel categoryLabel;
+    org.netbeans.modules.bugtracking.util.LinkButton deleteQueryLinkButton;
     javax.swing.JButton executeQueryButton;
     javax.swing.JComboBox filterComboBox;
     javax.swing.JLabel filterLabel;
@@ -543,6 +567,7 @@ public class MantisQueryPanel extends javax.swing.JPanel {
     javax.swing.JLabel gotoIssueLabel;
     javax.swing.JPanel gotoIssuePanel;
     javax.swing.JFormattedTextField gotoIssueTextField;
+    javax.swing.JPanel headerButtonsPanel;
     javax.swing.JLayeredPane innerQuery;
     javax.swing.JPanel issueTablePanel;
     javax.swing.JLabel jLabel1;
@@ -563,6 +588,7 @@ public class MantisQueryPanel extends javax.swing.JPanel {
     javax.swing.JLabel reporterLabel;
     javax.swing.JComboBox resolutionComboBox;
     javax.swing.JLabel resolutionLabel;
+    javax.swing.JButton saveQueryButton;
     javax.swing.JComboBox severityComboBox;
     javax.swing.JLabel severityLabel;
     javax.swing.JComboBox statusComboBox;

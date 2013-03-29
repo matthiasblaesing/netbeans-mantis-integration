@@ -12,18 +12,16 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
 import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
-import org.openide.util.Exceptions;
+import org.openide.util.Mutex;
+import org.openide.util.MutexException;
 
 public class MantisIssue {
     private final static Logger logger = Logger.getLogger(MantisIssue.class.getName());
@@ -101,6 +99,9 @@ public class MantisIssue {
     public boolean refresh() throws ServiceException, RemoteException {
         setBusy(true);
         boolean result = mr.updateIssueFromRepository(MantisIssue.this);
+        if(result) {
+            firePropertyChange(IssueProvider.EVENT_ISSUE_REFRESHED, null, null);
+        }
         setBusy(false);
         return result;
     }
@@ -137,7 +138,12 @@ public class MantisIssue {
         issueData.setNotes(id.getNotes());
         issueData.setCustom_fields(id.getCustom_fields());
         issueData.setTags(id.getTags());
-        firePropertyChange(IssueProvider.EVENT_ISSUE_REFRESHED, null, null);
+        Mutex.EVENT.writeAccess(new Runnable() {
+            @Override
+            public void run() {
+                firePropertyChange(IssueProvider.EVENT_ISSUE_REFRESHED, null, null);
+            }
+        });
     }
     
     public MantisIssueController getController() {
@@ -246,23 +252,12 @@ public class MantisIssue {
     }
 
     protected void firePropertyChange(final String property, final Object oldValue, final Object newValue) {
-        Runnable update = new Runnable() {
+        Mutex.EVENT.writeAccess(new Runnable() {
             @Override
             public void run() {
                 pcs.firePropertyChange(property, oldValue, newValue);
             }
-        };
-        if (SwingUtilities.isEventDispatchThread()) {
-            update.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(update);
-            } catch (InterruptedException ex) {
-                logger.log(Level.INFO, "", ex);
-            } catch (InvocationTargetException ex) {
-                logger.log(Level.INFO, "", ex);
-            }
-        }
+        });
     }
 
     // Delegation to IssueData including property change support
