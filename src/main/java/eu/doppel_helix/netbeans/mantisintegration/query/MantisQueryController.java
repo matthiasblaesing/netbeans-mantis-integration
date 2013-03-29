@@ -235,7 +235,7 @@ public class MantisQueryController extends QueryController implements ActionList
             }
                 
             };
-        issueTable.setRenderer(new MantisQueryTableCellRenderer());
+        issueTable.setRenderer(new MantisQueryTableCellRenderer(issueTable.getRenderer()));
         // IssueTables relies on initialized Columns, but dispatches initColumns
         // via an invokeLater ... -- not sure whether this is intended or a bug
         // @todo: investigate!

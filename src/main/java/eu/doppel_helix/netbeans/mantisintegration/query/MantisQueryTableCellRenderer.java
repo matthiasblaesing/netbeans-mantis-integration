@@ -15,11 +15,17 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import org.netbeans.modules.bugtracking.issuetable.IssueNode;
 
 public class MantisQueryTableCellRenderer extends DefaultTableCellRenderer {
+    private TableCellRenderer superRenderer;
     private Map<BigInteger,Color> colorMap = Mantis.getInstance().getStatusColorMap();
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+    public MantisQueryTableCellRenderer(TableCellRenderer superRenderer) {
+        this.superRenderer = superRenderer;
+    }
     
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -27,8 +33,8 @@ public class MantisQueryTableCellRenderer extends DefaultTableCellRenderer {
         Color overrideColor = Color.WHITE;
         if(value instanceof IssueNode.IssueProperty) {
             try {
-                value = ((IssueNode.IssueProperty) value).getValue();
                 if ("mantis.issue.status".equals(((IssueNode.IssueProperty) originalValue).getName())) {
+                    value = ((IssueNode.IssueProperty) value).getValue();
                     if (value instanceof ObjectRef) {
                         ObjectRef or = (ObjectRef) value;
                         BigInteger level = or.getId();
@@ -53,7 +59,7 @@ public class MantisQueryTableCellRenderer extends DefaultTableCellRenderer {
             value = df.format(((Calendar) value).getTime());
         }
         
-        Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        Component c = superRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         
         if(overrideColor != null) {
         if(c instanceof JComponent) {
