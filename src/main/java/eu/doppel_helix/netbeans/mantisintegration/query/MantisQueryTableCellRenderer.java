@@ -33,13 +33,15 @@ public class MantisQueryTableCellRenderer extends DefaultTableCellRenderer {
         Color overrideColor = Color.WHITE;
         if(value instanceof IssueNode.IssueProperty) {
             try {
-                if ("mantis.issue.status".equals(((IssueNode.IssueProperty) originalValue).getName())) {
-                    value = ((IssueNode.IssueProperty) value).getValue();
-                    if (value instanceof ObjectRef) {
-                        ObjectRef or = (ObjectRef) value;
-                        BigInteger level = or.getId();
-                        if(colorMap.get(level) != null) {
-                            overrideColor = colorMap.get(level);
+		if (((IssueNode.IssueProperty) originalValue).getName().startsWith("mantis.issue.")) {
+		    value = ((IssueNode.IssueProperty) value).getValue();
+                    if ("mantis.issue.status".equals(((IssueNode.IssueProperty) originalValue).getName())) {
+                        if (value instanceof ObjectRef) {
+                            ObjectRef or = (ObjectRef) value;
+                            BigInteger level = or.getId();
+                            if(colorMap.get(level) != null) {
+                                overrideColor = colorMap.get(level);
+                            }
                         }
                     }
                 }
@@ -59,7 +61,12 @@ public class MantisQueryTableCellRenderer extends DefaultTableCellRenderer {
             value = df.format(((Calendar) value).getTime());
         }
         
-        Component c = superRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        Component c = null;
+	if(value instanceof IssueNode.IssueProperty) {
+		c = superRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+	} else {
+		c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+	}
         
         if(overrideColor != null) {
         if(c instanceof JComponent) {
