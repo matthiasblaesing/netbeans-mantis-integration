@@ -36,7 +36,9 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
     static {
         JAXBContext tempJaxbContext = null;
         try {
-            tempJaxbContext = JAXBContext.newInstance(MantisQueryXml.class);
+            tempJaxbContext = JAXBContext.newInstance(
+                    "eu.doppel_helix.netbeans.mantisintegration.query.serialization",
+                    MantisRepositoryQueryStore.class.getClassLoader());
         } catch (JAXBException ex) {
             LOG.log(Level.WARNING, "Failed to initialize MantisQuery saving", ex);
         }
