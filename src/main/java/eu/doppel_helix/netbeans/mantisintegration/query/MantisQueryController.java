@@ -335,6 +335,7 @@ public class MantisQueryController extends QueryController implements ActionList
             new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
+                    mq.setBusy(true);
                     mq.save();
                     issueTable.started();
                     mq.refresh();
@@ -347,6 +348,7 @@ public class MantisQueryController extends QueryController implements ActionList
 
                 @Override
                 protected void done() {
+                    mq.setBusy(false);
                     try {
                         get();
                     } catch (InterruptedException ex) {
@@ -407,6 +409,7 @@ public class MantisQueryController extends QueryController implements ActionList
             SwingWorker sw = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
+                    mq.setBusy(true);
                     issueTable.started();
                     mq.refresh();
                     Collection<MantisIssue> issues = mq.getIssues();
@@ -418,6 +421,7 @@ public class MantisQueryController extends QueryController implements ActionList
 
                 @Override
                 protected void done() {
+                    mq.setBusy(false);
                     try {
                         get();
                     } catch (InterruptedException ex) {
