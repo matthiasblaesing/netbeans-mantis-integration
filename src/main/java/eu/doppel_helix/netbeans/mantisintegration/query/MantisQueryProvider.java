@@ -19,7 +19,11 @@ public class MantisQueryProvider extends QueryProvider<MantisQuery, MantisIssue>
 
     @Override
     public String getTooltip(MantisQuery q) {
-        return q.getName();
+        String tooltip = q.getName();
+        if(tooltip == null) {
+            tooltip = "";
+        }
+        return tooltip;
     }
 
     @Override

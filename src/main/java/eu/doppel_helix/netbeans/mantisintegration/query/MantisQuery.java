@@ -34,7 +34,7 @@ public class MantisQuery {
     private MantisQueryController mqc;
     private MantisRepository mr;
     private String id = UUID.randomUUID().toString();
-    private String name = "";
+    private String name = null;
     private BigInteger projectId;
     private BigInteger serversideFilterId;
     private AccountData reporter;
