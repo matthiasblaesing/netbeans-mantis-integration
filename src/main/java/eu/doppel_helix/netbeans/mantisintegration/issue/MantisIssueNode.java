@@ -5,6 +5,8 @@ import biz.futureware.mantisconnect.ObjectRef;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import org.netbeans.modules.bugtracking.issuetable.IssueNode;
 
@@ -22,13 +24,89 @@ public class MantisIssueNode extends IssueNode<MantisIssue> {
                 new SummaryProperty(),
                 new ReflectionProperty<Integer>("mantis.issue.noteCount", "#", "Note count", getIssueData(), Integer.class, "getNoteCount", null),
                 new ReflectionProperty<String>("mantis.issue.category", "Category", "Category", getIssueData(), String.class, "getCategory", null),
-                new ReflectionProperty<ObjectRef>("mantis.issue.severity", "Severity", "Severity", getIssueData(), ObjectRef.class, "getSeverity", null),
-                new ReflectionProperty<ObjectRef>("mantis.issue.priority", "Priority", "Priority", getIssueData(), ObjectRef.class, "getPriority", null),
-                new ReflectionProperty<ObjectRef>("mantis.issue.status", "Status", "Status", getIssueData(), ObjectRef.class, "getStatus", null),
-                new ReflectionProperty<Calendar>("mantis.issue.updated", "Updated", "Updated", getIssueData(), Calendar.class, "getLast_updated", null),
+                new ObjectRefProperty("mantis.issue.severity", "Severity", "Severity", getIssueData(), ObjectRef.class, "getSeverity", null),
+                new ObjectRefProperty("mantis.issue.priority", "Priority", "Priority", getIssueData(), ObjectRef.class, "getPriority", null),
+                new StatusProperty("mantis.issue.status", "Status", "Status", getIssueData(), ObjectRef.class, "getStatus", null),
+                new CalendarProperty("mantis.issue.updated", "Updated", "Updated", getIssueData(), Calendar.class, "getLast_updated", null),
             };
         } catch (NoSuchMethodException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+    
+    private class CalendarProperty extends ReflectionProperty<Calendar> {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        public CalendarProperty(String name, String displayName, String shortDescription, Object instance, Class<Calendar> valueType, String property) throws NoSuchMethodException {
+            super(name, displayName, shortDescription, instance, valueType, property);
+        }
+
+        public CalendarProperty(String name, String displayName, String shortDescription, Object instance, Class<Calendar> valueType, Method getter, Method setter) {
+            super(name, displayName, shortDescription, instance, valueType, getter, setter);
+        }
+
+        public CalendarProperty(String name, String displayName, String shortDescription, Object instance, Class<Calendar> valueType, String getter, String setter) throws NoSuchMethodException {
+            super(name, displayName, shortDescription, instance, valueType, getter, setter);
+        }
+
+        @Override
+        public String toString() {
+            Calendar c = getValue();
+            if(c == null) {
+                return "";
+            } else {
+                return df.format(c.getTime());
+            }
+        }
+    }
+    
+    public class StatusProperty extends ReflectionProperty<ObjectRef> {
+
+        public StatusProperty(String name, String displayName, String shortDescription, Object instance, Class<ObjectRef> valueType, String property) throws NoSuchMethodException {
+            super(name, displayName, shortDescription, instance, valueType, property);
+        }
+
+        public StatusProperty(String name, String displayName, String shortDescription, Object instance, Class<ObjectRef> valueType, Method getter, Method setter) {
+            super(name, displayName, shortDescription, instance, valueType, getter, setter);
+        }
+
+        public StatusProperty(String name, String displayName, String shortDescription, Object instance, Class<ObjectRef> valueType, String getter, String setter) throws NoSuchMethodException {
+            super(name, displayName, shortDescription, instance, valueType, getter, setter);
+        }
+
+        @Override
+        public String toString() {
+            ObjectRef or = getValue();
+            if(or == null) {
+                return "";
+            } else {
+                return or.getName();
+            }
+        }
+    }
+    
+    private class ObjectRefProperty extends ReflectionProperty<ObjectRef> {
+
+        public ObjectRefProperty(String name, String displayName, String shortDescription, Object instance, Class<ObjectRef> valueType, String property) throws NoSuchMethodException {
+            super(name, displayName, shortDescription, instance, valueType, property);
+        }
+
+        public ObjectRefProperty(String name, String displayName, String shortDescription, Object instance, Class<ObjectRef> valueType, Method getter, Method setter) {
+            super(name, displayName, shortDescription, instance, valueType, getter, setter);
+        }
+
+        public ObjectRefProperty(String name, String displayName, String shortDescription, Object instance, Class<ObjectRef> valueType, String getter, String setter) throws NoSuchMethodException {
+            super(name, displayName, shortDescription, instance, valueType, getter, setter);
+        }
+
+        @Override
+        public String toString() {
+            ObjectRef or = getValue();
+            if(or == null) {
+                return "";
+            } else {
+                return or.getName();
+            }
         }
     }
     
