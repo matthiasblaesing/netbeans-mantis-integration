@@ -120,11 +120,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.twelvemonkeys.imageio</groupId>
-            <artifactId>twelvemonkeys-imageio-ico</artifactId>
-            <version>2.3</version>
-        </dependency>
-        <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>0.5</version>

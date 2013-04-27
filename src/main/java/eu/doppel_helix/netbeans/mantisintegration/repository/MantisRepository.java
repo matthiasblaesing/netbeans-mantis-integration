@@ -18,18 +18,13 @@ import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
 import eu.doppel_helix.netbeans.mantisintegration.data.Version;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
-import eu.doppel_helix.netbeans.mantisintegration.swing.ImageIconWrapper;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -40,7 +35,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,10 +45,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
-import org.apache.axis.encoding.Base64;
 import org.netbeans.modules.bugtracking.api.Repository;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 import org.netbeans.modules.bugtracking.ui.issue.cache.IssueCache;
@@ -80,7 +72,6 @@ public class MantisRepository {
     private MantisRepositoryController controller;
     private Lookup lookup;
     private boolean iconLoaded = false;
-    private Image icon = null;
     private MantisConnectPortType client;
     private Cache cache;
     private Version version;
@@ -192,30 +183,7 @@ public class MantisRepository {
     }
 
     public Image getIcon() {
-        try {
-            updateIcon();
-        } catch (Exception ex) {
-            logger.log(Level.INFO, "Exception while retrieving icon for mantis bug tracker", ex);
-        }
-        try {
-            if (icon == null) {
-                FileObject fo = getBaseConfigFileObject().getFileObject(
-                        "favicon.ico");
-                if (fo != null && fo.canRead()) {
-                    BufferedImage tempImage = ImageIO.read(fo.getInputStream());
-                    if (tempImage != null) {
-                        icon = new ImageIconWrapper(tempImage);
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            logger.log(Level.INFO, "Exception while retrieving icon for mantis bug tracker", ex);
-        }
-        if (icon == null) {
-            return ICON;
-        } else {
-            return icon;
-        }
+        return ICON;
     }
 
     public Lookup getLookup() {
@@ -391,39 +359,6 @@ public class MantisRepository {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 2);
         }
         return baseUrl;
-    }
-    
-    private void updateIcon() throws IOException {
-        try {
-            if (!iconLoaded) {
-                URL url = new URL(getBaseUrl() + "/images/favicon.ico");
-                InputStream is = url.openStream();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                int read = 0;
-
-                while ((read = is.read(buffer)) > 0) {
-                    baos.write(buffer, 0, read);
-                }
-
-                is.close();
-
-                byte[] iconData = baos.toByteArray();
-                BufferedImage tempImage = ImageIO.read(new ByteArrayInputStream(iconData));
-
-                if (tempImage != null) {
-                    icon = new ImageIconWrapper(tempImage);
-                    FileObject fo = FileUtil.createData(getBaseConfigFileObject(), "favicon.ico");
-                    OutputStream os = fo.getOutputStream();
-                    os.write(iconData);
-                    os.close();
-                }
-
-                iconLoaded = true;
-            }
-        } catch (RuntimeException ex) {
-            throw new IOException(ex);
-        }
     }
 
     /**

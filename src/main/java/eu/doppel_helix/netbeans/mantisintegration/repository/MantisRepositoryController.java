@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
+import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -23,6 +24,7 @@ import org.netbeans.modules.bugtracking.spi.RepositoryController;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
+import org.openide.util.Mutex;
 
 public class MantisRepositoryController implements RepositoryController, DocumentListener, ChangeListener, ActionListener {
     private final static Logger logger = Logger.getLogger(MantisRepositoryController.class.getName());
@@ -31,6 +33,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
     private MantisRepositoryPanel panel;
     private final List<String> errorMessages = new ArrayList<String>();
     private ChangeSupport cs = new ChangeSupport(this);
+    private boolean checking = false;
     
     public MantisRepositoryController(MantisRepository repository) {
         this.repository = repository;
@@ -80,7 +83,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
             errorMessages.add("Username or password empty");
         }
         
-        return errorMessages.size() == 0;
+        return errorMessages.size() == 0 && (! checking);
     }
 
     @Override
@@ -150,8 +153,26 @@ public class MantisRepositoryController implements RepositoryController, Documen
         cs.fireChange();
     }
 
+    public boolean isChecking() {
+        return checking;
+    }
+
+    public void setChecking(boolean checking) {
+        this.checking = checking;
+        cs.fireChange();
+    }
+    
     @Override
     public void stateChanged(ChangeEvent e) {
+        Mutex.EVENT.readAccess(new Runnable() {
+            public void run() {
+                panel.checkButton.setEnabled(! checking);
+                panel.nameTextField.setEnabled(! checking);
+                panel.urlTextField.setEnabled(! checking);
+                panel.usernameTextField.setEnabled(! checking);
+                panel.passwordTextField.setEnabled(! checking);
+            }
+        });
         if(isValid()) {
             panel.checkButton.setEnabled(true);
         } else {
@@ -162,22 +183,39 @@ public class MantisRepositoryController implements RepositoryController, Documen
     @Override
     public void actionPerformed(ActionEvent e) {
         if (COMMAND_CHECKCONNECTION.equals(e.getActionCommand())) {
-            try {
-                Version v = MantisRepository.checkConnection(
-                        panel.urlTextField.getText(),
-                        panel.usernameTextField.getText(),
-                        panel.passwordTextField.getText());
-                panel.checkResult.setText("Successfully connected (version: " + v.getVersionString() + ")");
-                panel.checkResult.setForeground(Color.GREEN);
-            } catch (ServiceException ex) {
-                logger.log(Level.INFO, "", ex);
-                panel.checkResult.setText("Failed create client - check URL");
-                panel.checkResult.setForeground(Color.RED);
-            } catch (RemoteException ex) {
-                logger.log(Level.INFO, "", ex);
-                panel.checkResult.setText("Failed request - check username/password");
-                panel.checkResult.setForeground(Color.RED);
-            }
+            setChecking(true);
+            new SwingWorker<Object, Object>() {
+                private String result = "";
+                private Color resultColor = null;
+
+                @Override
+                protected Object doInBackground() throws Exception {
+                    try {
+                        Version v = MantisRepository.checkConnection(
+                                panel.urlTextField.getText(),
+                                panel.usernameTextField.getText(),
+                                panel.passwordTextField.getText());
+                        result = "Successfully connected (version: " + v.getVersionString() + ")";
+                        resultColor = Color.GREEN;
+                    } catch (ServiceException ex) {
+                        logger.log(Level.INFO, "", ex);
+                        result = "Failed create client - check URL";
+                        resultColor = Color.RED;
+                    } catch (RemoteException ex) {
+                        logger.log(Level.INFO, "", ex);
+                        result = "Failed request - check username/password";
+                        resultColor = Color.RED;
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    panel.checkResult.setText(result);
+                    panel.checkResult.setForeground(resultColor);
+                    setChecking(false);
+                }
+            }.execute();
         }
     }
     
