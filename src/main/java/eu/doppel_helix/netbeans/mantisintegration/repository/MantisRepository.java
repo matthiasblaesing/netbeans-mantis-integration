@@ -49,13 +49,12 @@ import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.api.Repository;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
-import org.netbeans.modules.bugtracking.ui.issue.cache.IssueCache;
+import org.netbeans.modules.bugtracking.cache.IssueCache;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
-import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
 public class MantisRepository {
@@ -175,7 +174,7 @@ public class MantisRepository {
                 info.getId());
     }
 
-    private IssueCache<MantisIssue, IssueData> getIssueCache() {
+    private IssueCache<MantisIssue> getIssueCache() {
         if (cache == null && getRepository() != null) {
             cache = new Cache();
         }
@@ -184,16 +183,6 @@ public class MantisRepository {
 
     public Image getIcon() {
         return ICON;
-    }
-
-    public Lookup getLookup() {
-        if (lookup == null) {
-            lookup = new AbstractLookup(ic);
-        }
-        if (getIssueCache() != null && lookup.lookup(IssueCache.class) == null) {
-            ic.add(getIssueCache());
-        }
-        return lookup;
     }
 
     public void remove() {
@@ -412,8 +401,8 @@ public class MantisRepository {
                     info.getUsername(),
                     new String(info.getPassword()),
                     issue.getId());
-            getIssueCache().setIssueData(id.getId().toString(), id);
             issue.updateFromIssueData(id);
+            getIssueCache().setIssueData(id.getId().toString(), issue);
             return true;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -715,7 +704,7 @@ public class MantisRepository {
         List<MantisIssue> result = new ArrayList<MantisIssue>();
         MantisConnectPortType mcpt = getClient();
         Set<BigInteger> matchingIds = new HashSet<BigInteger>();
-        IssueCache<MantisIssue, IssueData> ic = getIssueCache();
+        IssueCache<MantisIssue> ic = getIssueCache();
         if (mq.getServersideFilterId() != null) {
             for (int i = 0; i < 1000; i++) {
                 IssueHeaderData[] ids = mcpt.mc_filter_get_issue_headers(
@@ -759,7 +748,7 @@ public class MantisRepository {
             count++;
         }
         if(mq.isSaved()) {
-            getIssueCache().storeQueryIssues(mq.getId(), ids);
+            ic.storeQueryIssues(mq.getId(), ids);
         }
         return Arrays.asList(getIssues(matchingIds.toArray(new BigInteger[0])));
     }
@@ -957,37 +946,15 @@ public class MantisRepository {
         return baos.toByteArray();
     }
 
-    private class Cache extends IssueCache<MantisIssue, IssueData> {
+    private class Cache extends IssueCache<MantisIssue> {
 
         Cache() {
-            super(
-                    MantisRepository.this.getInfo().getUrl(),
-                    new IssueAccessorImpl(),
-                    Mantis.getInstance().getIssueProvider(),
-                    MantisRepository.this.getRepository());
+            super(  MantisRepository.this.getInfo().getUrl(),
+                    new IssueAccessorImpl());
         }
     }
 
-    private class IssueAccessorImpl implements IssueCache.IssueAccessor<MantisIssue, IssueData> {
-
-        @Override
-        public MantisIssue createIssue(IssueData taskData) {
-            MantisIssue issue = new MantisIssue(MantisRepository.this);
-            issue.updateFromIssueData(taskData);
-            return issue;
-        }
-
-        @Override
-        public void setIssueData(MantisIssue issue, IssueData taskData) {
-            issue.updateFromIssueData(taskData);
-        }
-
-        @Override
-        public String getRecentChanges(MantisIssue issue) {
-            // @todo: Implement method correctly
-            return "";
-        }
-
+    private class IssueAccessorImpl implements IssueCache.IssueAccessor<MantisIssue> {
         @Override
         public long getLastModified(MantisIssue issue) {
             return issue.getLast_updated().getTimeInMillis();
@@ -996,16 +963,6 @@ public class MantisRepository {
         @Override
         public long getCreated(MantisIssue issue) {
             return issue.getDate_submitted().getTimeInMillis();
-        }
-
-        @Override
-        public String getID(IssueData issueData) {
-            assert issueData != null;
-            if (issueData.getId() == null) {
-                return null;
-            } else {
-                return issueData.getId().toString();
-            }
         }
 
         @Override
