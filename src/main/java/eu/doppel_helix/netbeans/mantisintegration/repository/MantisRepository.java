@@ -60,18 +60,18 @@ import org.openide.util.lookup.InstanceContent;
 
 public class MantisRepository {
     private static final String BASE_CONFIG_PATH = "MantisIntegration"; // NOI18N
-    private final static Logger logger = Logger.getLogger(MantisRepository.class.getName());
-    private final static Image ICON = ImageUtilities.loadImage(
+    private static final Logger logger = Logger.getLogger(MantisRepository.class.getName());
+    private static final Image ICON = ImageUtilities.loadImage(
             "eu/doppel_helix/netbeans/mantisintegration/icon.png");
-    private final static Version tagVersion = new Version("1.2.9");
+    private static final Version tagVersion = new Version("1.2.9");
     
     private final transient InstanceContent ic;
+    
     private RequestProcessor requestProzessor = new RequestProcessor(MantisRepository.class);
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private RepositoryInfo info;
     private MantisRepositoryController controller;
     private Lookup lookup;
-    private boolean iconLoaded = false;
     private MantisConnectPortType client;
     private Cache cache;
     private Version version;
@@ -278,7 +278,7 @@ public class MantisRepository {
                             BigInteger.valueOf(pageSize));
                     for (IssueHeaderData id : ids) {
                         if (id.getSummary().contains(criteria)
-                                || p.matcher(id.getSummary()).find()) {
+                                || (p != null && p.matcher(id.getSummary()).find())) {
                             matchingIds.add(id.getId());
                             if (result.size() > 250) {
                                 break OUTER;
@@ -712,7 +712,6 @@ public class MantisRepository {
 
     public List<MantisIssue> findIssues(MantisQuery mq) throws ServiceException, RemoteException  {
         BigInteger PAGE_SIZE = BigInteger.valueOf(500);
-        List<MantisIssue> result = new ArrayList<MantisIssue>();
         MantisConnectPortType mcpt = getClient();
         Set<BigInteger> matchingIds = new HashSet<BigInteger>();
         IssueCache<MantisIssue, IssueData> ic = getIssueCache();
@@ -869,7 +868,7 @@ public class MantisRepository {
         initTags(false);
         return new ArrayList<TagData>(tags.values());
     }
-
+   
     public boolean canUpdate(MantisIssue mi) {
         BigInteger projectId = mi.getProject().getId();
         
@@ -945,7 +944,7 @@ public class MantisRepository {
         pcs.removePropertyChangeListener(listener);
     }
 
-    public static byte[] fileGetContents(File f) throws IOException {
+    private static byte[] fileGetContents(File f) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         FileInputStream fis = new FileInputStream(f);
         int read = 0;
