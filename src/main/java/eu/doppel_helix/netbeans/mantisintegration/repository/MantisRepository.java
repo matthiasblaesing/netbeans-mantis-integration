@@ -63,9 +63,9 @@ public class MantisRepository {
     private static final Logger logger = Logger.getLogger(MantisRepository.class.getName());
     private static final Image ICON = ImageUtilities.loadImage(
             "eu/doppel_helix/netbeans/mantisintegration/icon.png");
-    private static final Version tagVersion = new Version("1.2.9");
     
     private final transient InstanceContent ic;
+    private final transient Capabilities capabilities = new Capabilities(this);
     
     private RequestProcessor requestProzessor = new RequestProcessor(MantisRepository.class);
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -96,9 +96,6 @@ public class MantisRepository {
     private HashMap<BigInteger, AccountData[]> users = new HashMap<BigInteger, AccountData[]>();
     private HashMap<BigInteger, FilterData[]> filters = new HashMap<BigInteger, FilterData[]>();
     private UserData account = null;
-    private HashMap<BigInteger,Boolean> projectUpdater = new HashMap<BigInteger, Boolean>();
-    private boolean userIsUpdaterChecked = false;
-    private Boolean userIsUpdater = false;
     private MantisRepositoryQueryStore queryStore;
 
     String getBaseConfigPath() {
@@ -327,10 +324,6 @@ public class MantisRepository {
             version = new Version(versionString);
         }
         return version;
-    }
-
-    public boolean isTagSupport() throws ServiceException, RemoteException {
-        return getVersion().compareTo(tagVersion) >= 0;
     }
 
     public URI getIssueUrl(MantisIssue issue) {
@@ -868,72 +861,9 @@ public class MantisRepository {
         initTags(false);
         return new ArrayList<TagData>(tags.values());
     }
-   
-    public boolean canUpdate(MantisIssue mi) {
-        BigInteger projectId = mi.getProject().getId();
-        
-        // Try project specific variant first (will fail on large resultsets)
-        
-        // Check cached value -- BEWARE! NULL _is_ a valid user => unknown
-        if(projectUpdater.containsKey(projectId) && projectUpdater.get(projectId) != null) {
-            return projectUpdater.get(projectId);
-        }
-        
-        // 40 is the access level for "updater"
-        final BigInteger requiredAccesslevel = BigInteger.valueOf(40);
-        
-        // Only try this once => takes potentially extremely long
-        if (projectUpdater.containsKey(projectId)) {
-            try {
-                AccountData[] validUsers = getClient().mc_project_get_users(
-                        info.getUsername(),
-                        new String(info.getPassword()),
-                        projectId,
-                        requiredAccesslevel);
-                for (AccountData ac : validUsers) {
-                    if (info.getUsername().equals(ac.getName())) {
-                        projectUpdater.put(projectId, true);
-                    }
-                }
-                projectUpdater.put(projectId, false);
-            } catch (Exception ex) {
-                logger.log(Level.INFO, MessageFormat.format(
-                        "Failed to retrieve updaters for project {0}",
-                        projectId), ex);
-                // Prevent multiple tries to retrieve users
-                projectUpdater.put(projectId, null);
-            }
-        }
-        
-        
-        
-        // Fallback to user role
-        if(userIsUpdaterChecked && userIsUpdater != null) {
-            return userIsUpdater;
-        }
-        
-        // Try this only once ...
-        if(! userIsUpdaterChecked) {
-            userIsUpdaterChecked = true;
-            
-            BigInteger userAccessLevel;
-            try {
-                userAccessLevel = getAccount().getAccess_level();
-                if (userAccessLevel.compareTo(requiredAccesslevel) >= 0) {
-                    userIsUpdater = true;
-                } else {
-                    userIsUpdater = false;
-                }
-                return userIsUpdater;
-            } catch (Exception ex) {
-                logger.log(Level.INFO, "Failed to retrieve accesslevel for user", ex);
-                userIsUpdater = null;
-            }
-        }
-            
-        // *arg* -> we can't know so asume the developer (our targetgroup)
-        // knows what he is doing and allowed
-        return true;
+
+    public Capabilities getCapabilities() {
+        return capabilities;
     }
     
     public void addPropertyChangeListener(PropertyChangeListener listener) {

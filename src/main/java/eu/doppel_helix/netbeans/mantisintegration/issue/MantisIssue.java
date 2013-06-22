@@ -234,12 +234,12 @@ public class MantisIssue {
     }
 
     /**
-     * Update issue data + add tags
+     * Check whether update of issue data and tags is possible
      * 
      * @todo: Implement a better strategy to check
      */
     public boolean canUpdate() {
-        return mr.canUpdate(this);
+        return mr.getCapabilities().canUpdate(this);
     }
     
     // Property change support
