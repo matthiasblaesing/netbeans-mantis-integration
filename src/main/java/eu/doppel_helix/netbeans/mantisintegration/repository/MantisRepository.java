@@ -456,12 +456,18 @@ public class MantisRepository {
         issue.refresh();
     }
 
-    public void addComment(MantisIssue issue, String comment, ObjectRef viewState)
+    public void addComment(MantisIssue issue, String comment, ObjectRef viewState, BigInteger timetracking)
             throws ServiceException, RemoteException {
         MantisConnectPortType mcpt = getClient();
         IssueNoteData ind = new IssueNoteData();
         ind.setText(comment);
         ind.setView_state(viewState);
+        if(timetracking == null) {
+            ind.setTime_tracking(BigInteger.ZERO);
+        } else {
+            ind.setTime_tracking(timetracking);
+        }
+        
         mcpt.mc_issue_note_add(
                 info.getUsername(),
                 new String(info.getPassword()),
