@@ -43,8 +43,9 @@ and is installable stand-alone.
 
 Known Kombinations:
 
-7.2: mvn -Dmantisintegration.nbtarget=RELEASE72 -Dmantisintegration.bugtracking.implver=201301311716 package
-7.3: mvn -Dmantisintegration.nbtarget=RELEASE73 -Dmantisintegration.bugtracking.implver=201302132200 package
+* 7.2: mvn -Dmantisintegration.nbtarget=RELEASE72 -Dmantisintegration.bugtracking.implver=201301311716 package
+* 7.3: mvn -Dmantisintegration.nbtarget=RELEASE73 -Dmantisintegration.bugtracking.implver=201302132200 package
+* 7.3.1: mvn -Dmantisintegration.nbtarget=RELEASE73 -Dmantisintegration.bugtracking.implver=201302132200 package
 
 The mantisintegration.nbtarget property is necessary because the RepositoryProvider
 interface received two new methods removePropertyChangeListerer and addPropertyChangeListener
