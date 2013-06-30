@@ -24,7 +24,9 @@ If you use a self-signed certificate, there are two options:
 2. Make sure you use a recent version of MantisIntegration (0.5 and newer) and
 install the "SSL Certificate Exception" module, that is part of nb-ldap-explorer.
 The module can be found at: [http://code.google.com/p/nb-ldap-explorer/downloads/list](http://code.google.com/p/nb-ldap-explorer/downloads/list)
-and is installable stand-alone.
+and is installable stand-alone. Since version 0.6 the "SSL Certificate Exception"
+module is distributed together with the 7.3 and 7.3.1 modules inside the zip 
+downloadable from the netbeans plugin center.
 
 #Developer information
 ##BUILD Instructions:
@@ -45,7 +47,7 @@ Known Kombinations:
 
 * 7.2: mvn -Dmantisintegration.nbtarget=RELEASE72 -Dmantisintegration.bugtracking.implver=201301311716 package
 * 7.3: mvn -Dmantisintegration.nbtarget=RELEASE73 -Dmantisintegration.bugtracking.implver=201302132200 package
-* 7.3.1: mvn -Dmantisintegration.nbtarget=RELEASE73 -Dmantisintegration.bugtracking.implver=201302132200 package
+* 7.3.1: mvn -Dmantisintegration.nbtarget=RELEASE73 -Dmantisintegration.bugtracking.implver=201306052037 package
 
 The mantisintegration.nbtarget property is necessary because the RepositoryProvider
 interface received two new methods removePropertyChangeListerer and addPropertyChangeListener
