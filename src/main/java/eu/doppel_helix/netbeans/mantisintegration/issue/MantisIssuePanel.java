@@ -10,6 +10,7 @@ import eu.doppel_helix.netbeans.mantisintegration.swing.NoopListener;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ObjectRefListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ProjectListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.StringNullSaveListCellRenderer;
+import eu.doppel_helix.netbeans.mantisintegration.swing.TimeFormatterFactory;
 import eu.doppel_helix.netbeans.mantisintegration.swing.VerticalScrollPane;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,7 +37,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
     private NoopListener noopListener = new NoopListener();
     JPanel waitPanel;
     
-    public MantisIssuePanel() {
+    public MantisIssuePanel() {        
         initComponents();
         scrollablePane.getVerticalScrollBar().setUnitIncrement(20);
         waitPanel = new JPanel(new BorderLayout()) {
@@ -154,6 +155,8 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         addNoteButton = new javax.swing.JButton();
         addNoteScrollPane = new javax.swing.JScrollPane();
         addNoteEditorPane = new eu.doppel_helix.netbeans.mantisintegration.swing.DirectionalEditorPane();
+        timetrackLabel = new javax.swing.JLabel();
+        timetrackInput = new javax.swing.JFormattedTextField();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 32767));
 
         setBackground(javax.swing.UIManager.getDefaults().getColor("TextArea.background"));
@@ -775,10 +778,10 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         buttonPanel2.add(addNoteButton);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         addNotesPanel.add(buttonPanel2, gridBagConstraints);
 
@@ -792,12 +795,30 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         addNoteScrollPane.setViewportView(addNoteEditorPane);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         addNotesPanel.add(addNoteScrollPane, gridBagConstraints);
         addNoteScrollPane.getViewport().setBackground(addNoteScrollPane.getBackground());
+
+        org.openide.awt.Mnemonics.setLocalizedText(timetrackLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.timetrackLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        addNotesPanel.add(timetrackLabel, gridBagConstraints);
+        timetrackInput.setFormatterFactory(new TimeFormatterFactory());
+        timetrackInput.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        timetrackInput.setText(org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.timetrackInput.text")); // NOI18N
+        timetrackInput.setMinimumSize(new java.awt.Dimension(4, 50));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.ipadx = 20;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        addNotesPanel.add(timetrackInput, gridBagConstraints);
 
         notesOuterPanel.add(addNotesPanel);
 
@@ -821,6 +842,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
 
         scrollablePane.setViewportView(innerPanel);
 
+        scrollablePane.setBounds(0, 0, 584, 736);
         add(scrollablePane, javax.swing.JLayeredPane.DEFAULT_LAYER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -894,6 +916,8 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
     javax.swing.JTextField summaryTextField;
     javax.swing.JLabel tagsLabel;
     javax.swing.JPanel tagsPanel;
+    javax.swing.JFormattedTextField timetrackInput;
+    javax.swing.JLabel timetrackLabel;
     javax.swing.JButton updateIssueButton;
     javax.swing.JLabel updatedLabel;
     javax.swing.JLabel updatedValueLabel;

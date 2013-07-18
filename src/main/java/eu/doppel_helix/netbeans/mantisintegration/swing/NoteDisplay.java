@@ -14,6 +14,7 @@ public class NoteDisplay extends javax.swing.JPanel {
     private final static BigInteger privateVal = BigInteger.valueOf(50);
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     private IssueNoteData noteData;
+    private boolean showTimeTrack = false;
     private LayoutManager layout = new LayoutManager() {
 
         @Override
@@ -59,6 +60,7 @@ public class NoteDisplay extends javax.swing.JPanel {
             height += submitDateLabel.getMinimumSize().getHeight();
             height += editDateLabel.getMinimumSize().getHeight();
             height += privateLabel.getMinimumSize().getHeight();
+            height += timeTrackingLabel.getMinimumSize().getHeight();
             height += 20; // Somewhere my calculation is off
             return (int) height;
         }
@@ -68,6 +70,7 @@ public class NoteDisplay extends javax.swing.JPanel {
             height += submitDateLabel.getPreferredSize().getHeight();
             height += editDateLabel.getPreferredSize().getHeight();
             height += privateLabel.getPreferredSize().getHeight();
+            height += timeTrackingLabel.getPreferredSize().getHeight();
             height += 20; // Somewhere my calculation is off
             return (int) height;
         }
@@ -78,12 +81,13 @@ public class NoteDisplay extends javax.swing.JPanel {
         setLayout(layout);
     }
 
-    public NoteDisplay(IssueNoteData noteData) {
+    public NoteDisplay(IssueNoteData noteData, boolean showTimeTrack) {
         this();
-        setNoteData(noteData);
+        setNoteData(noteData, showTimeTrack);
     }
     
-    public void setNoteData(IssueNoteData noteData) {
+    public void setNoteData(IssueNoteData noteData, boolean showTimeTrack) {
+        this.showTimeTrack = showTimeTrack;
         this.noteData = noteData;
         reporterLabel.setText(noteData.getReporter().getName());
         submitDateLabel.setText(sdf.format(noteData.getDate_submitted().getTime()));
@@ -98,6 +102,15 @@ public class NoteDisplay extends javax.swing.JPanel {
             privateLabel.setText("[private]");
         } else {
             privateLabel.setText("");
+        }
+        // TimeTracking is returned in minutes
+        BigInteger timeTrack = noteData.getTime_tracking();
+        if(showTimeTrack && timeTrack != null && timeTrack.compareTo(BigInteger.ZERO) > 0) {
+            BigInteger[] parts = timeTrack.divideAndRemainder(BigInteger.valueOf(60));
+            timeTrackingLabel.setVisible(true);
+            timeTrackingLabel.setText(String.format("Time: %02d:%02d",parts[0], parts[1]));
+        } else {
+            timeTrackingLabel.setVisible(false);
         }
         DefaultCaret dc = (DefaultCaret) noteTextPane.getCaret();
         dc.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
@@ -119,6 +132,7 @@ public class NoteDisplay extends javax.swing.JPanel {
         submitDateLabel = new javax.swing.JLabel();
         editDateLabel = new javax.swing.JLabel();
         privateLabel = new javax.swing.JLabel();
+        timeTrackingLabel = new javax.swing.JLabel();
         noteTextPane = new javax.swing.JTextPane();
 
         setBackground(new java.awt.Color(255, 255, 255));
@@ -148,6 +162,10 @@ public class NoteDisplay extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(privateLabel, org.openide.util.NbBundle.getMessage(NoteDisplay.class, "NoteDisplay.privateLabel.text")); // NOI18N
         leftPanel.add(privateLabel);
 
+        timeTrackingLabel.setFont(timeTrackingLabel.getFont().deriveFont(timeTrackingLabel.getFont().getStyle() & ~java.awt.Font.BOLD, timeTrackingLabel.getFont().getSize()-1));
+        org.openide.awt.Mnemonics.setLocalizedText(timeTrackingLabel, org.openide.util.NbBundle.getMessage(NoteDisplay.class, "NoteDisplay.timeTrackingLabel.text")); // NOI18N
+        leftPanel.add(timeTrackingLabel);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -171,5 +189,6 @@ public class NoteDisplay extends javax.swing.JPanel {
     private javax.swing.JLabel privateLabel;
     private javax.swing.JLabel reporterLabel;
     private javax.swing.JLabel submitDateLabel;
+    private javax.swing.JLabel timeTrackingLabel;
     // End of variables declaration//GEN-END:variables
 }

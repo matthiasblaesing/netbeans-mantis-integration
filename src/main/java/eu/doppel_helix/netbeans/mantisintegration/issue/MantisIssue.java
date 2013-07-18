@@ -7,6 +7,7 @@ import biz.futureware.mantisconnect.IssueData;
 import biz.futureware.mantisconnect.IssueNoteData;
 import biz.futureware.mantisconnect.ObjectRef;
 import biz.futureware.mantisconnect.RelationshipData;
+import eu.doppel_helix.netbeans.mantisintegration.data.Permission;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -21,7 +22,6 @@ import java.util.logging.Logger;
 import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
 import org.openide.util.Mutex;
-import org.openide.util.MutexException;
 
 public class MantisIssue {
     private final static Logger logger = Logger.getLogger(MantisIssue.class.getName());
@@ -30,6 +30,7 @@ public class MantisIssue {
     private IssueData issueData = new IssueData();
     private MantisIssueController mic;
     private Integer busy = 0;
+    private Permission timetracking = Permission.NONE;
 
     public MantisIssue(MantisRepository mr) {
         this.mr = mr;
@@ -99,6 +100,7 @@ public class MantisIssue {
     public boolean refresh() throws ServiceException, RemoteException {
         setBusy(true);
         boolean result = mr.updateIssueFromRepository(MantisIssue.this);
+        timetracking = mr.getCapabilities().getTrackTime(this);
         if(result) {
             firePropertyChange(IssueProvider.EVENT_ISSUE_REFRESHED, null, null);
         }
@@ -201,9 +203,9 @@ public class MantisIssue {
         setBusy(false);
     }
 
-    public void addComment(String comment, ObjectRef viewState) throws ServiceException, RemoteException {
+    public void addComment(String comment, ObjectRef viewState, BigInteger timetracking) throws ServiceException, RemoteException {
         setBusy(true);
-        mr.addComment(this, comment, viewState);
+        mr.addComment(this, comment, viewState, timetracking);
         setBusy(false);
     }
 
@@ -234,12 +236,16 @@ public class MantisIssue {
     }
 
     /**
-     * Update issue data + add tags
+     * Check whether update of issue data and tags is possible
      * 
      * @todo: Implement a better strategy to check
      */
     public boolean canUpdate() {
-        return mr.canUpdate(this);
+        return mr.getCapabilities().canUpdate(this);
+    }
+    
+    public Permission getTimetracking() {
+        return timetracking;
     }
     
     // Property change support

@@ -8,6 +8,7 @@ import biz.futureware.mantisconnect.ObjectRef;
 import biz.futureware.mantisconnect.ProjectData;
 import biz.futureware.mantisconnect.RelationshipData;
 import eu.doppel_helix.netbeans.mantisintegration.data.FlattenedProjectData;
+import eu.doppel_helix.netbeans.mantisintegration.data.Permission;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.swing.AttachmentDisplay;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
@@ -204,6 +205,9 @@ public class MantisIssueController extends BugtrackingController implements Prop
             panel.tagsPanel.setVisible(true);
             panel.attachmentLabel.setVisible(true);
             panel.attachmentPanel.setVisible(true);
+            boolean timeTracking = issue.getTimetracking() == Permission.WRITE;
+            panel.timetrackInput.setVisible(timeTracking);
+            panel.timetrackLabel.setVisible(timeTracking);
         }
     }
     
@@ -408,13 +412,16 @@ public class MantisIssueController extends BugtrackingController implements Prop
                         if (!first) {
                             panel.notesPanel.add(new Box.Filler(fixedDim, fixedDim, fixedDim));
                         }
-                        panel.notesPanel.add(new NoteDisplay(ind));
+                        boolean showTimeTracking = issue.getTimetracking() == Permission.WRITE;
+                        showTimeTracking |= issue.getTimetracking() == Permission.READ;
+                        panel.notesPanel.add(new NoteDisplay(ind, showTimeTracking));
                         if (first) {
                             first = false;
                         }
                     }
                 }
             }
+            panel.timetrackInput.setValue(BigInteger.ZERO);
             panel.revalidate();
             panel.repaint();
         }
@@ -533,12 +540,14 @@ public class MantisIssueController extends BugtrackingController implements Prop
         } else if ("addNote".equals(e.getActionCommand())) {
             final ObjectRef viewState = (ObjectRef) panel.addNoteViewStateComboBox.getSelectedItem();
             final String comment = panel.addNoteEditorPane.getText();
+            final BigInteger timetracking = (BigInteger) panel.timetrackInput.getValue();
             panel.addNoteViewStateComboBox.setSelectedIndex(0);
             panel.addNoteEditorPane.setText("");
+            panel.timetrackInput.setValue(BigInteger.ZERO);
             issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
                 public void run() {
                     try {
-                        issue.addComment(comment, viewState);
+                        issue.addComment(comment, viewState, timetracking);
                     } catch (Exception ex) {
                         NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
                                 "Failed to comment to issue");
