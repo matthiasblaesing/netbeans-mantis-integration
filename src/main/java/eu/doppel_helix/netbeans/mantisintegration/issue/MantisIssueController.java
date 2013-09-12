@@ -6,6 +6,7 @@ import biz.futureware.mantisconnect.IssueData;
 import biz.futureware.mantisconnect.IssueNoteData;
 import biz.futureware.mantisconnect.ObjectRef;
 import biz.futureware.mantisconnect.ProjectData;
+import biz.futureware.mantisconnect.ProjectVersionData;
 import biz.futureware.mantisconnect.RelationshipData;
 import eu.doppel_helix.netbeans.mantisintegration.data.FlattenedProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.data.Permission;
@@ -63,13 +64,15 @@ public class MantisIssueController extends BugtrackingController implements Prop
     private ListBackedComboBoxModel<ObjectRef> resolutionsModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
     private ListBackedComboBoxModel<ObjectRef> statesModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
     private ListBackedComboBoxModel<ObjectRef> etasModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
+    private ListBackedComboBoxModel<String> targetVersionModel = new ListBackedComboBoxModel<String>(String.class);
+    private ListBackedComboBoxModel<String> productVersionModel = new ListBackedComboBoxModel<String>(String.class);
+    private ListBackedComboBoxModel<String> fixVersionModel = new ListBackedComboBoxModel<String>(String.class);
     private ListBackedComboBoxModel<ObjectRef> projectionsModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
     private ListBackedComboBoxModel<String> categoriesModel = new ListBackedComboBoxModel<String>(String.class);
     private ListBackedComboBoxModel<AccountData> assignedModel = new ListBackedComboBoxModel<AccountData>(AccountData.class);
     private MantisIssuePanel panel;
     private MantisIssue issue;
     private StateMonitor stateMonitor = new StateMonitor();
-
     private final SwingWorker updateModel = new SwingWorker() {
         List<FlattenedProjectData> projects;
         List<ObjectRef> viewStates;
@@ -156,6 +159,9 @@ public class MantisIssueController extends BugtrackingController implements Prop
             panel.statusComboBox.setModel(statesModel);
             panel.projectionComboBox.setModel(projectionsModel);
             panel.etaComboBox.setModel(etasModel);
+            panel.targetVersionComboBox.setModel(targetVersionModel);
+            panel.fixVersionComboBox.setModel(fixVersionModel);
+            panel.versionComboBox.setModel(productVersionModel);
             panel.refreshLinkButton.addActionListener(this);
             panel.openIssueWebbrowserLinkButton.addActionListener(this);
             panel.projectComboBox.addActionListener(this);
@@ -221,6 +227,9 @@ public class MantisIssueController extends BugtrackingController implements Prop
         panel.priorityComboBox.setEnabled(enabled);
         panel.projectionComboBox.setEnabled(enabled);
         panel.etaComboBox.setEnabled(enabled);
+        panel.targetVersionComboBox.setEnabled(enabled);
+        panel.fixVersionComboBox.setEnabled(enabled);
+        panel.versionComboBox.setEnabled(enabled);
         panel.platformTextField.setEditable(enabled);
         panel.osTextField.setEditable(enabled);
         panel.osVersionTextField.setEditable(enabled);
@@ -285,6 +294,15 @@ public class MantisIssueController extends BugtrackingController implements Prop
             }
             if (property == null || "category".equals(property)) {
                 panel.categoryComboBox.setSelectedItem(issue.getCategory());
+            }
+            if (property == null || "target_version".equals(property)) {
+                panel.targetVersionComboBox.setSelectedItem(issue.getTarget_version());
+            }
+            if (property == null || "version".equals(property)) {
+                panel.versionComboBox.setSelectedItem(issue.getVersion());
+            }
+            if (property == null || "fixed_in_version".equals(property)) {
+                panel.fixVersionComboBox.setSelectedItem(issue.getFixed_in_version());
             }
             if (property == null || "view_state".equals(property)) {
                 panel.viewStatusComboBox.setSelectedItem(issue.getView_state());
@@ -461,9 +479,9 @@ public class MantisIssueController extends BugtrackingController implements Prop
         updateData.setSteps_to_reproduce(panel.stepsToReproduceEditorPane.getText());
         updateData.setSummary(panel.summaryTextField.getText());
         updateData.setView_state((ObjectRef) panel.viewStatusComboBox.getSelectedItem());
-        // ToDo: the next two need exposure in GUI
-        updateData.setTarget_version(issue.getTarget_version());
-        updateData.setVersion(issue.getVersion());
+        updateData.setTarget_version((String)panel.targetVersionComboBox.getSelectedItem());
+        updateData.setVersion((String)panel.versionComboBox.getSelectedItem());
+        updateData.setFixed_in_version((String)panel.fixVersionComboBox.getSelectedItem());
         updateData.setSponsorship_total(issue.getSponsorship_total());
         // Should reporter/submitdate/last be updateable?
         updateData.setReporter(issue.getReporter());
@@ -559,6 +577,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
             try {
                 List<String> categories = new ArrayList<String>();
                 List<AccountData> users = new ArrayList<AccountData>();
+                List<String> versions = new ArrayList<String>();
                 FlattenedProjectData fpd = (FlattenedProjectData) panel.projectComboBox.getSelectedItem();
                 if (fpd != null) {
                     MantisRepository mr = issue.getMantisRepository();
@@ -566,9 +585,16 @@ public class MantisIssueController extends BugtrackingController implements Prop
                     categories.addAll(Arrays.asList(mr.getCategories(fpd.getProjectData().getId())));
                     users.add(null);
                     users.addAll(Arrays.asList(mr.getUsers(fpd.getProjectData().getId())));
+                    versions.add(null);
+                    for (ProjectVersionData vdata : mr.getVersions(fpd.getProjectData().getId())) {
+                        versions.add(vdata.getName());
+                    }
                 }
                 categoriesModel.setBackingList(categories);
                 assignedModel.setBackingList(users);
+                targetVersionModel.setBackingList(versions);
+                productVersionModel.setBackingList(versions);
+                fixVersionModel.setBackingList(versions);
             } catch (Exception ex) {
                 if (ex instanceof RemoteException || ex instanceof ServiceException) {
                     NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,

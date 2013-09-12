@@ -158,6 +158,12 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         timetrackLabel = new javax.swing.JLabel();
         timetrackInput = new javax.swing.JFormattedTextField();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 32767));
+        targetVersionLabel = new javax.swing.JLabel();
+        targetVersionComboBox = new javax.swing.JComboBox();
+        versionLabel = new javax.swing.JLabel();
+        versionComboBox = new javax.swing.JComboBox();
+        fixVersionLabel = new javax.swing.JLabel();
+        fixVersionComboBox = new javax.swing.JComboBox();
 
         setBackground(javax.swing.UIManager.getDefaults().getColor("TextArea.background"));
 
@@ -673,7 +679,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         org.openide.awt.Mnemonics.setLocalizedText(relationsLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.relationsLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(relationsLabel, gridBagConstraints);
@@ -684,7 +690,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         relationsPanel.setLayout(flowLayout1);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -694,7 +700,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         org.openide.awt.Mnemonics.setLocalizedText(tagsLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.tagsLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(tagsLabel, gridBagConstraints);
@@ -705,7 +711,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         tagsPanel.setLayout(flowLayout2);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -809,6 +815,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         addNotesPanel.add(timetrackLabel, gridBagConstraints);
+
         timetrackInput.setFormatterFactory(new TimeFormatterFactory());
         timetrackInput.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         timetrackInput.setText(org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.timetrackInput.text")); // NOI18N
@@ -840,9 +847,72 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.weighty = 1.0;
         innerPanel.add(filler1, gridBagConstraints);
 
+        targetVersionLabel.setFont(targetVersionLabel.getFont().deriveFont(targetVersionLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
+        org.openide.awt.Mnemonics.setLocalizedText(targetVersionLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.targetVersionLabel.text")); // NOI18N
+        targetVersionLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.targetVersionLabel.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        innerPanel.add(targetVersionLabel, gridBagConstraints);
+
+        targetVersionComboBox.setPrototypeDisplayValue("XXXXXXXX");
+        targetVersionComboBox.setRenderer(new ObjectRefListCellRenderer());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        innerPanel.add(targetVersionComboBox, gridBagConstraints);
+
+        versionLabel.setFont(versionLabel.getFont().deriveFont(versionLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
+        org.openide.awt.Mnemonics.setLocalizedText(versionLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.versionLabel.text")); // NOI18N
+        versionLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.versionLabel.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        innerPanel.add(versionLabel, gridBagConstraints);
+
+        versionComboBox.setPrototypeDisplayValue("XXXXXXXX");
+        versionComboBox.setRenderer(new ObjectRefListCellRenderer());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        innerPanel.add(versionComboBox, gridBagConstraints);
+
+        fixVersionLabel.setFont(fixVersionLabel.getFont().deriveFont(fixVersionLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
+        org.openide.awt.Mnemonics.setLocalizedText(fixVersionLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.fixVersionLabel.text")); // NOI18N
+        fixVersionLabel.setToolTipText(org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.fixVersionLabel.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        innerPanel.add(fixVersionLabel, gridBagConstraints);
+
+        fixVersionComboBox.setPrototypeDisplayValue("XXXXXXXX");
+        fixVersionComboBox.setRenderer(new ObjectRefListCellRenderer());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        innerPanel.add(fixVersionComboBox, gridBagConstraints);
+
         scrollablePane.setViewportView(innerPanel);
 
-        scrollablePane.setBounds(0, 0, 584, 736);
+        scrollablePane.setBounds(0, 0, 606, 764);
         add(scrollablePane, javax.swing.JLayeredPane.DEFAULT_LAYER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -874,6 +944,8 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
     javax.swing.JComboBox etaComboBox;
     javax.swing.JLabel etaLabel;
     javax.swing.Box.Filler filler1;
+    javax.swing.JComboBox fixVersionComboBox;
+    javax.swing.JLabel fixVersionLabel;
     javax.swing.JPanel headerButtonsPanel;
     javax.swing.JPanel headerPanel;
     javax.swing.JPanel innerPanel;
@@ -916,11 +988,15 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
     javax.swing.JTextField summaryTextField;
     javax.swing.JLabel tagsLabel;
     javax.swing.JPanel tagsPanel;
+    javax.swing.JComboBox targetVersionComboBox;
+    javax.swing.JLabel targetVersionLabel;
     javax.swing.JFormattedTextField timetrackInput;
     javax.swing.JLabel timetrackLabel;
     javax.swing.JButton updateIssueButton;
     javax.swing.JLabel updatedLabel;
     javax.swing.JLabel updatedValueLabel;
+    javax.swing.JComboBox versionComboBox;
+    javax.swing.JLabel versionLabel;
     javax.swing.JComboBox viewStatusComboBox;
     javax.swing.JLabel viewStatusLabel;
     // End of variables declaration//GEN-END:variables

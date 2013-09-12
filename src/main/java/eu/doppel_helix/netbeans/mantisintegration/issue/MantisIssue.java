@@ -140,6 +140,8 @@ public class MantisIssue {
         issueData.setNotes(id.getNotes());
         issueData.setCustom_fields(id.getCustom_fields());
         issueData.setTags(id.getTags());
+        issueData.setTarget_version(id.getTarget_version());
+        issueData.setVersion(id.getVersion());
         Mutex.EVENT.writeAccess(new Runnable() {
             @Override
             public void run() {

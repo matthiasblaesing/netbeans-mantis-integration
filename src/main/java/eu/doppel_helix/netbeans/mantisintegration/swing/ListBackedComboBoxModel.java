@@ -22,7 +22,7 @@ public class ListBackedComboBoxModel<E> implements ComboBoxModel<E> {
     }
     
     /**
-     * Set the backing List for this ComboBoxModel
+     * Set the backing List for this ComboBoxModel (the list is copied)
      * 
      * @param elements 
      */

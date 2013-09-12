@@ -10,6 +10,7 @@ import biz.futureware.mantisconnect.MantisConnectLocator;
 import biz.futureware.mantisconnect.MantisConnectPortType;
 import biz.futureware.mantisconnect.ObjectRef;
 import biz.futureware.mantisconnect.ProjectData;
+import biz.futureware.mantisconnect.ProjectVersionData;
 import biz.futureware.mantisconnect.RelationshipData;
 import biz.futureware.mantisconnect.TagData;
 import biz.futureware.mantisconnect.UserData;
@@ -94,6 +95,7 @@ public class MantisRepository {
     private HashMap<BigInteger, TagData> tags;
     private HashMap<BigInteger, String[]> categories = new HashMap<BigInteger, String[]>();
     private HashMap<BigInteger, AccountData[]> users = new HashMap<BigInteger, AccountData[]>();
+    private HashMap<BigInteger, ProjectVersionData[]> versions = new HashMap<BigInteger, ProjectVersionData[]>();
     private HashMap<BigInteger, FilterData[]> filters = new HashMap<BigInteger, FilterData[]>();
     private UserData account = null;
     private MantisRepositoryQueryStore queryStore;
@@ -697,6 +699,28 @@ public class MantisRepository {
         return result;
     }
 
+    public ProjectVersionData[] getVersions(BigInteger projectID) throws ServiceException, RemoteException  {
+        if (versions.get(projectID) == null) {
+            MantisConnectPortType mcpt = getClient();
+            try {
+                ProjectVersionData[] projVersions = mcpt.mc_project_get_versions(
+                        info.getUsername(),
+                        new String(info.getPassword()),
+                        projectID);
+                Arrays.sort(projVersions, new ProjectVersionDataComparator());
+                versions.put(projectID, projVersions);
+            } catch (RemoteException ex) {
+                logger.log(Level.INFO, "", ex);
+                versions.put(projectID, new ProjectVersionData[0]);
+            }
+        }
+        ProjectVersionData[] result = versions.get(projectID);
+        if(result == null) {
+            result = new ProjectVersionData[0];
+        }
+        return result;
+    }
+    
     public FilterData[] getFilters(BigInteger projectID) throws ServiceException, RemoteException  {
         if (filters.get(projectID) == null) {
             MantisConnectPortType mcpt = getClient();
