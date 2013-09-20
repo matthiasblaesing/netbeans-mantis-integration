@@ -858,7 +858,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         innerPanel.add(targetVersionLabel, gridBagConstraints);
 
         targetVersionComboBox.setPrototypeDisplayValue("XXXXXXXX");
-        targetVersionComboBox.setRenderer(new ObjectRefListCellRenderer());
+        targetVersionComboBox.setRenderer(new StringNullSaveListCellRenderer());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 7;
@@ -879,7 +879,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         innerPanel.add(versionLabel, gridBagConstraints);
 
         versionComboBox.setPrototypeDisplayValue("XXXXXXXX");
-        versionComboBox.setRenderer(new ObjectRefListCellRenderer());
+        versionComboBox.setRenderer(new StringNullSaveListCellRenderer());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
@@ -900,7 +900,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         innerPanel.add(fixVersionLabel, gridBagConstraints);
 
         fixVersionComboBox.setPrototypeDisplayValue("XXXXXXXX");
-        fixVersionComboBox.setRenderer(new ObjectRefListCellRenderer());
+        fixVersionComboBox.setRenderer(new StringNullSaveListCellRenderer());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 7;

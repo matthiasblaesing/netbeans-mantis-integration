@@ -479,9 +479,12 @@ public class MantisIssueController extends BugtrackingController implements Prop
         updateData.setSteps_to_reproduce(panel.stepsToReproduceEditorPane.getText());
         updateData.setSummary(panel.summaryTextField.getText());
         updateData.setView_state((ObjectRef) panel.viewStatusComboBox.getSelectedItem());
-        updateData.setTarget_version((String)panel.targetVersionComboBox.getSelectedItem());
-        updateData.setVersion((String)panel.versionComboBox.getSelectedItem());
-        updateData.setFixed_in_version((String)panel.fixVersionComboBox.getSelectedItem());
+        String targetVersion = (String)panel.targetVersionComboBox.getSelectedItem();
+        String version = (String)panel.versionComboBox.getSelectedItem();
+        String fixedInVersion = (String)panel.fixVersionComboBox.getSelectedItem();
+        updateData.setTarget_version(targetVersion == null ? "" : targetVersion);
+        updateData.setVersion(version == null ? "" : version);
+        updateData.setFixed_in_version(fixedInVersion == null ? "" : fixedInVersion);
         updateData.setSponsorship_total(issue.getSponsorship_total());
         // Should reporter/submitdate/last be updateable?
         updateData.setReporter(issue.getReporter());

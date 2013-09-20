@@ -1428,7 +1428,7 @@
                   <Connection code="&quot;XXXXXXXX&quot;" type="code"/>
                 </Property>
                 <Property name="renderer" type="javax.swing.ListCellRenderer" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new ObjectRefListCellRenderer()" type="code"/>
+                  <Connection code="new StringNullSaveListCellRenderer()" type="code"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -1466,7 +1466,7 @@
                   <Connection code="&quot;XXXXXXXX&quot;" type="code"/>
                 </Property>
                 <Property name="renderer" type="javax.swing.ListCellRenderer" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new ObjectRefListCellRenderer()" type="code"/>
+                  <Connection code="new StringNullSaveListCellRenderer()" type="code"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -1504,7 +1504,7 @@
                   <Connection code="&quot;XXXXXXXX&quot;" type="code"/>
                 </Property>
                 <Property name="renderer" type="javax.swing.ListCellRenderer" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new ObjectRefListCellRenderer()" type="code"/>
+                  <Connection code="new StringNullSaveListCellRenderer()" type="code"/>
                 </Property>
               </Properties>
               <Constraints>
