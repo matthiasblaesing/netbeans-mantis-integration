@@ -54,7 +54,7 @@ public class Capabilities {
                         projectId,
                         requiredAccesslevel);
                 for (AccountData ac : validUsers) {
-                    if (mr.getInfo().getUsername().equals(ac.getName())) {
+                    if (mr.getInfo().getUsername().equalsIgnoreCase(ac.getName())) {
                         projectUpdater.put(projectId, true);
                         return true;
                     }
@@ -180,7 +180,7 @@ public class Capabilities {
                         projectId,
                         editThreshold);
                 for (AccountData ac : validUsers) {
-                    if (mr.getInfo().getUsername().equals(ac.getName())) {
+                    if (mr.getInfo().getUsername().equalsIgnoreCase(ac.getName())) {
                         projectTimetracker.put(projectId, Permission.WRITE);
                         return Permission.WRITE;
                     }
@@ -193,7 +193,7 @@ public class Capabilities {
                         projectId,
                         viewThreshold);
                 for (AccountData ac : validUsers) {
-                    if (mr.getInfo().getUsername().equals(ac.getName())) {
+                    if (mr.getInfo().getUsername().equalsIgnoreCase(ac.getName())) {
                         projectTimetracker.put(projectId, Permission.READ);
                         return Permission.READ;
                     }
