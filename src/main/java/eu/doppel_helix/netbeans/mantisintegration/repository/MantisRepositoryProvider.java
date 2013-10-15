@@ -12,7 +12,6 @@ import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 import org.netbeans.modules.bugtracking.spi.RepositoryProvider;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
-import org.openide.util.Lookup;
 
 public class MantisRepositoryProvider extends RepositoryProvider<MantisRepository,MantisQuery,MantisIssue> {
 
@@ -61,11 +60,6 @@ public class MantisRepositoryProvider extends RepositoryProvider<MantisRepositor
     @Override
     public Collection<MantisQuery> getQueries(MantisRepository r) {
         return r.getQueries();
-    }
-
-    @Override
-    public Lookup getLookup(MantisRepository r) {
-        return r.getLookup();
     }
 
     @Override

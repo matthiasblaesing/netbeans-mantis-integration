@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import org.netbeans.modules.bugtracking.spi.BugtrackingController;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
+import org.netbeans.modules.bugtracking.spi.IssueStatusProvider;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 
@@ -93,5 +94,30 @@ public class MantisIssueProvider extends IssueProvider<MantisIssue> {
     public void addPropertyChangeListener(MantisIssue data, PropertyChangeListener listener) {
         data.addPropertyChangeListener(listener);
     }
+
+    @Override
+    public IssueStatusProvider getStatusProvider() {
+        return dummyProvider;
+    }
     
+     private final static IssueStatusProvider dummyProvider = new IssueStatusProvider<MantisIssue>() {
+
+        @Override
+        public Status getStatus(MantisIssue i) {
+            return Status.SEEN;
+        }
+
+        @Override
+        public void setSeen(MantisIssue i, boolean bln) {
+        }
+
+        @Override
+        public void removePropertyChangeListener(MantisIssue i, PropertyChangeListener pl) {
+        }
+
+        @Override
+        public void addPropertyChangeListener(MantisIssue i, PropertyChangeListener pl) {
+            
+        }
+    };
 }

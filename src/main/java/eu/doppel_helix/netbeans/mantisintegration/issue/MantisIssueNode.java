@@ -13,7 +13,7 @@ import org.netbeans.modules.bugtracking.issuetable.IssueNode;
 public class MantisIssueNode extends IssueNode<MantisIssue> {
 
     public MantisIssueNode(MantisIssue issue) {
-        super(issue.getMantisRepository().getRepository(), issue);
+        super(issue.getMantisRepository().getRepository(), issue, new ChangesProvider());
     }
     
     @Override
@@ -195,6 +195,13 @@ public class MantisIssueNode extends IssueNode<MantisIssue> {
                 throw new RuntimeException(ex);
             }
             
+        }
+    }
+    
+    private static class ChangesProvider implements IssueNode.ChangesProvider<MantisIssue> {
+        @Override
+        public String getRecentChanges(MantisIssue i) {
+            return "";
         }
     }
 }

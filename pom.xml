@@ -30,8 +30,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide />
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
-        <mantisintegration.nbtarget>RELEASE73</mantisintegration.nbtarget>
-        <mantisintegration.bugtracking.implver>201302132200</mantisintegration.bugtracking.implver>
+        <mantisintegration.nbtarget>SNAPSHOT</mantisintegration.nbtarget>
+        <mantisintegration.bugtracking.implver>201307092200</mantisintegration.bugtracking.implver>
     </properties>
 
     <repositories>
