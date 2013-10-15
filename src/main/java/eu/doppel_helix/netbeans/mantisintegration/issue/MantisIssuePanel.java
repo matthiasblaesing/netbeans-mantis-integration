@@ -33,8 +33,8 @@ import javax.swing.SwingConstants;
 
 public class MantisIssuePanel extends javax.swing.JLayeredPane {
 
-    private Map<BigInteger, Color> colorMap = Mantis.getInstance().getStatusColorMap();
-    private NoopListener noopListener = new NoopListener();
+    private final Map<BigInteger, Color> colorMap = Mantis.getInstance().getStatusColorMap();
+    private final NoopListener noopListener = new NoopListener();
     JPanel waitPanel;
     
     public MantisIssuePanel() {        

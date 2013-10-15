@@ -50,25 +50,25 @@ public class MantisQueryController extends QueryController implements ActionList
             MantisQueryController.class.getName());
     RequestProcessor rp = new RequestProcessor("MantisQueryController");
     private final IssueTable issueTable;
-    private ListBackedComboBoxModel<FlattenedProjectData> projectModel1 = new ListBackedComboBoxModel<FlattenedProjectData>(
+    private ListBackedComboBoxModel<FlattenedProjectData> projectModel1 = new ListBackedComboBoxModel<>(
             FlattenedProjectData.class);
-    private ListBackedComboBoxModel<FilterData> filterModel1 = new ListBackedComboBoxModel<FilterData>(
+    private ListBackedComboBoxModel<FilterData> filterModel1 = new ListBackedComboBoxModel<>(
             FilterData.class);
-    private ListBackedComboBoxModel<AccountData> reporterModel = new ListBackedComboBoxModel<AccountData>(
+    private ListBackedComboBoxModel<AccountData> reporterModel = new ListBackedComboBoxModel<>(
             AccountData.class);
-    private ListBackedComboBoxModel<AccountData> assignedToModel = new ListBackedComboBoxModel<AccountData>(
+    private ListBackedComboBoxModel<AccountData> assignedToModel = new ListBackedComboBoxModel<>(
             AccountData.class);
-    private ListBackedComboBoxModel<String> categoryModel = new ListBackedComboBoxModel<String>(
+    private ListBackedComboBoxModel<String> categoryModel = new ListBackedComboBoxModel<>(
             String.class);
-    private ListBackedComboBoxModel<ObjectRef> severityModel = new ListBackedComboBoxModel<ObjectRef>(
+    private ListBackedComboBoxModel<ObjectRef> severityModel = new ListBackedComboBoxModel<>(
             ObjectRef.class);
-    private ListBackedComboBoxModel<ObjectRef> resolutionModel = new ListBackedComboBoxModel<ObjectRef>(
+    private ListBackedComboBoxModel<ObjectRef> resolutionModel = new ListBackedComboBoxModel<>(
             ObjectRef.class);
-    private ListBackedComboBoxModel<ObjectRef> statusModel = new ListBackedComboBoxModel<ObjectRef>(
+    private ListBackedComboBoxModel<ObjectRef> statusModel = new ListBackedComboBoxModel<>(
             ObjectRef.class);
-    private ListBackedComboBoxModel<ObjectRef> priorityModel = new ListBackedComboBoxModel<ObjectRef>(
+    private ListBackedComboBoxModel<ObjectRef> priorityModel = new ListBackedComboBoxModel<>(
             ObjectRef.class);
-    private ListBackedComboBoxModel<ObjectRef> viewstatusModel = new ListBackedComboBoxModel<ObjectRef>(
+    private ListBackedComboBoxModel<ObjectRef> viewstatusModel = new ListBackedComboBoxModel<>(
             ObjectRef.class);
     private MantisQueryPanel mqp;
     private MantisQuery mq;

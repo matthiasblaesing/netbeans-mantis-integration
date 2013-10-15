@@ -12,10 +12,10 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 public class ListBackedComboBoxModel<E> implements ComboBoxModel<E> {
+    private final List<E> backingList = new ArrayList<>();
+    private final Class<E> klass;
+    Set<ListDataListener> listener = new HashSet<>();
     private E selectedItem = null;
-    private List<E> backingList = new ArrayList<E>();
-    Set<ListDataListener> listener = new HashSet<ListDataListener>();
-    private Class<E> klass;
     
     public ListBackedComboBoxModel(Class<E> klass) {
         this.klass = klass;

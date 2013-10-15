@@ -42,7 +42,7 @@ public class AddRelationshipDialog extends javax.swing.JDialog {
         setLocationByPlatform(true);
         initComponents();
         final MantisRepository mr = issue.getMantisRepository();
-        DefaultComboBoxModel<ObjectRef> types = new DefaultComboBoxModel<ObjectRef>(mr.getRelationships());
+        DefaultComboBoxModel<ObjectRef> types = new DefaultComboBoxModel<>(mr.getRelationships());
         types.insertElementAt(null, 0);
         types.setSelectedItem(null);
         typeComboBox.setModel(types);
@@ -59,6 +59,7 @@ public class AddRelationshipDialog extends javax.swing.JDialog {
                     return;
                 }
                 issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             issue.addRelationship((ObjectRef) typeComboBox.getSelectedItem(), new BigInteger(idTextField.getText()));

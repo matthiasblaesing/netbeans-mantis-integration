@@ -13,8 +13,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 public class MantisQueryTableCellRenderer extends DefaultTableCellRenderer {
-    private TableCellRenderer superRenderer;
-    private Map<BigInteger,Color> colorMap = Mantis.getInstance().getStatusColorMap();
+    private final TableCellRenderer superRenderer;
+    private final Map<BigInteger,Color> colorMap = Mantis.getInstance().getStatusColorMap();
     
 
     public MantisQueryTableCellRenderer(TableCellRenderer superRenderer) {

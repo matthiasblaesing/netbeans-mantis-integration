@@ -31,8 +31,8 @@ public class MantisRepositoryController implements RepositoryController, Documen
     private final static String COMMAND_CHECKCONNECTION = "checkConnection";
     private final MantisRepository repository;
     private MantisRepositoryPanel panel;
-    private final List<String> errorMessages = new ArrayList<String>();
-    private ChangeSupport cs = new ChangeSupport(this);
+    private final List<String> errorMessages = new ArrayList<>();
+    private final ChangeSupport cs = new ChangeSupport(this);
     private boolean checking = false;
     
     public MantisRepositoryController(MantisRepository repository) {
@@ -165,6 +165,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
     @Override
     public void stateChanged(ChangeEvent e) {
         Mutex.EVENT.readAccess(new Runnable() {
+            @Override
             public void run() {
                 panel.checkButton.setEnabled(! checking);
                 panel.nameTextField.setEnabled(! checking);

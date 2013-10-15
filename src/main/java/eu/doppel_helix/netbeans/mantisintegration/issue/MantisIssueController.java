@@ -55,21 +55,21 @@ public class MantisIssueController extends BugtrackingController implements Prop
     private static final Logger logger = Logger.getLogger(MantisIssueController.class.getName());
     private static File lastDirectory;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private ListBackedComboBoxModel<FlattenedProjectData> projectModel = new ListBackedComboBoxModel<FlattenedProjectData>(FlattenedProjectData.class);
-    private ListBackedComboBoxModel<ObjectRef> viewstatesModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
-    private ListBackedComboBoxModel<ObjectRef> viewstatesModel2 = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
-    private ListBackedComboBoxModel<ObjectRef> severitiesModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
-    private ListBackedComboBoxModel<ObjectRef> reproducibilitiesModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
-    private ListBackedComboBoxModel<ObjectRef> prioritiesModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
-    private ListBackedComboBoxModel<ObjectRef> resolutionsModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
-    private ListBackedComboBoxModel<ObjectRef> statesModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
-    private ListBackedComboBoxModel<ObjectRef> etasModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
-    private ListBackedComboBoxModel<String> targetVersionModel = new ListBackedComboBoxModel<String>(String.class);
-    private ListBackedComboBoxModel<String> productVersionModel = new ListBackedComboBoxModel<String>(String.class);
-    private ListBackedComboBoxModel<String> fixVersionModel = new ListBackedComboBoxModel<String>(String.class);
-    private ListBackedComboBoxModel<ObjectRef> projectionsModel = new ListBackedComboBoxModel<ObjectRef>(ObjectRef.class);
-    private ListBackedComboBoxModel<String> categoriesModel = new ListBackedComboBoxModel<String>(String.class);
-    private ListBackedComboBoxModel<AccountData> assignedModel = new ListBackedComboBoxModel<AccountData>(AccountData.class);
+    private ListBackedComboBoxModel<FlattenedProjectData> projectModel = new ListBackedComboBoxModel<>(FlattenedProjectData.class);
+    private ListBackedComboBoxModel<ObjectRef> viewstatesModel = new ListBackedComboBoxModel<>(ObjectRef.class);
+    private ListBackedComboBoxModel<ObjectRef> viewstatesModel2 = new ListBackedComboBoxModel<>(ObjectRef.class);
+    private ListBackedComboBoxModel<ObjectRef> severitiesModel = new ListBackedComboBoxModel<>(ObjectRef.class);
+    private ListBackedComboBoxModel<ObjectRef> reproducibilitiesModel = new ListBackedComboBoxModel<>(ObjectRef.class);
+    private ListBackedComboBoxModel<ObjectRef> prioritiesModel = new ListBackedComboBoxModel<>(ObjectRef.class);
+    private ListBackedComboBoxModel<ObjectRef> resolutionsModel = new ListBackedComboBoxModel<>(ObjectRef.class);
+    private ListBackedComboBoxModel<ObjectRef> statesModel = new ListBackedComboBoxModel<>(ObjectRef.class);
+    private ListBackedComboBoxModel<ObjectRef> etasModel = new ListBackedComboBoxModel<>(ObjectRef.class);
+    private ListBackedComboBoxModel<String> targetVersionModel = new ListBackedComboBoxModel<>(String.class);
+    private ListBackedComboBoxModel<String> productVersionModel = new ListBackedComboBoxModel<>(String.class);
+    private ListBackedComboBoxModel<String> fixVersionModel = new ListBackedComboBoxModel<>(String.class);
+    private ListBackedComboBoxModel<ObjectRef> projectionsModel = new ListBackedComboBoxModel<>(ObjectRef.class);
+    private ListBackedComboBoxModel<String> categoriesModel = new ListBackedComboBoxModel<>(String.class);
+    private ListBackedComboBoxModel<AccountData> assignedModel = new ListBackedComboBoxModel<>(AccountData.class);
     private MantisIssuePanel panel;
     private MantisIssue issue;
     private StateMonitor stateMonitor = new StateMonitor();
@@ -91,7 +91,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 MantisRepository mr = issue.getMantisRepository();
                 viewStates = Arrays.asList(mr.getViewStates());
                 
-                projects = new ArrayList<FlattenedProjectData>();
+                projects = new ArrayList<>();
                 projects.add(null);
                 for(ProjectData pd: mr.getProjects()) {
                     projects.addAll(FlattenedProjectData.buildList(pd));
@@ -101,7 +101,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 reproducibilities = Arrays.asList(mr.getReproducibilities());
                 resolutions = Arrays.asList(mr.getResolutions());
                 priorities = Arrays.asList(mr.getPriorities());
-                states = new ArrayList<ObjectRef>(Arrays.asList(mr.getStates()));
+                states = new ArrayList<>(Arrays.asList(mr.getStates()));
                 states.add(0, null);
                 etas = Arrays.asList(mr.getEtas());
                 projections = Arrays.asList(mr.getProjections());
@@ -282,9 +282,8 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 if (issue.getProject() != null) {
                     BigInteger id = issue.getProject().getId();
                     for (int i = 0; i < projectModel.getSize(); i++) {
-                        if (projectModel.getElementAt(i) == null) {
-                            continue;
-                        } else if (projectModel.getElementAt(i).getProjectData().getId().equals(id)) {
+                        if ((projectModel.getElementAt(i) != null)
+                                && (projectModel.getElementAt(i).getProjectData().getId().equals(id))) {
                             current = projectModel.getElementAt(i);
                             break;
                         }
@@ -566,6 +565,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
             panel.addNoteEditorPane.setText("");
             panel.timetrackInput.setValue(BigInteger.ZERO);
             issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
+                @Override
                 public void run() {
                     try {
                         issue.addComment(comment, viewState, timetracking);
@@ -578,9 +578,9 @@ public class MantisIssueController extends BugtrackingController implements Prop
             });
         } else if ("selectProject".equals(e.getActionCommand())) {
             try {
-                List<String> categories = new ArrayList<String>();
-                List<AccountData> users = new ArrayList<AccountData>();
-                List<String> versions = new ArrayList<String>();
+                List<String> categories = new ArrayList<>();
+                List<AccountData> users = new ArrayList<>();
+                List<String> versions = new ArrayList<>();
                 FlattenedProjectData fpd = (FlattenedProjectData) panel.projectComboBox.getSelectedItem();
                 if (fpd != null) {
                     MantisRepository mr = issue.getMantisRepository();

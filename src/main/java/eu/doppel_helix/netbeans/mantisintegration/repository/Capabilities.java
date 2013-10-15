@@ -18,11 +18,11 @@ import org.apache.axis.AxisFault;
 public class Capabilities {
     private static final Version tagVersion = new Version("1.2.9");
     private static final Logger logger = Logger.getLogger(Capabilities.class.getName());
-    private MantisRepository mr;
-    private HashMap<BigInteger,Boolean> projectUpdater = new HashMap<BigInteger, Boolean>();
+    private final MantisRepository mr;
+    private final HashMap<BigInteger,Boolean> projectUpdater = new HashMap<>();
     private boolean userIsUpdaterChecked = false;
     private Boolean userIsUpdater = false;
-    private HashMap<BigInteger,Permission> projectTimetracker = new HashMap<BigInteger, Permission>();
+    private final HashMap<BigInteger,Permission> projectTimetracker = new HashMap<>();
     private boolean trackTimeChecked = false;
     private boolean trackTime = false;
     private Permission trackTimeGlobal = null;

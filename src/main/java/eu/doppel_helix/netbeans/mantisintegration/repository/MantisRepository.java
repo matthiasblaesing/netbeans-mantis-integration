@@ -32,7 +32,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.rmi.RemoteException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -71,7 +70,6 @@ public class MantisRepository {
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private RepositoryInfo info;
     private MantisRepositoryController controller;
-    private Lookup lookup;
     private MantisConnectPortType client;
     private Cache cache;
     private Version version;

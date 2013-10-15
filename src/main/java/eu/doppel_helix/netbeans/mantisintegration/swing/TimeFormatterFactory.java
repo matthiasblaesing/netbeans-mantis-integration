@@ -11,8 +11,8 @@ import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 
 public class TimeFormatterFactory extends AbstractFormatterFactory {
 
-    private WeakHashMap<JFormattedTextField,AbstractFormatter> cache =
-            new WeakHashMap<JFormattedTextField, AbstractFormatter>();
+    private final WeakHashMap<JFormattedTextField,AbstractFormatter> cache =
+            new WeakHashMap<>();
 
     @Override
     public JFormattedTextField.AbstractFormatter getFormatter(JFormattedTextField tf) {

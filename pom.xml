@@ -134,6 +134,12 @@
             <artifactId>swingx-all</artifactId>
             <version>1.6.4</version>
         </dependency>
+        <dependency>
+            <artifactId>org-openide-filesystems</artifactId>
+            <groupId>org.netbeans.api</groupId>
+            <type>jar</type>
+            <version>RELEASE74-BETA</version>
+        </dependency>
     </dependencies>
 
     <build>

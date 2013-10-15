@@ -27,7 +27,7 @@ import javax.swing.SwingConstants;
 
 public class MantisQueryPanel extends javax.swing.JPanel {
 
-    private Map<BigInteger, Color> colorMap = Mantis.getInstance().getStatusColorMap();
+    private final Map<BigInteger, Color> colorMap = Mantis.getInstance().getStatusColorMap();
     // Swallow Mouseevents
     private static final NoopListener noopListener = new NoopListener();
     JPanel waitPanel;
@@ -289,8 +289,6 @@ public class MantisQueryPanel extends javax.swing.JPanel {
                     ObjectRef or = (ObjectRef)value;
                     BigInteger level = or.getId();
                     color = colorMap.get(level);
-                } else if (value == null) {
-                    value = " ";
                 }
 
                 if(color == null) {
@@ -546,8 +544,8 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         gridBagConstraints.weighty = 1.0;
         mainPanel.add(issueTablePanel, gridBagConstraints);
 
+        innerQuery.add(mainPanel);
         mainPanel.setBounds(0, 0, 913, 294);
-        innerQuery.add(mainPanel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         add(innerQuery, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents

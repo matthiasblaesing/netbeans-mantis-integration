@@ -13,11 +13,11 @@ import org.openide.NotifyDescriptor;
 
 public class TagDisplay extends DelegatingBaseLineJPanel implements ActionListener {
     private final String COMMAND_DELETE = "deleteString";
-    private ObjectRef tag;
-    private MantisIssue issue;
-    private JLabel leadingLabel = new JLabel();
-    private LinkButton deleteButton = new LinkButton("delete");
-    private JLabel trailingLabel = new JLabel();
+    private final ObjectRef tag;
+    private final MantisIssue issue;
+    private final JLabel leadingLabel = new JLabel();
+    private final LinkButton deleteButton = new LinkButton("delete");
+    private final JLabel trailingLabel = new JLabel();
 
     public TagDisplay(MantisIssue issue, ObjectRef tag) {
         super();

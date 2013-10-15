@@ -25,9 +25,9 @@ import org.openide.util.Mutex;
 
 public class MantisIssue {
     private final static Logger logger = Logger.getLogger(MantisIssue.class.getName());
-    private MantisRepository mr;
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-    private IssueData issueData = new IssueData();
+    private final MantisRepository mr;
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final IssueData issueData = new IssueData();
     private MantisIssueController mic;
     private Integer busy = 0;
     private Permission timetracking = Permission.NONE;

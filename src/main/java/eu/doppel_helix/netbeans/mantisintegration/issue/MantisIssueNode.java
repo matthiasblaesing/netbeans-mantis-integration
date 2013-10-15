@@ -20,10 +20,10 @@ public class MantisIssueNode extends IssueNode<MantisIssue> {
     protected Property<?>[] getProperties() {
         try {
             return new Property<?>[] {
-                new ReflectionProperty<BigInteger>("mantis.issue.id", "ID", "Identifier", getIssueData(), BigInteger.class, "getId", null),
+                new ReflectionProperty<>("mantis.issue.id", "ID", "Identifier", getIssueData(), BigInteger.class, "getId", null),
                 new SummaryProperty(),
-                new ReflectionProperty<Integer>("mantis.issue.noteCount", "#", "Note count", getIssueData(), Integer.class, "getNoteCount", null),
-                new ReflectionProperty<String>("mantis.issue.category", "Category", "Category", getIssueData(), String.class, "getCategory", null),
+                new ReflectionProperty<>("mantis.issue.noteCount", "#", "Note count", getIssueData(), Integer.class, "getNoteCount", null),
+                new ReflectionProperty<>("mantis.issue.category", "Category", "Category", getIssueData(), String.class, "getCategory", null),
                 new ObjectRefProperty("mantis.issue.severity", "Severity", "Severity", getIssueData(), ObjectRef.class, "getSeverity", null),
                 new ObjectRefProperty("mantis.issue.priority", "Priority", "Priority", getIssueData(), ObjectRef.class, "getPriority", null),
                 new StatusProperty("mantis.issue.status", "Status", "Status", getIssueData(), ObjectRef.class, "getStatus", null),
@@ -111,8 +111,8 @@ public class MantisIssueNode extends IssueNode<MantisIssue> {
     }
     
     private class ReflectionProperty<T> extends IssueNode<MantisIssue>.IssueProperty<T> {
-        private Object instance;
-        private Class<? extends T> valueType;
+        private final Object instance;
+        private final Class<? extends T> valueType;
         private Method getter;
         private Method setter;
         
@@ -189,9 +189,7 @@ public class MantisIssueNode extends IssueNode<MantisIssue> {
                 } else {
                     return toString().compareTo(o.toString());
                 }
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            } catch (InvocationTargetException ex) {
+            } catch (IllegalAccessException | InvocationTargetException ex) {
                 throw new RuntimeException(ex);
             }
             

@@ -20,13 +20,13 @@ public class AttachmentDisplay extends DelegatingBaseLineJPanel implements Actio
     private static File lastDirectory;
     private final String COMMAND_DELETE = "delete";
     private final String COMMAND_DOWNLOAD = "download";
-    private AttachmentData ad;
-    private MantisIssue issue;
-    private JLabel leadingLabel = new JLabel();
-    private LinkButton deleteButton = new LinkButton("delete");
-    private JLabel medianLabel = new JLabel();
-    private LinkButton downloadButton = new LinkButton("download");
-    private JLabel trailingLabel = new JLabel();
+    private final AttachmentData ad;
+    private final MantisIssue issue;
+    private final JLabel leadingLabel = new JLabel();
+    private final LinkButton deleteButton = new LinkButton("delete");
+    private final JLabel medianLabel = new JLabel();
+    private final LinkButton downloadButton = new LinkButton("download");
+    private final JLabel trailingLabel = new JLabel();
 
     public AttachmentDisplay(MantisIssue issue, AttachmentData ad) {
         super();

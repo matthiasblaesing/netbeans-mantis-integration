@@ -27,7 +27,6 @@ import org.openide.filesystems.FileRenameEvent;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Mutex;
 
 public class MantisRepositoryQueryStore implements FileChangeListener {
     private static final Logger LOG = Logger.getLogger(MantisRepositoryQueryStore.class.getName());
@@ -58,7 +57,7 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
     
     private FileObject storage;
     
-    private Map<String,FileObject> backingFileMap = new HashMap<String, FileObject>();
+    private final Map<String,FileObject> backingFileMap = new HashMap<>();
     
     public MantisRepositoryQueryStore(MantisRepository mr, PropertyChangeSupport pcs) {
         this.mr = mr;
@@ -101,12 +100,9 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
         if (backingFileMap.containsKey(id)) {
             FileObject fo = backingFileMap.get(id);
             if(fo.canRead()) {
-                try {
+                try (InputStream is = fo.getInputStream()) {
                     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-                    InputStream is = fo.getInputStream();
-                    MantisQueryXml mqx = (MantisQueryXml) unmarshaller.unmarshal(
-                            is);
-                    is.close();
+                    MantisQueryXml mqx = (MantisQueryXml) unmarshaller.unmarshal(is);
                     result = new MantisQuery(mr);
                     mqx.toMantisQuery(result);
                     result.setSaved(true);
@@ -128,34 +124,30 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
             getStorage().getFileSystem().runAtomicAction(new FileSystem.AtomicAction() {
                 @Override
                 public void run() throws IOException {
-                    try {
-                        FileObject targetFile = backingFileMap.get(mq.getId());
-                        if (targetFile == null) {
-                            targetFile = storage.createData(mq.getId(), "xml");
-                        }
+                    FileObject targetFile = backingFileMap.get(mq.getId());
+                    if (targetFile == null) {
+                        targetFile = storage.createData(mq.getId(), "xml");
+                    }
+                    try (OutputStream os = targetFile.getOutputStream()) {
                         Marshaller marshaller = jaxbContext.createMarshaller();
                         MantisQueryXml mqx = new MantisQueryXml(mq);
-                        OutputStream os = targetFile.getOutputStream();
                         marshaller.marshal(mqx, os);
-                        os.close();
                     } catch (JAXBException ex) {
                         LOG.log(Level.WARNING, "Failed to write query", ex);
                     }
                 }
             });
-        } catch (FileStateInvalidException ex) {
-            LOG.log(Level.WARNING, "Failed to write query", ex);
         } catch (IOException ex) {
             LOG.log(Level.WARNING, "Failed to write query", ex);
         }
     }
     
     public List<String> getQueryIds() {
-        return new ArrayList<String>(backingFileMap.keySet());
+        return new ArrayList<>(backingFileMap.keySet());
     }
     
     public List<MantisQuery> getQueries() {
-        List<MantisQuery> queries = new ArrayList<MantisQuery>();
+        List<MantisQuery> queries = new ArrayList<>();
         for(String id: getQueryIds()) {
             MantisQuery mq = getMantisQuery(id);
             if(mq != null) {

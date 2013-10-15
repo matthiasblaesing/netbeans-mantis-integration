@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 public class Version implements Comparable<Version> {
     private final static Logger logger = Logger.getLogger(Version.class.getName());
-    List<Integer> levels = new ArrayList<Integer>();;
+    List<Integer> levels = new ArrayList<>();
     String versionString;
     
     public Version(String versionString) {
@@ -38,7 +38,7 @@ public class Version implements Comparable<Version> {
     public int compareTo(Version o) {
         for(int i = 0; i < Math.max(levels.size(), o.levels.size()); i++) {
             Integer i1 = levels.size() > i ? levels.get(i) : 0;
-            Integer i2 = o.levels.size() > 1 ? o.levels.get(i) : 0;
+            Integer i2 = o.levels.size() > i ? o.levels.get(i) : 0;
             if(i1 == null) {
                 i1 = 0;
             }
@@ -52,6 +52,7 @@ public class Version implements Comparable<Version> {
         return 0;
     }
     
+    @Override
     public String toString() {
         return levels.toString() + " (" + versionString + ")";
     }

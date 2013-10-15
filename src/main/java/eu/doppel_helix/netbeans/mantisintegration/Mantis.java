@@ -54,7 +54,7 @@ public class Mantis {
     
     public BugtrackingFactory<MantisRepository, MantisQuery, MantisIssue> getBugtrackingFactory() {
         if (bf == null) {
-            bf = new BugtrackingFactory<MantisRepository, MantisQuery, MantisIssue>();
+            bf = new BugtrackingFactory<>();
         }
         return bf;
     }
@@ -62,7 +62,7 @@ public class Mantis {
     public Map<BigInteger, Color> getStatusColorMap() {
         if(statusColorMap == null) {
             // Taken from default config
-            statusColorMap = new HashMap<BigInteger, Color>();
+            statusColorMap = new HashMap<>();
             statusColorMap.put(new BigInteger("10"), Color.decode("#FFA0A0")); // new -> red
             statusColorMap.put(new BigInteger("20"), Color.decode("#FF50A8")); // feedback -> purple
             statusColorMap.put(new BigInteger("30"), Color.decode("#FFD850")); // acknowledged - > orange
