@@ -204,30 +204,26 @@ public class MantisRepository {
         client = null;
     }
 
-    public MantisIssue[] getIssues(String... issues) throws ServiceException, RemoteException {
-        MantisIssue[] results = new MantisIssue[issues.length];
-        for (int i = 0; i < issues.length; i++) {
-            MantisIssue issue = (MantisIssue) getIssueCache().getIssue(issues[i]);
-            if (issue == null) {
-                issue = new MantisIssue(this);
-                issue.setId(new BigInteger(issues[i]));
-            }
-            issue.refresh();
-            results[i] = issue;
+    public List<MantisIssue> getIssues(boolean onlyCached, String... issues) throws ServiceException, RemoteException {
+        BigInteger[] issueIds = new BigInteger[issues.length];
+        for(int i = 0; i < issues.length; i++) {
+            issueIds[i] = new BigInteger(issues[i]);
         }
-        return results;
+        return getIssues(onlyCached, issueIds);
     }
 
-    public MantisIssue[] getIssues(BigInteger... issues) throws ServiceException, RemoteException {
-        MantisIssue[] results = new MantisIssue[issues.length];
+    public List<MantisIssue> getIssues(boolean onlyCached, BigInteger... issues) throws ServiceException, RemoteException {
+        List<MantisIssue> results = new ArrayList<>();
         for (int i = 0; i < issues.length; i++) {
             MantisIssue issue = (MantisIssue) getIssueCache().getIssue(issues[i].toString());
-            if (issue == null) {
+            if (issue == null && (! onlyCached)) {
                 issue = new MantisIssue(this);
                 issue.setId(issues[i]);
                 issue.refresh();
             }
-            results[i] = issue;
+            if(issue != null) {
+                results.add(issue);
+            }
         }
         return results;
     }
@@ -238,8 +234,8 @@ public class MantisRepository {
 
         try {
             BigInteger possibleId = new BigInteger(criteria);
-            MantisIssue[] issues = getIssues(possibleId.toString());
-            result.addAll(Arrays.asList(issues));
+            List<MantisIssue> issues = getIssues(false, possibleId.toString());
+            result.addAll(issues);
         } catch (NumberFormatException ex) {
         }
 
@@ -278,7 +274,7 @@ public class MantisRepository {
                     }
                 }
             }
-            result.addAll(Arrays.asList(getIssues(matchingIds.toArray(new BigInteger[0]))));
+            result.addAll(getIssues(false, matchingIds.toArray(new BigInteger[0])));
         }
 
         return result;
@@ -772,7 +768,7 @@ public class MantisRepository {
         if(mq.isSaved()) {
             ic.storeQueryIssues(mq.getId(), ids);
         }
-        return Arrays.asList(getIssues(matchingIds.toArray(new BigInteger[0])));
+        return getIssues(false, matchingIds.toArray(new BigInteger[0]));
     }
 
     private void initTags(boolean enforceUpdate) throws ServiceException, RemoteException {

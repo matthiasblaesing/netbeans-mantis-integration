@@ -448,7 +448,7 @@ public class MantisQueryController extends QueryController implements ActionList
                             mq.getMantisRepository().getInfo().getId());
 
                     MantisIssue mi = mq.getMantisRepository().
-                            getIssues(mqp.gotoIssueTextField.getText())[0];
+                            getIssues(false, mqp.gotoIssueTextField.getText()).get(0);
 
                     Mantis.getInstance().getBugtrackingFactory().openIssue(r, mi);
                 } catch (Exception ex) {

@@ -70,7 +70,7 @@ public class RelationshipDisplay extends DelegatingBaseLineJPanel implements Act
                                 issue.getMantisRepository().getInfo().getId());
 
                         MantisIssue mi = issue.getMantisRepository().
-                                getIssues(rd.getTarget_id())[0];
+                                getIssues(false, rd.getTarget_id()).get(0);
 
                         Mantis.getInstance().getBugtrackingFactory().openIssue(r, mi);
                     } catch (Exception ex) {

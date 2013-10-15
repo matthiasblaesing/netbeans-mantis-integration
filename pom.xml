@@ -30,8 +30,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide />
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
-        <mantisintegration.nbtarget>SNAPSHOT</mantisintegration.nbtarget>
-        <mantisintegration.bugtracking.implver>201307092200</mantisintegration.bugtracking.implver>
+        <mantisintegration.nbtarget>RELEASE74-BETA</mantisintegration.nbtarget>
+        <mantisintegration.bugtracking.implver>201310111528</mantisintegration.bugtracking.implver>
     </properties>
 
     <repositories>
@@ -182,8 +182,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
 

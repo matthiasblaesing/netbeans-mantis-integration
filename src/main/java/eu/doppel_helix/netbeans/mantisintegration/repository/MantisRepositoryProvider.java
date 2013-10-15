@@ -28,7 +28,7 @@ public class MantisRepositoryProvider extends RepositoryProvider<MantisRepositor
     @Override
     public MantisIssue[] getIssues(MantisRepository r, String... ids) {
         try {
-            return r.getIssues(ids);
+            return r.getIssues(false, ids).toArray(new MantisIssue[0]);
         } catch (Exception ex) {
             NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
                     "Failed to get issues");

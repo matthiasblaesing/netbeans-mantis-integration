@@ -10,7 +10,6 @@ import java.beans.PropertyChangeSupport;
 import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -19,11 +18,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import javax.swing.SwingWorker;
 import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.QueryController;
 import org.netbeans.modules.bugtracking.spi.QueryProvider;
-import org.openide.util.Mutex;
 
 public class MantisQuery {
     public enum Combination {
@@ -49,7 +46,7 @@ public class MantisQuery {
     private Date lastUpdateBefore;
     private String summaryFilter;
     private Combination combination = Combination.ALL;
-    private List<String> matchingIds = new ArrayList<String>();
+    private final List<String> matchingIds = new ArrayList<>();
     private Integer busy = 0;
     private boolean saved = false;
 
@@ -100,8 +97,7 @@ public class MantisQuery {
     }
 
     public Collection<MantisIssue> getIssues() throws ServiceException, RemoteException {
-        return Arrays.asList(
-                mr.getIssues(matchingIds.toArray(new String[matchingIds.size()])));
+        return mr.getIssues(true, matchingIds.toArray(new String[matchingIds.size()]));
     }
 
     public boolean contains(String id) {
@@ -110,12 +106,16 @@ public class MantisQuery {
 
     public void refresh() throws ServiceException, RemoteException {
         setBusy(true);
-        Set<String> oldList = new HashSet<String>(matchingIds);
+        Set<String> oldList = new HashSet<>(matchingIds);
         matchingIds.clear();
         for (MantisIssue mi : mr.findIssues(this)) {
             matchingIds.add(mi.getIdAsString());
         }
-        if(! oldList.equals(new HashSet<String>(matchingIds))) {
+        // Assumption: this is called off the EDT and should do the heavy
+        // lifting, while getIssues is called on the EDT and needs to be
+        // lightweight
+        mr.getIssues(false, matchingIds.toArray(new String[matchingIds.size()]));
+        if(! oldList.equals(new HashSet<>(matchingIds))) {
             firePropertyChanged(QueryProvider.EVENT_QUERY_ISSUES_CHANGED, null, null);
         }
         setBusy(false);
