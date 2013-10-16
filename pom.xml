@@ -98,9 +98,9 @@
             <version>${mantisintegration.nbtarget}</version>
         </dependency>
         <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-libs-commons_logging</artifactId>
-            <version>RELEASE701</version>
+            <groupId>org.netbeans.external</groupId>
+            <artifactId>org-apache-commons-logging</artifactId>
+            <version>${mantisintegration.nbtarget}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.axis</groupId>
