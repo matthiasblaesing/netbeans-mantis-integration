@@ -33,6 +33,11 @@ public class Capabilities {
     }
     
     public boolean canUpdate(MantisIssue mi) {
+        // While updating MantisIssue could be not update and project not yet assigned
+        if(mi == null || mi.getProject() == null) {
+            return false;
+        }
+        
         BigInteger projectId = mi.getProject().getId();
         
         // Try project specific variant first (will fail on large resultsets)
@@ -106,6 +111,12 @@ public class Capabilities {
     }
     
     public Permission getTrackTime(MantisIssue mi) throws RemoteException {
+        // While updating MantisIssue could be not update and project not yet assigned
+        // Fallback to WRITE permission
+        if(mi == null || mi.getProject() == null) {
+            return Permission.WRITE;
+        }
+        
         BigInteger projectId = mi.getProject().getId();
 
         // Try project specific variant first (will fail on large resultsets)
