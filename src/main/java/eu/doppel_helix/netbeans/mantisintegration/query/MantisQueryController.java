@@ -38,7 +38,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.RequestProcessor;
 
-public class MantisQueryController extends QueryController implements ActionListener, PropertyChangeListener {
+public class MantisQueryController implements ActionListener, PropertyChangeListener, QueryController {
 
     public final static String COMMAND_OPEN_ISSUE = "open_issue";
     public final static String COMMAND_SELECT_PROJECT1 = "selectProject1";
@@ -82,7 +82,7 @@ public class MantisQueryController extends QueryController implements ActionList
         pseudoProject.setId(BigInteger.ZERO);
         pseudoProject.setName("All");
     }
-    private QueryMode mode = QueryMode.SHOW_ALL;
+
     private SwingWorker initialize = new SwingWorker() {
         List<FlattenedProjectData> projects;
         List<AccountData> users;
@@ -198,17 +198,21 @@ public class MantisQueryController extends QueryController implements ActionList
         mq.setBusy(true);
         initialize.execute();
 
-        issueTable = new IssueTable(mq.getMantisRepository().getRepository(), mq,
+        issueTable = new IssueTable(
+                mq.getMantisRepository().getInfo().getID(),
+                mq.getName(),
+                this,
                 new ColumnDescriptor[]{
-            new ColumnDescriptor("mantis.issue.id", BigInteger.class, "ID", "ID", 40, true, true),
-            new ColumnDescriptor("mantis.issue.noteCount", Integer.class, "#", "Note count", 40),
-            new ColumnDescriptor("mantis.issue.category", String.class, "Category", "Category", 80),
-            new ColumnDescriptor("mantis.issue.severity", ObjectRef.class, "Severity", "Severity", 80),
-            new ColumnDescriptor("mantis.issue.priority", ObjectRef.class, "Priority", "Priority", 80),
-            new ColumnDescriptor("mantis.issue.status", ObjectRef.class, "Status", "Status", 80),
-            new ColumnDescriptor("mantis.issue.updated", Calendar.class, "Updated", "Updated", 80),
-            new ColumnDescriptor(IssueNode.LABEL_NAME_SUMMARY, String.class, "Summary", "Summary"),
-         }) {
+                    new ColumnDescriptor("mantis.issue.id", BigInteger.class, "ID", "ID", 40, true, true),
+                    new ColumnDescriptor("mantis.issue.noteCount", Integer.class, "#", "Note count", 40),
+                    new ColumnDescriptor("mantis.issue.category", String.class, "Category", "Category", 80),
+                    new ColumnDescriptor("mantis.issue.severity", ObjectRef.class, "Severity", "Severity", 80),
+                    new ColumnDescriptor("mantis.issue.priority", ObjectRef.class, "Priority", "Priority", 80),
+                    new ColumnDescriptor("mantis.issue.status", ObjectRef.class, "Status", "Status", 80),
+                    new ColumnDescriptor("mantis.issue.updated", Calendar.class, "Updated", "Updated", 80),
+                    new ColumnDescriptor(IssueNode.LABEL_NAME_SUMMARY, String.class, "Summary", "Summary"),},
+                mq.isSaved()
+        ) {
 
             @Override
             public void ancestorAdded(AncestorEvent event) {
@@ -241,51 +245,7 @@ public class MantisQueryController extends QueryController implements ActionList
         // @todo: investigate!
         issueTable.initColumns();
     }
-
-    @Override
-    public void setMode(QueryMode mode) {
-        // @todo: implement method correctly
-        this.mode = mode;
-    }
-
-    @Override
-    public JComponent getComponent() {
-        if (mqp == null) {
-            mqp = new MantisQueryPanel();
-            mqp.projectComboBox.setModel(projectModel1);
-            mqp.projectComboBox.addActionListener(this);
-            mqp.projectComboBox.setActionCommand(COMMAND_SELECT_PROJECT1);
-            mqp.reporterComboBox.setModel(reporterModel);
-            mqp.assignedToComboBox.setModel(assignedToModel);
-            mqp.categoryComboBox.setModel(categoryModel);
-            mqp.severityComboBox.setModel(severityModel);
-            mqp.resolutionComboBox.setModel(resolutionModel);
-            mqp.statusComboBox.setModel(statusModel);
-            mqp.priorityComboBox.setModel(priorityModel);
-            mqp.viewStatusComboBox.setModel(viewstatusModel);
-            mqp.gotoIssueButton.setActionCommand(COMMAND_OPEN_ISSUE);
-            mqp.gotoIssueButton.addActionListener(this);
-            mqp.gotoIssueTextField.setActionCommand(COMMAND_OPEN_ISSUE);
-            mqp.gotoIssueTextField.addActionListener(this);
-            mqp.filterComboBox.setModel(filterModel1);
-            mqp.executeQueryButton.addActionListener(this);
-            mqp.saveQueryButton.addActionListener(this);
-            mqp.deleteQueryLinkButton.addActionListener(this);
-            mqp.issueTablePanel.add(issueTable.getComponent());
-            mq.addPropertyChangeListener(this);
-            mqp.waitPanel.setVisible(mq.isBusy());
-            updateFilterList();
-            mqp.lastUpdateAfterDatePicker.setDate(mq.getLastUpdateAfter());
-            mqp.lastUpdateBeforeDatePicker.setDate(mq.getLastUpdateBefore());
-            mqp.summaryTextField.setText(mq.getSummaryFilter());
-            if (mq.getCombination() == MantisQuery.Combination.ANY) {
-                mqp.matchTypeComboBox.setSelectedIndex(1);
-            }
-            onSaveState();
-        }
-        return mqp;
-    }
-
+    
     private void onSaveState() {
         if (mq.isSaved()) {
             mqp.gotoIssuePanel.setVisible(false);
@@ -437,20 +397,17 @@ public class MantisQueryController extends QueryController implements ActionList
     }
 
     private void gotoIssue() {
-        getComponent(); // Make sure component exists
+        getComponent(QueryMode.VIEW); // Make sure component exists
 
         Runnable r = new Runnable() {
             @Override
             public void run() {
                 try {
-                    Repository r = Mantis.getInstance().getBugtrackingFactory().getRepository(
-                            MantisConnector.ID,
-                            mq.getMantisRepository().getInfo().getId());
-
                     MantisIssue mi = mq.getMantisRepository().
                             getIssues(false, mqp.gotoIssueTextField.getText()).get(0);
 
-                    Mantis.getInstance().getBugtrackingFactory().openIssue(r, mi);
+                    Mantis.getInstance().getBugtrackingSupport().openIssue(
+                            mq.getMantisRepository(), mi);
                 } catch (Exception ex) {
                     NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
                             "Failed to open issue");
@@ -467,5 +424,86 @@ public class MantisQueryController extends QueryController implements ActionList
         if ("busy".equals(evt.getPropertyName()) && mqp != null) {
             mqp.waitPanel.setVisible((Boolean) evt.getNewValue());
         }
+    }
+
+    @Override
+    public boolean providesMode(QueryMode mode) {
+        if(mode == QueryMode.EDIT) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public JComponent getComponent(QueryMode mode) {
+        if (mqp == null) {
+            mqp = new MantisQueryPanel();
+            mqp.projectComboBox.setModel(projectModel1);
+            mqp.projectComboBox.addActionListener(this);
+            mqp.projectComboBox.setActionCommand(COMMAND_SELECT_PROJECT1);
+            mqp.reporterComboBox.setModel(reporterModel);
+            mqp.assignedToComboBox.setModel(assignedToModel);
+            mqp.categoryComboBox.setModel(categoryModel);
+            mqp.severityComboBox.setModel(severityModel);
+            mqp.resolutionComboBox.setModel(resolutionModel);
+            mqp.statusComboBox.setModel(statusModel);
+            mqp.priorityComboBox.setModel(priorityModel);
+            mqp.viewStatusComboBox.setModel(viewstatusModel);
+            mqp.gotoIssueButton.setActionCommand(COMMAND_OPEN_ISSUE);
+            mqp.gotoIssueButton.addActionListener(this);
+            mqp.gotoIssueTextField.setActionCommand(COMMAND_OPEN_ISSUE);
+            mqp.gotoIssueTextField.addActionListener(this);
+            mqp.filterComboBox.setModel(filterModel1);
+            mqp.executeQueryButton.addActionListener(this);
+            mqp.saveQueryButton.addActionListener(this);
+            mqp.deleteQueryLinkButton.addActionListener(this);
+            mqp.issueTablePanel.add(issueTable.getComponent());
+            mq.addPropertyChangeListener(this);
+            mqp.waitPanel.setVisible(mq.isBusy());
+            updateFilterList();
+            mqp.lastUpdateAfterDatePicker.setDate(mq.getLastUpdateAfter());
+            mqp.lastUpdateBeforeDatePicker.setDate(mq.getLastUpdateBefore());
+            mqp.summaryTextField.setText(mq.getSummaryFilter());
+            if (mq.getCombination() == MantisQuery.Combination.ANY) {
+                mqp.matchTypeComboBox.setSelectedIndex(1);
+            }
+            onSaveState();
+        }
+        return mqp;
+    }
+
+    @Override
+    public void opened() {
+    }
+
+    @Override
+    public void closed() {
+    }
+
+    @Override
+    public boolean saveChanges(String name) {
+        mq.save();
+        return true;
+    }
+
+    @Override
+    public boolean discardUnsavedChanges() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean isChanged() {
+        return ! mq.isSaved();
+    }
+
+    @Override
+    public void addPropertyChangeListener(PropertyChangeListener l) {
+        mq.addPropertyChangeListener(l);
+    }
+
+    @Override
+    public void removePropertyChangeListener(PropertyChangeListener l) {
+        mq.removePropertyChangeListener(l);
     }
 }

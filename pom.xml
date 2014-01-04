@@ -30,8 +30,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide />
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
-        <mantisintegration.nbtarget>RELEASE74-BETA</mantisintegration.nbtarget>
-        <mantisintegration.bugtracking.implver>201310111528</mantisintegration.bugtracking.implver>
+        <mantisintegration.nbtarget>SNAPSHOT</mantisintegration.nbtarget>
     </properties>
 
     <repositories>
@@ -56,12 +55,6 @@
     </repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-modules-bugtracking</artifactId>
-            <version>${mantisintegration.nbtarget}</version>
-            <type>jar</type>
-        </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
@@ -138,7 +131,17 @@
             <artifactId>org-openide-filesystems</artifactId>
             <groupId>org.netbeans.api</groupId>
             <type>jar</type>
-            <version>RELEASE74-BETA</version>
+            <version>${mantisintegration.nbtarget}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-bugtracking</artifactId>
+            <version>${mantisintegration.nbtarget}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-bugtracking-commons</artifactId>
+            <version>${mantisintegration.nbtarget}</version>
         </dependency>
     </dependencies>
 
@@ -170,13 +173,6 @@
                 <configuration>
                     <author>Matthias Bläsing</author>
                     <verifyRuntime>warn</verifyRuntime>
-                    <moduleDependencies>
-                        <dependency>
-                            <id>org.netbeans.modules:org-netbeans-modules-bugtracking</id>
-                            <type>impl</type>
-                            <explicitValue>org.netbeans.modules.bugtracking = ${mantisintegration.bugtracking.implver}</explicitValue>
-                        </dependency>
-                    </moduleDependencies>
                     <licenseName>Apache License, Version 2.0 (+additional Information)</licenseName>
                     <licenseFile>src/main/nbm/license.txt</licenseFile>
                 </configuration>

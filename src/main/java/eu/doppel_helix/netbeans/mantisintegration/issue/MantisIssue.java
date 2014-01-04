@@ -87,14 +87,14 @@ public class MantisIssue {
         }
     }
 
-    public String[] getSubtasks() {
+    public List<String> getSubtasks() {
         List<String> result = new ArrayList<String>();
         for (RelationshipData rd : getRelationships()) {
             if (rd.getType().getId().intValue() == 2) {
                 result.add(rd.getTarget_id().toString());
             }
         }
-        return result.toArray(new String[result.size()]);
+        return result;
     }
 
     public boolean refresh() throws ServiceException, RemoteException {
@@ -102,7 +102,7 @@ public class MantisIssue {
         boolean result = mr.updateIssueFromRepository(MantisIssue.this);
         timetracking = mr.getCapabilities().getTrackTime(this);
         if(result) {
-            firePropertyChange(IssueProvider.EVENT_ISSUE_REFRESHED, null, null);
+            firePropertyChange(IssueProvider.EVENT_ISSUE_DATA_CHANGED, null, null);
         }
         setBusy(false);
         return result;
@@ -145,7 +145,7 @@ public class MantisIssue {
         Mutex.EVENT.writeAccess(new Runnable() {
             @Override
             public void run() {
-                firePropertyChange(IssueProvider.EVENT_ISSUE_REFRESHED, null, null);
+                firePropertyChange(IssueProvider.EVENT_ISSUE_DATA_CHANGED, null, null);
             }
         });
     }
@@ -163,7 +163,7 @@ public class MantisIssue {
         return BigInteger.valueOf(80).compareTo(issueData.getStatus().getId()) <= 0;
     }
 
-    public void attachPatch(File file, String description) throws ServiceException, RemoteException, IOException {
+    public void attachFile(File file, String description) throws ServiceException, RemoteException, IOException {
         setBusy(true);
         mr.addFile(this, file, description);
         setBusy(false);

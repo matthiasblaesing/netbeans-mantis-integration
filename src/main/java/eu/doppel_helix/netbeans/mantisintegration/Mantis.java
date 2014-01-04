@@ -11,7 +11,7 @@ import java.awt.Color;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
-import org.netbeans.modules.bugtracking.spi.BugtrackingFactory;
+import org.netbeans.modules.bugtracking.spi.BugtrackingSupport;
 
 public class Mantis {
     private static Mantis instance;
@@ -20,7 +20,7 @@ public class Mantis {
     private MantisRepositoryProvider mrp;
     private MantisQueryProvider mqp;
     private MantisIssueProvider mip; 
-    private BugtrackingFactory<MantisRepository, MantisQuery, MantisIssue> bf;
+    private BugtrackingSupport<MantisRepository, MantisQuery, MantisIssue> bf;
     
     private Mantis() {}
     
@@ -52,13 +52,17 @@ public class Mantis {
         return mrp;
     }
     
-    public BugtrackingFactory<MantisRepository, MantisQuery, MantisIssue> getBugtrackingFactory() {
+    public BugtrackingSupport<MantisRepository, MantisQuery, MantisIssue> getBugtrackingSupport() {
         if (bf == null) {
-            bf = new BugtrackingFactory<>();
+            bf = new BugtrackingSupport<>(
+                    getRepositoryProvider(),
+                    getQueryProvider(),
+                    getIssueProvider()
+            );
         }
         return bf;
     }
-
+    
     public Map<BigInteger, Color> getStatusColorMap() {
         if(statusColorMap == null) {
             // Taken from default config

@@ -96,7 +96,7 @@
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
                   <SubComponents>
-                    <Component class="org.netbeans.modules.bugtracking.util.LinkButton" name="refreshLinkButton">
+                    <Component class="org.jdesktop.swingx.JXHyperlink" name="refreshLinkButton">
                       <Properties>
                         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
@@ -140,7 +140,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="org.netbeans.modules.bugtracking.util.LinkButton" name="openIssueWebbrowserLinkButton">
+                    <Component class="org.jdesktop.swingx.JXHyperlink" name="openIssueWebbrowserLinkButton">
                       <Properties>
                         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">

@@ -11,7 +11,7 @@ import java.io.IOException;
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import org.netbeans.modules.bugtracking.util.LinkButton;
+import org.jdesktop.swingx.JXHyperlink;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
@@ -23,9 +23,9 @@ public class AttachmentDisplay extends DelegatingBaseLineJPanel implements Actio
     private final AttachmentData ad;
     private final MantisIssue issue;
     private final JLabel leadingLabel = new JLabel();
-    private final LinkButton deleteButton = new LinkButton("delete");
+    private final JXHyperlink deleteButton = new JXHyperlink();
     private final JLabel medianLabel = new JLabel();
-    private final LinkButton downloadButton = new LinkButton("download");
+    private final JXHyperlink downloadButton = new JXHyperlink();
     private final JLabel trailingLabel = new JLabel();
 
     public AttachmentDisplay(MantisIssue issue, AttachmentData ad) {
@@ -46,8 +46,10 @@ public class AttachmentDisplay extends DelegatingBaseLineJPanel implements Actio
         this.add(medianLabel);
         this.add(deleteButton);
         this.add(trailingLabel);
+        deleteButton.setText("delete");
         deleteButton.addActionListener(this);
         deleteButton.setActionCommand(COMMAND_DELETE);
+        deleteButton.setText("download");
         downloadButton.addActionListener(this);
         downloadButton.setActionCommand(COMMAND_DOWNLOAD);
     }

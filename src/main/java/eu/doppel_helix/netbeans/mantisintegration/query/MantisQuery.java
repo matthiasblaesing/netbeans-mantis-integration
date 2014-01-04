@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -21,12 +22,15 @@ import java.util.regex.PatternSyntaxException;
 import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.QueryController;
 import org.netbeans.modules.bugtracking.spi.QueryProvider;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 
 public class MantisQuery {
     public enum Combination {
         ALL,
         ANY
     }
+    private QueryProvider.IssueContainer<MantisIssue> issueContainer;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private MantisQueryController mqc;
     private MantisRepository mr;
@@ -80,9 +84,6 @@ public class MantisQuery {
 
     public void setSaved(boolean saved) {
         this.saved = saved;
-        if(saved) {
-            firePropertyChanged(QueryProvider.EVENT_QUERY_SAVED, null, null);
-        }
     }
     
     public void save() {
@@ -93,7 +94,6 @@ public class MantisQuery {
     public void remove() {
         matchingIds.clear();
         mr.deleteQuery(id);
-        firePropertyChanged(QueryProvider.EVENT_QUERY_REMOVED, null, null);
     }
 
     public Collection<MantisIssue> getIssues() throws ServiceException, RemoteException {
@@ -106,6 +106,11 @@ public class MantisQuery {
 
     public void refresh() throws ServiceException, RemoteException {
         setBusy(true);
+        
+        if(issueContainer != null) {
+            issueContainer.refreshingStarted();
+        }
+        
         Set<String> oldList = new HashSet<>(matchingIds);
         matchingIds.clear();
         for (MantisIssue mi : mr.findIssues(this)) {
@@ -114,10 +119,15 @@ public class MantisQuery {
         // Assumption: this is called off the EDT and should do the heavy
         // lifting, while getIssues is called on the EDT and needs to be
         // lightweight
-        mr.getIssues(false, matchingIds.toArray(new String[matchingIds.size()]));
-        if(! oldList.equals(new HashSet<>(matchingIds))) {
-            firePropertyChanged(QueryProvider.EVENT_QUERY_ISSUES_CHANGED, null, null);
+        List<MantisIssue> mis = mr.getIssues(
+                false, matchingIds.toArray(new String[matchingIds.size()]));
+        
+        if(issueContainer != null) {
+            issueContainer.clear();
+            issueContainer.add(mis.toArray(new MantisIssue[mis.size()]));
+            issueContainer.refreshingFinished();
         }
+        
         setBusy(false);
     }
 
@@ -300,6 +310,14 @@ public class MantisQuery {
         pcs.firePropertyChange("combination", oldValue, combination);
     }
 
+    public QueryProvider.IssueContainer<MantisIssue> getIssueContainer() {
+        return issueContainer;
+    }
+
+    public void setIssueContainer(QueryProvider.IssueContainer<MantisIssue> issueContainer) {
+        this.issueContainer = issueContainer;
+    }
+    
     public boolean matchesFilter(IssueHeaderData id) {
         int matches = 0;
         int checks = 0;

@@ -12,6 +12,7 @@ import eu.doppel_helix.netbeans.mantisintegration.data.FlattenedProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.data.Permission;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.swing.AttachmentDisplay;
+import org.jdesktop.swingx.JXHyperlink;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
 import eu.doppel_helix.netbeans.mantisintegration.swing.NoteDisplay;
 import eu.doppel_helix.netbeans.mantisintegration.swing.RelationshipDisplay;
@@ -42,15 +43,14 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultCaret;
 import javax.xml.rpc.ServiceException;
-import org.netbeans.modules.bugtracking.spi.BugtrackingController;
+import org.netbeans.modules.bugtracking.spi.IssueController;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
-import org.netbeans.modules.bugtracking.util.LinkButton;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.HelpCtx;
 import org.openide.windows.WindowManager;
 
-public class MantisIssueController extends BugtrackingController implements PropertyChangeListener, ActionListener {
+public class MantisIssueController implements PropertyChangeListener, ActionListener, IssueController {
 
     private static final Logger logger = Logger.getLogger(MantisIssueController.class.getName());
     private static File lastDirectory;
@@ -185,6 +185,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
         panel.statusComboBox.setEnabled(false);
         panel.resolutionComboBox.setEnabled(false);
         panel.headerPanel.setVisible(false);
+        panel.subheaderPanel.setVisible(false);
         panel.relationsLabel.setVisible(false);
         panel.relationsPanel.setVisible(false);
         panel.tagsLabel.setVisible(false);
@@ -205,6 +206,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
             setUpdateEnabledFields(issue.canUpdate());
             panel.notesOuterPanel.setVisible(true);
             panel.headerPanel.setVisible(true);
+            panel.subheaderPanel.setVisible(true);
             panel.relationsLabel.setVisible(true);
             panel.relationsPanel.setVisible(true);
             panel.tagsLabel.setVisible(true);
@@ -389,7 +391,8 @@ public class MantisIssueController extends BugtrackingController implements Prop
                         panel.relationsPanel.add(new RelationshipDisplay(issue, rd));
                     }
                 }
-                LinkButton lb = new LinkButton("Add");
+                JXHyperlink lb = new JXHyperlink();
+                lb.setText("Add");
                 lb.setActionCommand("addRelationship");
                 lb.addActionListener(this);
                 panel.relationsPanel.add(lb);
@@ -401,7 +404,8 @@ public class MantisIssueController extends BugtrackingController implements Prop
                         panel.tagsPanel.add(new TagDisplay(issue, or));
                     }
                 }
-                LinkButton lb = new LinkButton("Add");
+                JXHyperlink lb = new JXHyperlink();
+                lb.setText("Add");
                 lb.setActionCommand("addTag");
                 lb.addActionListener(this);
                 panel.tagsPanel.add(lb);
@@ -415,7 +419,8 @@ public class MantisIssueController extends BugtrackingController implements Prop
                         panel.attachmentPanel.add(adisplay);
                     }
                 }
-                LinkButton lb = new LinkButton("Add");
+                JXHyperlink lb = new JXHyperlink();
+                lb.setText("Add");
                 lb.setActionCommand("addAttachment");
                 lb.addActionListener(this);
                 panel.attachmentPanel.add(lb);
@@ -498,7 +503,6 @@ public class MantisIssueController extends BugtrackingController implements Prop
         return new HelpCtx(MantisIssueController.class.getName());
     }
 
-    @Override
     public boolean isValid() {
         boolean result = true;
         result &= panel.projectComboBox.getSelectedItem() != null;
@@ -508,40 +512,12 @@ public class MantisIssueController extends BugtrackingController implements Prop
     }
 
     @Override
-    public void applyChanges() {
-        issue.setBusy(true);
-        try {
-            if (isValid()) {
-                if (issue.getId() == null) {
-                    MantisRepository mr = issue.getMantisRepository();
-                    mr.addIssue(issue, getUpdateData());
-                } else {
-                    MantisRepository mr = issue.getMantisRepository();
-                    mr.updateIssue(issue, getUpdateData());
-                }
-            }
-        } catch (Exception ex) {
-            if(ex instanceof RemoteException || ex instanceof ServiceException) {
-                NotifyDescriptor nd = new NotifyDescriptor.Exception(ex, 
-                        "Failed to create/add issue");
-                DialogDisplayer.getDefault().notifyLater(nd);
-            } else if (ex instanceof RuntimeException) {
-                throw (RuntimeException) ex;
-            } else {
-                assert false : "Should never be reached";
-            }
-        } finally {
-            issue.setBusy(false);
-        }
-    }
-
-    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         String propertyName = evt.getPropertyName();
         if ("busy".equals(propertyName) && panel != null) {
             panel.waitPanel.setVisible((Boolean) evt.getNewValue());
         } else {
-            if (IssueProvider.EVENT_ISSUE_REFRESHED.equals(propertyName)) {
+            if (IssueProvider.EVENT_ISSUE_DATA_CHANGED.equals(propertyName)) {
                 propertyName = null;
             }
             updateInfo(propertyName);
@@ -554,7 +530,7 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 || "updateIssue".equals(e.getActionCommand())) {
             issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
                 public void run() {
-                    applyChanges();
+                    saveChanges();
                 }
             });
         } else if ("addNote".equals(e.getActionCommand())) {
@@ -654,6 +630,66 @@ public class MantisIssueController extends BugtrackingController implements Prop
                 });
             }
         }
+    }
+
+    @Override
+    public void opened() {
+    }
+
+    @Override
+    public void closed() {
+    }
+
+    @Override
+    public boolean saveChanges() {
+        issue.setBusy(true);
+        try {
+            if (isValid()) {
+                if (issue.getId() == null) {
+                    MantisRepository mr = issue.getMantisRepository();
+                    mr.addIssue(issue, getUpdateData());
+                } else {
+                    MantisRepository mr = issue.getMantisRepository();
+                    mr.updateIssue(issue, getUpdateData());
+                }
+            }
+        } catch (Exception ex) {
+            if(ex instanceof RemoteException || ex instanceof ServiceException) {
+                NotifyDescriptor nd = new NotifyDescriptor.Exception(ex, 
+                        "Failed to create/add issue");
+                DialogDisplayer.getDefault().notifyLater(nd);
+            } else if (ex instanceof RuntimeException) {
+                throw (RuntimeException) ex;
+            } else {
+                assert false : "Should never be reached";
+            }
+        } finally {
+            issue.setBusy(false);
+        }
+        // @todo: Implement correctly
+        return true;
+    }
+
+    @Override
+    public boolean discardUnsavedChanges() {
+        updateInfo(null);
+        return true;
+    }
+
+    @Override
+    public boolean isChanged() {
+        // @todo: Impelement change detection
+        return false;
+    }
+
+    @Override
+    public void addPropertyChangeListener(PropertyChangeListener l) {
+        issue.addPropertyChangeListener(l);
+    }
+
+    @Override
+    public void removePropertyChangeListener(PropertyChangeListener l) {
+        issue.removePropertyChangeListener(l);
     }
 
     private class StateMonitor implements DocumentListener, ActionListener {

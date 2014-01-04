@@ -86,9 +86,9 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         headerPanel = new javax.swing.JPanel();
         issueHeader = new javax.swing.JLabel();
         headerButtonsPanel = new javax.swing.JPanel();
-        refreshLinkButton = new org.netbeans.modules.bugtracking.util.LinkButton();
+        refreshLinkButton = new org.jdesktop.swingx.JXHyperlink();
         seperatorLabel = new javax.swing.JLabel();
-        openIssueWebbrowserLinkButton = new org.netbeans.modules.bugtracking.util.LinkButton();
+        openIssueWebbrowserLinkButton = new org.jdesktop.swingx.JXHyperlink();
         subheaderPanel = new javax.swing.JPanel();
         createdLabel = new javax.swing.JLabel();
         createdValueLabel = new javax.swing.JLabel();
@@ -952,7 +952,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
     javax.swing.JLabel issueHeader;
     javax.swing.JPanel notesOuterPanel;
     javax.swing.JPanel notesPanel;
-    org.netbeans.modules.bugtracking.util.LinkButton openIssueWebbrowserLinkButton;
+    org.jdesktop.swingx.JXHyperlink openIssueWebbrowserLinkButton;
     javax.swing.JLabel osLabel;
     javax.swing.JTextField osTextField;
     javax.swing.JLabel osVersionLabel;
@@ -965,7 +965,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
     javax.swing.JLabel projectLabel;
     javax.swing.JComboBox projectionComboBox;
     javax.swing.JLabel projectionLabel;
-    org.netbeans.modules.bugtracking.util.LinkButton refreshLinkButton;
+    org.jdesktop.swingx.JXHyperlink refreshLinkButton;
     javax.swing.JLabel relationsLabel;
     javax.swing.JPanel relationsPanel;
     javax.swing.JLabel reporterLabel;

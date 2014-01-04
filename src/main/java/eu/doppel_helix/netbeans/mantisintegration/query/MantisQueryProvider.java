@@ -10,7 +10,7 @@ import org.netbeans.modules.bugtracking.spi.QueryProvider;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 
-public class MantisQueryProvider extends QueryProvider<MantisQuery, MantisIssue> {
+public class MantisQueryProvider implements QueryProvider<MantisQuery, MantisIssue> {
 
     @Override
     public String getDisplayName(MantisQuery q) {
@@ -32,30 +32,8 @@ public class MantisQueryProvider extends QueryProvider<MantisQuery, MantisIssue>
     }
 
     @Override
-    public boolean isSaved(MantisQuery q) {
-        return q.isSaved();
-    }
-
-    @Override
     public void remove(MantisQuery q) {
         q.remove();
-    }
-
-    @Override
-    public Collection<MantisIssue> getIssues(MantisQuery q) {
-        try {
-            return q.getIssues();
-        } catch (Exception ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                    "Failed to retrieve issues");
-            DialogDisplayer.getDefault().notifyLater(nd);
-            return Collections.EMPTY_LIST;
-        }
-    }
-
-    @Override
-    public boolean contains(MantisQuery q, String id) {
-        return q.contains(id);
     }
 
     @Override
@@ -70,13 +48,23 @@ public class MantisQueryProvider extends QueryProvider<MantisQuery, MantisIssue>
     }
 
     @Override
-    public void removePropertyChangeListener(MantisQuery q, PropertyChangeListener listener) {
-        q.removePropertyChangeListener(listener);
+    public boolean canRemove(MantisQuery q) {
+        return true;
     }
 
     @Override
-    public void addPropertyChangeListener(MantisQuery q, PropertyChangeListener listener) {
-        q.addPropertyChangeListener(listener);
+    public boolean canRename(MantisQuery q) {
+        return false;
+    }
+
+    @Override
+    public void rename(MantisQuery q, String newName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setIssueContainer(MantisQuery q, IssueContainer<MantisIssue> ic) {
+        q.setIssueContainer(ic);
     }
     
 }

@@ -108,25 +108,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
         }
         return message.toString();
     }
-    
-    @Override
-    public void applyChanges() throws IOException {
-        String name = panel.nameTextField.getText();
-        String url = panel.urlTextField.getText();
-        String username = panel.usernameTextField.getText();
-        String password = panel.passwordTextField.getText();
-        RepositoryInfo ri = repository.getInfo();
-        String id = null;
-        if( ri != null && ri.getId() != null) {
-            id = ri.getId();
-        }
-          
-        if(id == null) {
-            id = MantisConnector.ID + System.currentTimeMillis();
-        }
-        ri = new RepositoryInfo(id, MantisConnector.ID, url, name, "", username, "", password.toCharArray(), "".toCharArray());
-        repository.setInfo(ri);
-    }
+
     
     @Override
     public void addChangeListener(ChangeListener l) {
@@ -218,6 +200,29 @@ public class MantisRepositoryController implements RepositoryController, Documen
                 }
             }.execute();
         }
+    }
+
+    @Override
+    public void cancelChanges() {
+    }
+
+    @Override
+    public void applyChanges() {
+        String name = panel.nameTextField.getText();
+        String url = panel.urlTextField.getText();
+        String username = panel.usernameTextField.getText();
+        String password = panel.passwordTextField.getText();
+        RepositoryInfo ri = repository.getInfo();
+        String id = null;
+        if( ri != null && ri.getID() != null) {
+            id = ri.getID();
+        }
+          
+        if(id == null) {
+            id = MantisConnector.ID + System.currentTimeMillis();
+        }
+        ri = new RepositoryInfo(id, MantisConnector.ID, url, name, "", username, "", password.toCharArray(), "".toCharArray());
+        repository.setInfo(ri);
     }
     
 }

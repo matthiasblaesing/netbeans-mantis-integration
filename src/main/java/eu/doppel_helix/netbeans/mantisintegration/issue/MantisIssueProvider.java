@@ -3,13 +3,14 @@ package eu.doppel_helix.netbeans.mantisintegration.issue;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import org.netbeans.modules.bugtracking.spi.BugtrackingController;
+import java.util.Collection;
+import org.netbeans.modules.bugtracking.spi.IssueController;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
 import org.netbeans.modules.bugtracking.spi.IssueStatusProvider;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 
-public class MantisIssueProvider extends IssueProvider<MantisIssue> {
+public class MantisIssueProvider implements IssueProvider<MantisIssue> {
 
     @Override
     public String getDisplayName(MantisIssue data) {
@@ -24,11 +25,6 @@ public class MantisIssueProvider extends IssueProvider<MantisIssue> {
     @Override
     public String getID(MantisIssue data) {
         return data.getIdAsString();
-    }
-
-    @Override
-    public String[] getSubtasks(MantisIssue data) {
-        return data.getSubtasks();
     }
 
     @Override
@@ -70,18 +66,7 @@ public class MantisIssueProvider extends IssueProvider<MantisIssue> {
     }
 
     @Override
-    public void attachPatch(MantisIssue data, File file, String description) {
-        try {
-            data.attachPatch(file, description);
-        } catch (Exception ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                    "Failed to add patch to issue");
-            DialogDisplayer.getDefault().notifyLater(nd);
-        }
-    }
-
-    @Override
-    public BugtrackingController getController(MantisIssue data) {
+    public IssueController getController(MantisIssue data) {
         return data.getController();
     }
 
@@ -96,28 +81,18 @@ public class MantisIssueProvider extends IssueProvider<MantisIssue> {
     }
 
     @Override
-    public IssueStatusProvider getStatusProvider() {
-        return dummyProvider;
+    public Collection<String> getSubtasks(MantisIssue data) {
+        return data.getSubtasks();
     }
-    
-     private final static IssueStatusProvider dummyProvider = new IssueStatusProvider<MantisIssue>() {
 
-        @Override
-        public Status getStatus(MantisIssue i) {
-            return Status.SEEN;
+    @Override
+    public void attachFile(MantisIssue data, File file, String description, boolean isPatch) {
+        try {
+            data.attachFile(file, description);
+        } catch (Exception ex) {
+            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                    "Failed to add patch to issue");
+            DialogDisplayer.getDefault().notifyLater(nd);
         }
-
-        @Override
-        public void setSeen(MantisIssue i, boolean bln) {
-        }
-
-        @Override
-        public void removePropertyChangeListener(MantisIssue i, PropertyChangeListener pl) {
-        }
-
-        @Override
-        public void addPropertyChangeListener(MantisIssue i, PropertyChangeListener pl) {
-            
-        }
-    };
+    }
 }

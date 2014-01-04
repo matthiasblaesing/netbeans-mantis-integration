@@ -9,8 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import org.jdesktop.swingx.JXHyperlink;
 import org.netbeans.modules.bugtracking.api.Repository;
-import org.netbeans.modules.bugtracking.util.LinkButton;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 
@@ -19,8 +19,8 @@ public class RelationshipDisplay extends DelegatingBaseLineJPanel implements Act
     private final String COMMAND_OPENISSUE = "openIssue";
     private RelationshipData rd;
     private MantisIssue issue;
-    private LinkButton bugButton = new LinkButton();
-    private LinkButton deleteButton = new LinkButton("delete");
+    private JXHyperlink bugButton = new JXHyperlink();
+    private JXHyperlink deleteButton = new JXHyperlink();
     private JLabel trailingLabel = new JLabel();
     private JLabel middleLabel = new JLabel();
 
@@ -41,6 +41,7 @@ public class RelationshipDisplay extends DelegatingBaseLineJPanel implements Act
         this.add(bugButton);
         this.add(middleLabel);
         this.add(deleteButton);
+        deleteButton.setText("delete");
         deleteButton.addActionListener(this);
         deleteButton.setActionCommand(COMMAND_DELETE);
         this.add(trailingLabel);
@@ -65,14 +66,12 @@ public class RelationshipDisplay extends DelegatingBaseLineJPanel implements Act
             issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
                 public void run() {
                     try {
-                        Repository r = Mantis.getInstance().getBugtrackingFactory().getRepository(
-                                MantisConnector.ID,
-                                issue.getMantisRepository().getInfo().getId());
-
                         MantisIssue mi = issue.getMantisRepository().
                                 getIssues(false, rd.getTarget_id()).get(0);
 
-                        Mantis.getInstance().getBugtrackingFactory().openIssue(r, mi);
+                        Mantis.getInstance().getBugtrackingSupport().openIssue(
+                                issue.getMantisRepository(),
+                                mi);
                     } catch (Exception ex) {
                         NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
                                 "Failed to open issue");

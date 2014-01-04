@@ -1,9 +1,15 @@
 
 package eu.doppel_helix.netbeans.mantisintegration;
 
+import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
+import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.Collections;
 import org.netbeans.modules.bugtracking.api.Repository;
+import org.netbeans.modules.bugtracking.issuetable.IssueNode;
 import org.netbeans.modules.bugtracking.spi.BugtrackingConnector;
+import org.netbeans.modules.bugtracking.spi.IssueStatusProvider;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 import org.openide.util.NbBundle;
 
@@ -12,7 +18,7 @@ import org.openide.util.NbBundle;
         displayName="#LBL_ConnectorName",
         tooltip="#LBL_ConnectorTooltip"
 )    
-public class MantisConnector extends BugtrackingConnector {
+public class MantisConnector implements BugtrackingConnector {
     public static final String ID = "eu.doppel_helix.netbeans.mantisintegration";
     
     public static String getConnectorName() {
@@ -24,21 +30,14 @@ public class MantisConnector extends BugtrackingConnector {
     @Override
     public Repository createRepository(RepositoryInfo info) {
         MantisRepository mr = new MantisRepository(info);
-        return Mantis.getInstance().getBugtrackingFactory().createRepository(
-                mr,
-                Mantis.getInstance().getRepositoryProvider(),
-                Mantis.getInstance().getQueryProvider(),
-                Mantis.getInstance().getIssueProvider());
+        return Mantis.getInstance().getBugtrackingSupport().createRepository(
+                mr, null, null, null, null);
     }
     
     @Override
     public Repository createRepository() {
         MantisRepository mr = new MantisRepository();
-        Mantis m = Mantis.getInstance();
-        return m.getBugtrackingFactory().createRepository(
-                mr,
-                m.getRepositoryProvider(),
-               m.getQueryProvider(),
-                m.getIssueProvider());
+        return Mantis.getInstance().getBugtrackingSupport().createRepository(
+                mr, null, null, null, null);
     }
 }

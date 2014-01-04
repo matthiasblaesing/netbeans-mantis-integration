@@ -14,7 +14,6 @@ import biz.futureware.mantisconnect.ProjectVersionData;
 import biz.futureware.mantisconnect.RelationshipData;
 import biz.futureware.mantisconnect.TagData;
 import biz.futureware.mantisconnect.UserData;
-import eu.doppel_helix.netbeans.mantisintegration.Mantis;
 import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
 import eu.doppel_helix.netbeans.mantisintegration.data.Version;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
@@ -38,7 +37,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -47,13 +45,10 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
-import org.netbeans.modules.bugtracking.api.Repository;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
-import org.netbeans.modules.bugtracking.cache.IssueCache;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ImageUtilities;
-import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.InstanceContent;
 
@@ -66,12 +61,12 @@ public class MantisRepository {
     private final transient InstanceContent ic;
     private final transient Capabilities capabilities = new Capabilities(this);
     
+    private IssueCache cache = new IssueCache();
     private RequestProcessor requestProzessor = new RequestProcessor(MantisRepository.class);
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private RepositoryInfo info;
     private MantisRepositoryController controller;
     private MantisConnectPortType client;
-    private Cache cache;
     private Version version;
     private ObjectRef[] priorities;
     private ObjectRef[] states;
@@ -98,7 +93,7 @@ public class MantisRepository {
     private MantisRepositoryQueryStore queryStore;
 
     String getBaseConfigPath() {
-        return String.format("%s/%s", BASE_CONFIG_PATH, getInfo().getId());
+        return String.format("%s/%s", BASE_CONFIG_PATH, getInfo().getID());
     }
     
     FileObject getBaseConfigFileObject() {
@@ -165,16 +160,7 @@ public class MantisRepository {
         return requestProzessor;
     }
 
-    public Repository getRepository() {
-        return Mantis.getInstance().getBugtrackingFactory().getRepository(
-                info.getConnectorId(),
-                info.getId());
-    }
-
-    private IssueCache<MantisIssue> getIssueCache() {
-        if (cache == null && getRepository() != null) {
-            cache = new Cache();
-        }
+    private IssueCache getIssueCache() {
         return cache;
     }
 
@@ -213,7 +199,7 @@ public class MantisRepository {
     public List<MantisIssue> getIssues(boolean onlyCached, BigInteger... issues) throws ServiceException, RemoteException {
         List<MantisIssue> results = new ArrayList<>();
         for (int i = 0; i < issues.length; i++) {
-            MantisIssue issue = (MantisIssue) getIssueCache().getIssue(issues[i].toString());
+            MantisIssue issue = getIssueCache().getIssue(issues[i]);
             if (issue == null && (! onlyCached)) {
                 issue = new MantisIssue(this);
                 issue.setId(issues[i]);
@@ -247,7 +233,6 @@ public class MantisRepository {
             }
 
             MantisConnectPortType mcpt = getClient();
-            IssueCache ic = getIssueCache();
             List<BigInteger> matchingIds = new ArrayList<BigInteger>();
             OUTER:
             for (BigInteger projectID : projects.keySet()) {
@@ -300,7 +285,6 @@ public class MantisRepository {
     
     public void deleteQuery(String id) {
         queryStore.removeMantisQuery(id);
-        getIssueCache().removeQuery(id);
     }
 
     public Version getVersion() throws ServiceException, RemoteException {
@@ -391,7 +375,7 @@ public class MantisRepository {
                     new String(info.getPassword()),
                     issue.getId());
             issue.updateFromIssueData(id);
-            getIssueCache().setIssueData(id.getId().toString(), issue);
+            getIssueCache().setIssueData(id.getId(), issue);
             return true;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -720,7 +704,6 @@ public class MantisRepository {
         BigInteger PAGE_SIZE = BigInteger.valueOf(500);
         MantisConnectPortType mcpt = getClient();
         Set<BigInteger> matchingIds = new HashSet<BigInteger>();
-        IssueCache<MantisIssue> ic = getIssueCache();
         if (mq.getServersideFilterId() != null) {
             for (int i = 0; i < 1000; i++) {
                 IssueHeaderData[] ids = mcpt.mc_filter_get_issue_headers(
@@ -762,9 +745,6 @@ public class MantisRepository {
         for(BigInteger bi: matchingIds) {
             ids[count] = bi.toString();
             count++;
-        }
-        if(mq.isSaved()) {
-            ic.storeQueryIssues(mq.getId(), ids);
         }
         return getIssues(false, matchingIds.toArray(new BigInteger[0]));
     }
@@ -899,30 +879,4 @@ public class MantisRepository {
         return baos.toByteArray();
     }
 
-    private class Cache extends IssueCache<MantisIssue> {
-
-        Cache() {
-            super(  MantisRepository.this.getInfo().getUrl(),
-                    new IssueAccessorImpl());
-        }
-    }
-
-    private class IssueAccessorImpl implements IssueCache.IssueAccessor<MantisIssue> {
-        @Override
-        public long getLastModified(MantisIssue issue) {
-            return issue.getLast_updated().getTimeInMillis();
-        }
-
-        @Override
-        public long getCreated(MantisIssue issue) {
-            return issue.getDate_submitted().getTimeInMillis();
-        }
-
-        @Override
-        public Map<String, String> getAttributes(MantisIssue issue) {
-            HashMap<String,String> result = new HashMap<String, String>();
-            result.put("issue.lastModified", issue.getLast_updated().toString());
-            return result;
-        }
-    }
 }

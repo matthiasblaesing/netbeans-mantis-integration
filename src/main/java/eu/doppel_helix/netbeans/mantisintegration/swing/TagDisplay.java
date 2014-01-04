@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
-import org.netbeans.modules.bugtracking.util.LinkButton;
+import org.jdesktop.swingx.JXHyperlink;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 
@@ -16,7 +16,7 @@ public class TagDisplay extends DelegatingBaseLineJPanel implements ActionListen
     private final ObjectRef tag;
     private final MantisIssue issue;
     private final JLabel leadingLabel = new JLabel();
-    private final LinkButton deleteButton = new LinkButton("delete");
+    private final JXHyperlink deleteButton = new JXHyperlink();
     private final JLabel trailingLabel = new JLabel();
 
     public TagDisplay(MantisIssue issue, ObjectRef tag) {
@@ -31,6 +31,7 @@ public class TagDisplay extends DelegatingBaseLineJPanel implements ActionListen
         trailingLabel.setText(")");
         this.add(leadingLabel);
         this.add(deleteButton);
+        deleteButton.setText("delete");
         deleteButton.addActionListener(this);
         deleteButton.setActionCommand(COMMAND_DELETE);
         this.add(trailingLabel);

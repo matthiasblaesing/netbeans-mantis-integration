@@ -114,7 +114,7 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         headerButtonsPanel = new javax.swing.JPanel();
-        deleteQueryLinkButton = new org.netbeans.modules.bugtracking.util.LinkButton();
+        deleteQueryLinkButton = new org.jdesktop.swingx.JXHyperlink();
         buttonsPanel = new javax.swing.JPanel();
         saveQueryButton = new javax.swing.JButton();
         executeQueryButton = new javax.swing.JButton();
@@ -556,7 +556,7 @@ public class MantisQueryPanel extends javax.swing.JPanel {
     javax.swing.JPanel buttonsPanel;
     javax.swing.JComboBox categoryComboBox;
     javax.swing.JLabel categoryLabel;
-    org.netbeans.modules.bugtracking.util.LinkButton deleteQueryLinkButton;
+    org.jdesktop.swingx.JXHyperlink deleteQueryLinkButton;
     javax.swing.JButton executeQueryButton;
     javax.swing.JComboBox filterComboBox;
     javax.swing.JLabel filterLabel;

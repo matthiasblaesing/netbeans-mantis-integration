@@ -13,7 +13,7 @@ import org.netbeans.modules.bugtracking.spi.RepositoryProvider;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 
-public class MantisRepositoryProvider extends RepositoryProvider<MantisRepository,MantisQuery,MantisIssue> {
+public class MantisRepositoryProvider implements RepositoryProvider<MantisRepository,MantisQuery,MantisIssue> {
 
     @Override
     public RepositoryInfo getInfo(MantisRepository r) {
@@ -26,20 +26,15 @@ public class MantisRepositoryProvider extends RepositoryProvider<MantisRepositor
     }
 
     @Override
-    public MantisIssue[] getIssues(MantisRepository r, String... ids) {
+    public Collection<MantisIssue> getIssues(MantisRepository r, String... ids) {
         try {
-            return r.getIssues(false, ids).toArray(new MantisIssue[0]);
+            return r.getIssues(false, ids);
         } catch (Exception ex) {
             NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
                     "Failed to get issues");
             DialogDisplayer.getDefault().notifyLater(nd);
-            return new MantisIssue[0];
+            return Collections.EMPTY_LIST;
         }
-    }
-
-    @Override
-    public void remove(MantisRepository r) {
-        r.remove();
     }
 
     @Override
@@ -82,6 +77,24 @@ public class MantisRepositoryProvider extends RepositoryProvider<MantisRepositor
     @Override
     public void addPropertyChangeListener(MantisRepository r, PropertyChangeListener pl) {
         r.addPropertyChangeListener(pl);
+    }
+
+    @Override
+    public MantisIssue createIssue(MantisRepository r, String summary, String description) {
+        MantisIssue mi = r.createIssue();
+        mi.setSummary(summary);
+        mi.setDescription(description);
+        return mi;
+    }
+
+    @Override
+    public boolean canAttachFiles(MantisRepository r) {
+        return true;
+    }
+
+    @Override
+    public void removed(MantisRepository r) {
+        r.remove();
     }
 
 }
