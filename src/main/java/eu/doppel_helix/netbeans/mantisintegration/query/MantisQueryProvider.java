@@ -3,14 +3,19 @@ package eu.doppel_helix.netbeans.mantisintegration.query;
 
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import java.beans.PropertyChangeListener;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.QueryController;
 import org.netbeans.modules.bugtracking.spi.QueryProvider;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 
 public class MantisQueryProvider implements QueryProvider<MantisQuery, MantisIssue> {
+    private static final Logger LOG = Logger.getLogger(MantisQueryProvider.class.getName());
 
     @Override
     public String getDisplayName(MantisQuery q) {
@@ -40,10 +45,8 @@ public class MantisQueryProvider implements QueryProvider<MantisQuery, MantisIss
     public void refresh(MantisQuery query) {
         try {
             query.refresh();
-        } catch (Exception ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                    "Failed to refresh buglist");
-            DialogDisplayer.getDefault().notifyLater(nd);
+        } catch (ServiceException | RemoteException | RuntimeException ex) {
+            LOG.log(Level.WARNING, "Failed to refresh buglist", ex);
         }
     }
 

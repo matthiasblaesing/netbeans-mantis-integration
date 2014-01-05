@@ -5,7 +5,6 @@ import biz.futureware.mantisconnect.FilterData;
 import biz.futureware.mantisconnect.ObjectRef;
 import biz.futureware.mantisconnect.ProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.Mantis;
-import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
 import eu.doppel_helix.netbeans.mantisintegration.data.FlattenedProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
@@ -14,23 +13,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.SwingWorker;
-import javax.swing.event.AncestorEvent;
-import org.netbeans.modules.bugtracking.api.Repository;
-import org.netbeans.modules.bugtracking.issuetable.ColumnDescriptor;
-import org.netbeans.modules.bugtracking.issuetable.IssueNode;
-import org.netbeans.modules.bugtracking.issuetable.IssueTable;
 import org.netbeans.modules.bugtracking.spi.QueryController;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -49,7 +40,6 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
     private final static Logger logger = Logger.getLogger(
             MantisQueryController.class.getName());
     RequestProcessor rp = new RequestProcessor("MantisQueryController");
-    private final IssueTable issueTable;
     private ListBackedComboBoxModel<FlattenedProjectData> projectModel1 = new ListBackedComboBoxModel<>(
             FlattenedProjectData.class);
     private ListBackedComboBoxModel<FilterData> filterModel1 = new ListBackedComboBoxModel<>(
@@ -83,7 +73,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
         pseudoProject.setName("All");
     }
 
-    private SwingWorker initialize = new SwingWorker() {
+    private final SwingWorker initialize = new SwingWorker() {
         List<FlattenedProjectData> projects;
         List<AccountData> users;
         List<String> categories;
@@ -97,29 +87,29 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
         @Override
         protected Object doInBackground() throws Exception {
             try {
-                projects = new ArrayList<FlattenedProjectData>();
+                projects = new ArrayList<>();
                 projects.add(new FlattenedProjectData(pseudoProject, 0));
                 for (ProjectData pd : mr.getProjects()) {
                     projects.addAll(FlattenedProjectData.buildList(pd));
                 }
-                users = new ArrayList<AccountData>(Arrays.asList(mr.getUsers(
+                users = new ArrayList<>(Arrays.asList(mr.getUsers(
                         BigInteger.ZERO)));
                 users.add(0, null);
-                categories = new ArrayList<String>(Arrays.asList(
+                categories = new ArrayList<>(Arrays.asList(
                         mr.getCategories(BigInteger.ZERO)));
                 categories.add(0, null);
-                severities = new ArrayList<ObjectRef>(Arrays.asList(
+                severities = new ArrayList<>(Arrays.asList(
                         mr.getSeverities()));
                 severities.add(0, null);
-                resolutions = new ArrayList<ObjectRef>(Arrays.asList(
+                resolutions = new ArrayList<>(Arrays.asList(
                         mr.getResolutions()));
                 resolutions.add(0, null);
-                states = new ArrayList<ObjectRef>(Arrays.asList(mr.getStates()));
+                states = new ArrayList<>(Arrays.asList(mr.getStates()));
                 states.add(0, null);
-                priorities = new ArrayList<ObjectRef>(Arrays.asList(
+                priorities = new ArrayList<>(Arrays.asList(
                         mr.getPriorities()));
                 priorities.add(0, null);
-                viewstates = new ArrayList<ObjectRef>(Arrays.asList(
+                viewstates = new ArrayList<>(Arrays.asList(
                         mr.getViewStates()));
                 viewstates.add(0, null);
             } catch (Exception ex) {
@@ -197,53 +187,6 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
 
         mq.setBusy(true);
         initialize.execute();
-
-        issueTable = new IssueTable(
-                mq.getMantisRepository().getInfo().getID(),
-                mq.getName(),
-                this,
-                new ColumnDescriptor[]{
-                    new ColumnDescriptor("mantis.issue.id", BigInteger.class, "ID", "ID", 40, true, true),
-                    new ColumnDescriptor("mantis.issue.noteCount", Integer.class, "#", "Note count", 40),
-                    new ColumnDescriptor("mantis.issue.category", String.class, "Category", "Category", 80),
-                    new ColumnDescriptor("mantis.issue.severity", ObjectRef.class, "Severity", "Severity", 80),
-                    new ColumnDescriptor("mantis.issue.priority", ObjectRef.class, "Priority", "Priority", 80),
-                    new ColumnDescriptor("mantis.issue.status", ObjectRef.class, "Status", "Status", 80),
-                    new ColumnDescriptor("mantis.issue.updated", Calendar.class, "Updated", "Updated", 80),
-                    new ColumnDescriptor(IssueNode.LABEL_NAME_SUMMARY, String.class, "Summary", "Summary"),},
-                mq.isSaved()
-        ) {
-
-            @Override
-            public void ancestorAdded(AncestorEvent event) {
-                try {
-                    // This _will_ break
-                    // @todo: Fix the underlaying bug - not sure where it is located ...
-                    Method m = IssueTable.class.getDeclaredMethod("getRecentChangesColumnIdx", new Class[]{});
-                    m.setAccessible(true);
-                    Integer i = (Integer) m.invoke(this, new Object[]{});
-                    if( (! mq.isSaved()) || i >= 0 ) {
-                        super.ancestorAdded(event);
-                    }
-                } catch (NoSuchMethodException ex) {
-                    throw new RuntimeException(ex);
-                } catch (SecurityException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IllegalAccessException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IllegalArgumentException ex) {
-                    throw new RuntimeException(ex);
-                } catch (InvocationTargetException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-                
-            };
-        issueTable.setRenderer(new MantisQueryTableCellRenderer(issueTable.getRenderer()));
-        // IssueTables relies on initialized Columns, but dispatches initColumns
-        // via an invokeLater ... -- not sure whether this is intended or a bug
-        // @todo: investigate!
-        issueTable.initColumns();
     }
     
     private void onSaveState() {
@@ -297,11 +240,10 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                 protected Object doInBackground() throws Exception {
                     mq.setBusy(true);
                     mq.save();
-                    issueTable.started();
                     mq.refresh();
                     Collection<MantisIssue> issues = mq.getIssues();
                     for (MantisIssue mi : issues) {
-                        issueTable.addNode(mi.getNode());
+                        getComponent(QueryMode.VIEW).getQueryListModel().setIssues(issues);
                     }
                     return null;
                 }
@@ -311,9 +253,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     mq.setBusy(false);
                     try {
                         get();
-                    } catch (InterruptedException ex) {
-                        Exceptions.printStackTrace(ex);
-                    } catch (ExecutionException ex) {
+                    } catch ( InterruptedException | ExecutionException ex) {
                         Exceptions.printStackTrace(ex);
                     }
                 }
@@ -329,9 +269,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                 protected void done() {
                     try {
                         get();
-                    } catch (InterruptedException ex) {
-                        Exceptions.printStackTrace(ex);
-                    } catch (ExecutionException ex) {
+                    } catch ( InterruptedException | ExecutionException ex) {
                         Exceptions.printStackTrace(ex);
                     }
                 }
@@ -370,12 +308,9 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                 @Override
                 protected Object doInBackground() throws Exception {
                     mq.setBusy(true);
-                    issueTable.started();
                     mq.refresh();
                     Collection<MantisIssue> issues = mq.getIssues();
-                    for (MantisIssue mi : issues) {
-                        issueTable.addNode(mi.getNode());
-                    }
+                    getComponent(QueryMode.VIEW).getQueryListModel().setIssues(issues);
                     return null;
                 }
 
@@ -384,9 +319,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     mq.setBusy(false);
                     try {
                         get();
-                    } catch (InterruptedException ex) {
-                        Exceptions.printStackTrace(ex);
-                    } catch (ExecutionException ex) {
+                    } catch ( InterruptedException | ExecutionException ex) {
                         Exceptions.printStackTrace(ex);
                     }
                 }
@@ -436,7 +369,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
     }
 
     @Override
-    public JComponent getComponent(QueryMode mode) {
+    public MantisQueryPanel getComponent(QueryMode mode) {
         if (mqp == null) {
             mqp = new MantisQueryPanel();
             mqp.projectComboBox.setModel(projectModel1);
@@ -458,7 +391,6 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
             mqp.executeQueryButton.addActionListener(this);
             mqp.saveQueryButton.addActionListener(this);
             mqp.deleteQueryLinkButton.addActionListener(this);
-            mqp.issueTablePanel.add(issueTable.getComponent());
             mq.addPropertyChangeListener(this);
             mqp.waitPanel.setVisible(mq.isBusy());
             updateFilterList();

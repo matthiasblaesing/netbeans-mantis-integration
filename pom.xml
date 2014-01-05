@@ -138,11 +138,6 @@
             <artifactId>org-netbeans-modules-bugtracking</artifactId>
             <version>${mantisintegration.nbtarget}</version>
         </dependency>
-        <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-modules-bugtracking-commons</artifactId>
-            <version>${mantisintegration.nbtarget}</version>
-        </dependency>
     </dependencies>
 
     <build>

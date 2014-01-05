@@ -55,10 +55,6 @@ public class MantisIssue {
         }
         firePropertyChange("busy", oldBusy, isBusy());
     }
-    
-    public MantisIssueNode getNode() {
-        return new MantisIssueNode(this);
-    }
 
     public void setIdFromString(String id) {
         String oldValue = getIdAsString();

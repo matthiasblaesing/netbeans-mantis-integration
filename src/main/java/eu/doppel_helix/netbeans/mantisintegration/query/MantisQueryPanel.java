@@ -24,14 +24,24 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
+import org.jdesktop.swingx.table.TableColumnExt;
 
 public class MantisQueryPanel extends javax.swing.JPanel {
 
     private final Map<BigInteger, Color> colorMap = Mantis.getInstance().getStatusColorMap();
     // Swallow Mouseevents
     private static final NoopListener noopListener = new NoopListener();
+    private QueryListModel queryListModel = new QueryListModel();
     JPanel waitPanel;
 
+    public QueryListModel getQueryListModel() {
+        return queryListModel;
+    }
+    
     public MantisQueryPanel() {
         initComponents();
         waitPanel = new JPanel(new BorderLayout()) {
@@ -63,6 +73,83 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         waitPanel.addKeyListener(noopListener);
         innerQuery.add(waitPanel, JLayeredPane.MODAL_LAYER);
         innerQuery.setLayout(new FullSizeLayout());
+        
+        DefaultTableColumnModelExt  tcm = new DefaultTableColumnModelExt();
+        
+        TableColumnExt tce;
+        
+        tce = new TableColumnExt(0);
+        tce.setTitle("ID");
+        tce.setToolTipText("Identifier");
+        tce.setMinWidth(0);
+        tce.setPreferredWidth(40);
+        tce.setMaxWidth(40);
+        tcm.addColumn(tce);
+        
+        tce = new TableColumnExt(1);
+        tce.setTitle("#");
+        tce.setToolTipText("Note count");
+        tce.setMinWidth(0);
+        tce.setPreferredWidth(40);
+        tce.setMaxWidth(40);
+        tcm.addColumn(tce);
+        
+        tce = new TableColumnExt(2);
+        tce.setTitle("Category");
+        tce.setToolTipText("Category");
+        tce.setMinWidth(0);
+        tce.setPreferredWidth(80);
+        tce.setMaxWidth(80);
+        tcm.addColumn(tce);
+        
+        tce = new TableColumnExt(3);
+        tce.setTitle("Severity");
+        tce.setToolTipText("Severity");
+        tce.setCellRenderer(new MantisObjectRefCellRenderer());
+        tce.setMinWidth(0);
+        tce.setPreferredWidth(80);
+        tce.setMaxWidth(80);
+        tcm.addColumn(tce);
+        
+        tce = new TableColumnExt(4);
+        tce.setTitle("Priority");
+        tce.setToolTipText("Priority");
+        tce.setCellRenderer(new MantisObjectRefCellRenderer());
+        tce.setMinWidth(0);
+        tce.setPreferredWidth(80);
+        tce.setMaxWidth(80);
+        tcm.addColumn(tce);
+        
+        tce = new TableColumnExt(5);
+        tce.setTitle("Status");
+        tce.setToolTipText("Status");
+        tce.setCellRenderer(new MantisObjectRefCellRenderer());
+        tce.setHighlighters(new MantisStatusHighlighter());
+        tce.setMinWidth(0);
+        tce.setPreferredWidth(80);
+        tce.setMaxWidth(80);
+        tcm.addColumn(tce);
+        
+        tce = new TableColumnExt(6);
+        tce.setTitle("Updated");
+        tce.setToolTipText("Updated");
+        tce.setCellRenderer(new MantisCalendarCellRenderer());
+        tce.setMinWidth(0);
+        tce.setPreferredWidth(80);
+        tce.setMaxWidth(80);
+        tcm.addColumn(tce);
+        
+        tce = new TableColumnExt(7);
+        tce.setTitle("Summary");
+        tce.setToolTipText("Summary");
+        tce.setPrototypeValue("Ein doch recht langer Text als Prototyp sollte genug Platz sichern!");
+        tce.setPreferredWidth(250);
+        tcm.addColumn(tce);
+
+        issueTable.getTableHeader().setReorderingAllowed(false);
+        issueTable.setColumnModel(tcm);
+        issueTable.setColumnControlVisible(true);
+        issueTable.doLayout();
     }
 
     /**
@@ -119,6 +206,8 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         saveQueryButton = new javax.swing.JButton();
         executeQueryButton = new javax.swing.JButton();
         issueTablePanel = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        issueTable = new org.jdesktop.swingx.JXTable();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setLayout(new java.awt.BorderLayout());
@@ -536,6 +625,13 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         issueTablePanel.setOpaque(false);
         issueTablePanel.setPreferredSize(new java.awt.Dimension(20, 20));
         issueTablePanel.setLayout(new java.awt.BorderLayout());
+
+        issueTable.setAutoCreateColumnsFromModel(false);
+        issueTable.setModel(queryListModel);
+        jScrollPane1.setViewportView(issueTable);
+
+        issueTablePanel.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -567,9 +663,11 @@ public class MantisQueryPanel extends javax.swing.JPanel {
     javax.swing.JFormattedTextField gotoIssueTextField;
     javax.swing.JPanel headerButtonsPanel;
     javax.swing.JLayeredPane innerQuery;
+    org.jdesktop.swingx.JXTable issueTable;
     javax.swing.JPanel issueTablePanel;
     javax.swing.JLabel jLabel1;
     javax.swing.JLabel jLabel2;
+    javax.swing.JScrollPane jScrollPane1;
     javax.swing.JSeparator jSeparator1;
     org.jdesktop.swingx.JXDatePicker lastUpdateAfterDatePicker;
     javax.swing.JLabel lastUpdateAfterLabel;

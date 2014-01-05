@@ -1,15 +1,9 @@
 
 package eu.doppel_helix.netbeans.mantisintegration;
 
-import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
-import java.beans.PropertyChangeListener;
-import java.util.Collection;
-import java.util.Collections;
 import org.netbeans.modules.bugtracking.api.Repository;
-import org.netbeans.modules.bugtracking.issuetable.IssueNode;
 import org.netbeans.modules.bugtracking.spi.BugtrackingConnector;
-import org.netbeans.modules.bugtracking.spi.IssueStatusProvider;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 import org.openide.util.NbBundle;
 
