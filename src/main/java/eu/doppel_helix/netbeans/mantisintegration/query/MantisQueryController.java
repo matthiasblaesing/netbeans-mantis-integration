@@ -11,6 +11,12 @@ import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigInteger;
@@ -20,7 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
-import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import org.netbeans.modules.bugtracking.spi.QueryController;
 import org.openide.DialogDisplayer;
@@ -65,6 +70,69 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
     private MantisRepository mr;
     private final static ProjectData pseudoProject;
 
+    private class IssueTableIssueOpener implements MouseListener, KeyListener {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                int viewRow = mqp.issueTable.getSelectedRow();
+                if (viewRow == -1) {
+                    return;
+                }
+                int modelRow = mqp.issueTable.convertRowIndexToModel(viewRow);
+                MantisIssue mi = mqp.getQueryListModel().getIssue(modelRow);
+                Mantis.getInstance().getBugtrackingSupport().openIssue(
+                        mi.getMantisRepository(),
+                        mi);
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                e.consume();
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+                    if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        int viewRow = mqp.issueTable.getSelectedRow();
+                        if(viewRow == -1) {
+                            return;
+                        }
+                        int modelRow = mqp.issueTable.convertRowIndexToModel(viewRow);
+                        MantisIssue mi = mqp.getQueryListModel().getIssue(modelRow);
+                        Mantis.getInstance().getBugtrackingSupport().openIssue(
+                                mi.getMantisRepository(),
+                                mi);
+                        e.consume();
+                    }
+        }
+    }
+
+    IssueTableIssueOpener issueTableIssueOpener = new IssueTableIssueOpener();
+    
     static {
         pseudoProject = new ProjectData();
         pseudoProject.setAccess_min(new ObjectRef(BigInteger.ZERO, "None"));
@@ -400,6 +468,8 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
             if (mq.getCombination() == MantisQuery.Combination.ANY) {
                 mqp.matchTypeComboBox.setSelectedIndex(1);
             }
+            mqp.issueTable.addMouseListener(issueTableIssueOpener);
+            mqp.issueTable.addKeyListener(issueTableIssueOpener);
             onSaveState();
         }
         return mqp;
