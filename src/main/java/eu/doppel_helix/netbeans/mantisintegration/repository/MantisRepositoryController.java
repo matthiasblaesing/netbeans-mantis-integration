@@ -29,6 +29,8 @@ import org.openide.util.Mutex;
 public class MantisRepositoryController implements RepositoryController, DocumentListener, ChangeListener, ActionListener {
     private final static Logger logger = Logger.getLogger(MantisRepositoryController.class.getName());
     private final static String COMMAND_CHECKCONNECTION = "checkConnection";
+    private final static Color errorColor = new Color( 205, 0, 0);
+    private final static Color goodColor = new Color( 7, 155, 0);
     private final MantisRepository repository;
     private MantisRepositoryPanel panel;
     private final List<String> errorMessages = new ArrayList<>();
@@ -179,15 +181,15 @@ public class MantisRepositoryController implements RepositoryController, Documen
                                 panel.usernameTextField.getText(),
                                 panel.passwordTextField.getText());
                         result = "Successfully connected (version: " + v.getVersionString() + ")";
-                        resultColor = Color.GREEN;
+                        resultColor = goodColor;
                     } catch (ServiceException ex) {
                         logger.log(Level.INFO, "", ex);
                         result = "Failed create client - check URL";
-                        resultColor = Color.RED;
+                        resultColor = errorColor;
                     } catch (RemoteException ex) {
                         logger.log(Level.INFO, "", ex);
                         result = "Failed request - check username/password";
-                        resultColor = Color.RED;
+                        resultColor = errorColor;
                     }
                     return null;
                 }

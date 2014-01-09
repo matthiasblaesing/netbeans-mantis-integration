@@ -10,7 +10,8 @@ import org.openide.util.NbBundle;
 @BugtrackingConnector.Registration (
         id=MantisConnector.ID,
         displayName="#LBL_ConnectorName",
-        tooltip="#LBL_ConnectorTooltip"
+        tooltip="#LBL_ConnectorTooltip",
+        iconPath = "eu/doppel_helix/netbeans/mantisintegration/icon.png"
 )    
 public class MantisConnector implements BugtrackingConnector {
     public static final String ID = "eu.doppel_helix.netbeans.mantisintegration";
