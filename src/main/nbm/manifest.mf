@@ -1,3 +1,2 @@
 Manifest-Version: 1.0
-OpenIDE-Module-Install: eu/doppel_helix/netbeans/mantisintegration/Installer.class
 OpenIDE-Module-Localizing-Bundle: eu/doppel_helix/netbeans/mantisintegration/Bundle.properties
