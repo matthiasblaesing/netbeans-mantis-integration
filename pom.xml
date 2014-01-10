@@ -91,6 +91,8 @@
             <version>${mantisintegration.nbtarget}</version>
         </dependency>
         <dependency>
+            <!-- Work around - is OSGI bundle - but OSGI option in nbm-maven plugin breaks commons-discovery -->
+            <scope>provided</scope>
             <groupId>org.netbeans.external</groupId>
             <artifactId>org-apache-commons-logging</artifactId>
             <version>${mantisintegration.nbtarget}</version>
@@ -169,14 +171,36 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.11.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <author>Matthias Bläsing</author>
                     <verifyRuntime>warn</verifyRuntime>
                     <licenseName>Apache License, Version 2.0 (+additional Information)</licenseName>
                     <licenseFile>src/main/nbm/license.txt</licenseFile>
+                    <useOSGiDependencies>false</useOSGiDependencies>
                 </configuration>
+            </plugin>
+
+            <!-- commons-logging is needed at runtime, but not properly referenced  -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <target>
+                                <ant dir="." antfile="ant.xml" target="addDependencyToManifest"> 
+                                    <property name="dependency" value="org.apache.commons.logging > 1.1.1" />
+                                </ant>                                
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
