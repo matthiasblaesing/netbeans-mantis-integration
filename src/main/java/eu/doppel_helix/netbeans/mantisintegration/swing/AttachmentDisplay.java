@@ -49,7 +49,7 @@ public class AttachmentDisplay extends DelegatingBaseLineJPanel implements Actio
         deleteButton.setText("delete");
         deleteButton.addActionListener(this);
         deleteButton.setActionCommand(COMMAND_DELETE);
-        deleteButton.setText("download");
+        downloadButton.setText("download");
         downloadButton.addActionListener(this);
         downloadButton.setActionCommand(COMMAND_DOWNLOAD);
     }
