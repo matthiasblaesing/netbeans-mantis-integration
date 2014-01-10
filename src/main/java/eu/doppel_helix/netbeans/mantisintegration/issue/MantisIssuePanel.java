@@ -5,6 +5,7 @@ import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.Mantis;
 import eu.doppel_helix.netbeans.mantisintegration.swing.AccountDataListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.DelegatingBaseLineJPanel;
+import eu.doppel_helix.netbeans.mantisintegration.swing.DispatchingListener;
 import eu.doppel_helix.netbeans.mantisintegration.swing.FullSizeLayout;
 import eu.doppel_helix.netbeans.mantisintegration.swing.NoopListener;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ObjectRefListCellRenderer;
@@ -16,6 +17,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -67,6 +69,15 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         // Swallow Mouse + Keyboard events
         waitPanel.addMouseListener(noopListener);
         waitPanel.addKeyListener(noopListener);
+        Cursor textCursor = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
+        descriptionScrollPane.setCursor(textCursor);
+        descriptionScrollPane.addMouseListener(new DispatchingListener(descriptionEditorPane));
+        stepsToReproduceScrollPane.setCursor(textCursor);
+        stepsToReproduceScrollPane.addMouseListener(new DispatchingListener(stepsToReproduceEditorPane));
+        additionalInformationScrollPane.setCursor(textCursor);
+        additionalInformationScrollPane.addMouseListener(new DispatchingListener(additionalInformationEditorPane));
+        addNoteScrollPane.setCursor(textCursor);
+        addNoteScrollPane.addMouseListener(new DispatchingListener(addNoteEditorPane));
         this.setLayout(new FullSizeLayout());
         this.add(waitPanel, JLayeredPane.MODAL_LAYER);
     }
@@ -796,7 +807,6 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         addNoteScrollPane.setPreferredSize(new java.awt.Dimension(10, 75));
 
         addNoteEditorPane.setMinimumSize(new java.awt.Dimension(6, 70));
-        addNoteEditorPane.setPreferredSize(new java.awt.Dimension(6, 70));
         addNoteEditorPane.setScrollableTracksViewportWidth(true);
         addNoteScrollPane.setViewportView(addNoteEditorPane);
 
@@ -912,8 +922,8 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
 
         scrollablePane.setViewportView(innerPanel);
 
+        add(scrollablePane);
         scrollablePane.setBounds(0, 0, 606, 764);
-        add(scrollablePane, javax.swing.JLayeredPane.DEFAULT_LAYER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     javax.swing.JButton addIssueButton;
