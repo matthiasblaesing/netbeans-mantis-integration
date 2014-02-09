@@ -30,7 +30,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide />
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
-        <mantisintegration.nbtarget>SNAPSHOT</mantisintegration.nbtarget>
+        <mantisintegration.nbtarget>RELEASE74</mantisintegration.nbtarget>
     </properties>
 
     <repositories>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
-            <version>${mantisintegration.nbtarget}</version>
+            <version>RELEASE74</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -144,7 +144,7 @@
         <dependency>
             <groupId>org.netbeans.modules</groupId>
             <artifactId>org-netbeans-modules-bugtracking</artifactId>
-            <version>${mantisintegration.nbtarget}</version>
+            <version>SNAPSHOT</version>
         </dependency>
     </dependencies>
 
