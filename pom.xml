@@ -30,7 +30,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide />
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
-        <mantisintegration.nbtarget>RELEASE74-BETA</mantisintegration.nbtarget>
+        <mantisintegration.nbtarget>RELEASE74</mantisintegration.nbtarget>
         <mantisintegration.bugtracking.implver>201310111528</mantisintegration.bugtracking.implver>
     </properties>
 
