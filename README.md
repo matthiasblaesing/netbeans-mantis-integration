@@ -32,21 +32,4 @@ from the netbeans plugin center.
 ##BUILD Instructions:
 
 1. Checkout the source code
-2. Determine the Implementation version of the issuetracker module:   
-    1. Open /ide/modules/org-netbeans-modules-bugtracking.jar
-    2. Inside the jar open META-INF/MANIFEST.MF
-    3. Find the line "OpenIDE-Module-Implementation-Version" - the value after that key is the value you search for (in 7.4 this is: 201310111528)
-3. Run:
-    mvn -Dmantisintegration.nbtarget=<RELEASE> -Dmantisintegration.bugtracking.implver=<BUGTRACKINGIMPL> package
-    
-    You have to replace <RELEASE> with RELEASE74 (Netbeans 7.4)
-    You have to replace <BUGTRACKINGIMPL> with the value determined in step 2
-4. You find the installable module in: target/
-
-Known Kombinations:
-
-* [unsupported] 7.2: mvn -Dmantisintegration.nbtarget=RELEASE72 -Dmantisintegration.bugtracking.implver=201301311716 package
-* [unsupported] 7.3: mvn -Dmantisintegration.nbtarget=RELEASE73 -Dmantisintegration.bugtracking.implver=201302132200 package
-* [unsupported] 7.3.1: mvn -Dmantisintegration.nbtarget=RELEASE73 -Dmantisintegration.bugtracking.implver=201306052037 package
-* [unsupported] 7.3.1: mvn -Dmantisintegration.nbtarget=RELEASE73 -Dmantisintegration.bugtracking.implver=201306052037 package
-* 7.4: mvn -Dmantisintegration.nbtarget=RELEASE74 -Dmantisintegration.bugtracking.implver=201310111528 package
+2. build with maven (mvn package)
