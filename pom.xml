@@ -249,5 +249,8 @@ please check these options, if you encounter problems:&lt;/p&gt;
 &lt;li&gt;source_control_notes_view_status (default private, integer value 10 -&gt; public)&lt;/li&gt;
 &lt;li&gt;source_control_set_resolution_to (integer value 80-&gt;resolved, 90-&gt;closed)&lt;/li&gt;
 &lt;li&gt;source_control_set_status_to (20-&gt;fixed)&lt;/li&gt;
-&lt;/ul&gt;</description>
+&lt;/ul&gt;
+
+&lt;p&gt;If a self-signed SSL certificate or an invalid certificate need to be accepted, please install the module 
+"SSL Certificate Exception".&lt;/p&gt;</description>
 </project>
