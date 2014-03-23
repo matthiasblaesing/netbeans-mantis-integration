@@ -3,7 +3,6 @@ package eu.doppel_helix.netbeans.mantisintegration.repository;
 
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
