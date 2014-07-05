@@ -9,6 +9,7 @@ import eu.doppel_helix.netbeans.mantisintegration.swing.DispatchingListener;
 import eu.doppel_helix.netbeans.mantisintegration.swing.FullSizeLayout;
 import eu.doppel_helix.netbeans.mantisintegration.swing.NoopListener;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ObjectRefListCellRenderer;
+import eu.doppel_helix.netbeans.mantisintegration.swing.PriorityListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ProjectListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.StringNullSaveListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.TimeFormatterFactory;
@@ -441,7 +442,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         innerPanel.add(priorityLabel, gridBagConstraints);
 
         priorityComboBox.setPrototypeDisplayValue("XXXXXXXX");
-        priorityComboBox.setRenderer(new ObjectRefListCellRenderer());
+        priorityComboBox.setRenderer(new PriorityListCellRenderer());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -923,7 +924,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         scrollablePane.setViewportView(innerPanel);
 
         add(scrollablePane);
-        scrollablePane.setBounds(0, 0, 606, 764);
+        scrollablePane.setBounds(0, 0, 606, 765);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     javax.swing.JButton addIssueButton;

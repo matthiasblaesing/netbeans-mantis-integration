@@ -7,13 +7,13 @@ import eu.doppel_helix.netbeans.mantisintegration.swing.FilterDataListCellRender
 import eu.doppel_helix.netbeans.mantisintegration.swing.FullSizeLayout;
 import eu.doppel_helix.netbeans.mantisintegration.swing.NoopListener;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ObjectRefListCellRenderer;
+import eu.doppel_helix.netbeans.mantisintegration.swing.PriorityListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ProjectListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.StringNullSaveListCellRenderer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,9 +24,6 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 
@@ -114,7 +111,7 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         tce = new TableColumnExt(4);
         tce.setTitle("Priority");
         tce.setToolTipText("Priority");
-        tce.setCellRenderer(new MantisObjectRefCellRenderer());
+        tce.setCellRenderer(new PriorityCellRenderer());
         tce.setMinWidth(0);
         tce.setPreferredWidth(80);
         tce.setMaxWidth(80);
@@ -400,7 +397,7 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         priorityComboBox.setMinimumSize(new java.awt.Dimension(118, 23));
         priorityComboBox.setPreferredSize(new java.awt.Dimension(118, 23));
         priorityComboBox.setPrototypeDisplayValue("XXXXXXXX");
-        priorityComboBox.setRenderer(new ObjectRefListCellRenderer());
+        priorityComboBox.setRenderer(new PriorityListCellRenderer());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
