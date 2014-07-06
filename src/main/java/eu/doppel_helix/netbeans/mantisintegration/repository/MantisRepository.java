@@ -61,9 +61,9 @@ public class MantisRepository {
     private final transient InstanceContent ic;
     private final transient Capabilities capabilities = new Capabilities(this);
     
-    private IssueCache cache = new IssueCache();
-    private RequestProcessor requestProzessor = new RequestProcessor(MantisRepository.class);
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final IssueCache cache = new IssueCache();
+    private final RequestProcessor requestProzessor = new RequestProcessor(MantisRepository.class);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private RepositoryInfo info;
     private MantisRepositoryController controller;
     private MantisConnectPortType client;
@@ -77,7 +77,7 @@ public class MantisRepository {
     private ObjectRef[] projections;
     private ObjectRef[] etas;
     // Hardcoded, as no api exists to retrieve this info
-    private ObjectRef[] relationships = new ObjectRef[]{
+    private final ObjectRef[] relationships = new ObjectRef[]{
         new ObjectRef(new BigInteger("0"), "duplicate of"),
         new ObjectRef(new BigInteger("1"), "related to"),
         new ObjectRef(new BigInteger("2"), "parent of"),
@@ -85,10 +85,11 @@ public class MantisRepository {
         new ObjectRef(new BigInteger("4"), "has duplicate"),};
     private HashMap<BigInteger, ProjectData> projects;
     private HashMap<BigInteger, TagData> tags;
-    private HashMap<BigInteger, String[]> categories = new HashMap<BigInteger, String[]>();
-    private HashMap<BigInteger, AccountData[]> users = new HashMap<BigInteger, AccountData[]>();
-    private HashMap<BigInteger, ProjectVersionData[]> versions = new HashMap<BigInteger, ProjectVersionData[]>();
-    private HashMap<BigInteger, FilterData[]> filters = new HashMap<BigInteger, FilterData[]>();
+    private final HashMap<BigInteger, String[]> categories = new HashMap<>();
+    private final HashMap<BigInteger, AccountData[]> users  = new HashMap<>();
+    private final HashMap<BigInteger, ProjectVersionData[]> versions = new HashMap<>();
+    private final HashMap<BigInteger, FilterData[]> filters = new HashMap<>();
+    private IssueInfosHandler issueInfosHandler;
     private UserData account = null;
     private MantisRepositoryQueryStore queryStore;
 
@@ -103,6 +104,13 @@ public class MantisRepository {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+    }
+    
+    public synchronized IssueInfosHandler getIssueInfosHandler() {
+        if(issueInfosHandler == null) {
+            issueInfosHandler = new IssueInfosHandler(this);
+        }
+        return issueInfosHandler;
     }
     
     public static Version checkConnection(String url, String username, String password) throws ServiceException, RemoteException {

@@ -2,6 +2,7 @@
 package eu.doppel_helix.netbeans.mantisintegration;
 
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisPriorityProvider;
+import eu.doppel_helix.netbeans.mantisintegration.issue.MantisScheduleProvider;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import org.netbeans.modules.bugtracking.api.Repository;
 import org.netbeans.modules.bugtracking.spi.BugtrackingConnector;
@@ -27,14 +28,23 @@ public class MantisConnector implements BugtrackingConnector {
     public Repository createRepository(RepositoryInfo info) {
         MantisRepository mr = new MantisRepository(info);
         return Mantis.getInstance().getBugtrackingSupport().createRepository(
-                mr, null, null, new MantisPriorityProvider(), null);
+                mr,
+                null, 
+                new MantisScheduleProvider(),
+                new MantisPriorityProvider(),
+                null
+        );
     }
     
     @Override
     public Repository createRepository() {
         MantisRepository mr = new MantisRepository();
         return Mantis.getInstance().getBugtrackingSupport().createRepository(
-                mr, null, null, 
-                new MantisPriorityProvider(), null);
+                mr,
+                null, 
+                new MantisScheduleProvider(),
+                new MantisPriorityProvider(),
+                null
+        );
     }
 }
