@@ -184,23 +184,56 @@
 
             <!-- commons-logging is needed at runtime, but not properly referenced  -->
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
+                <groupId>com.alexecollins.maven.plugin</groupId>
+                <artifactId>script-maven-plugin</artifactId>
+                <version>1.0.0</version>
                 <executions>
                     <execution>
                         <phase>process-classes</phase>
-                        <configuration>
-                            <target>
-                                <ant dir="." antfile="ant.xml" target="addDependencyToManifest"> 
-                                    <property name="dependency" value="org.apache.commons.logging &gt; 1.1.1" />
-                                </ant>                                
-                            </target>
-                        </configuration>
                         <goals>
-                            <goal>run</goal>
+                            <goal>execute</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <language>javascript</language>
+                    <script>
+                        <!-- Add dependencies of OSGI bundles to module by directly
+                        modifying the MANIFEST.MF file -->
+                        <![CDATA[
+                        var dependencies = [
+                            "org.apache.commons.logging > 1.1.1"
+                        ];
+
+                        var filename = project.getBasedir() + "/target/classes/META-INF/MANIFEST.MF";
+                        var manifest = new java.util.jar.Manifest(new java.io.FileInputStream(filename));
+                        var attributes = manifest.getMainAttributes();
+                        var entry = "OpenIDE-Module-Module-Dependencies";
+                        var value = attributes.getValue(entry);
+                        if(! value) {
+                            value = "";
+                        } else {
+                            value = value.trim() + "";
+                        }
+                        for(var i = 0; i < dependencies.length; i++) {
+                            if(value != "") {
+                                value += ", ";
+                            }
+                            value += dependencies[i];
+                        }
+                        attributes.putValue(entry, value);
+                        manifest.write(new java.io.FileOutputStream(filename));
+                        ]]>
+                    </script>
+                    <passProjectAsProperty>true</passProjectAsProperty>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>rhino</groupId>
+                        <artifactId>js</artifactId>
+                        <version>1.6R3</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
