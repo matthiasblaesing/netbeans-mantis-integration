@@ -2,17 +2,12 @@
 package eu.doppel_helix.netbeans.mantisintegration.query;
 
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
-import java.beans.PropertyChangeListener;
 import java.rmi.RemoteException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.QueryController;
 import org.netbeans.modules.bugtracking.spi.QueryProvider;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 
 public class MantisQueryProvider implements QueryProvider<MantisQuery, MantisIssue> {
     private static final Logger LOG = Logger.getLogger(MantisQueryProvider.class.getName());
@@ -62,7 +57,7 @@ public class MantisQueryProvider implements QueryProvider<MantisQuery, MantisIss
 
     @Override
     public void rename(MantisQuery q, String newName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
