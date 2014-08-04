@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,13 +25,13 @@ import org.openide.filesystems.FileChangeListener;
 import org.openide.filesystems.FileEvent;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileRenameEvent;
-import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
 
 public class MantisRepositoryQueryStore implements FileChangeListener {
     private static final Logger LOG = Logger.getLogger(MantisRepositoryQueryStore.class.getName());
     private static final JAXBContext jaxbContext;
+    private Map<String,WeakReference<MantisQuery>> openIssues = new HashMap<>();
     
     static {
         JAXBContext tempJaxbContext = null;
@@ -89,13 +90,22 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
         if (fo != null) {
             try {
                 fo.delete();
+                openIssues.remove(id);
             } catch (IOException ex) {
                 LOG.warning(String.format("Failed to delete: %s", fo.getPath()));
             }
         }
     }
     
-    public MantisQuery getMantisQuery(String id) {
+    public synchronized MantisQuery getMantisQuery(String id) {
+        MantisQuery cachedEntry = null;
+        WeakReference<MantisQuery> ref = openIssues.get(id);
+        if(ref != null) {
+            cachedEntry = ref.get();
+        }
+        if(cachedEntry != null) {
+            return cachedEntry;
+        }
         MantisQuery result = null;
         if (backingFileMap.containsKey(id)) {
             FileObject fo = backingFileMap.get(id);
@@ -119,7 +129,8 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
         return result;
     }
 
-    public void saveMantisQuery(final MantisQuery mq) {
+    public synchronized void saveMantisQuery(final MantisQuery mq) {
+        openIssues.put(mq.getId(), new WeakReference<>(mq));
         try {
             getStorage().getFileSystem().runAtomicAction(new FileSystem.AtomicAction() {
                 @Override
@@ -141,14 +152,10 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
             LOG.log(Level.WARNING, "Failed to write query", ex);
         }
     }
-    
-    public List<String> getQueryIds() {
-        return new ArrayList<>(backingFileMap.keySet());
-    }
-    
+
     public List<MantisQuery> getQueries() {
         List<MantisQuery> queries = new ArrayList<>();
-        for(String id: getQueryIds()) {
+        for(String id: backingFileMap.keySet()) {
             MantisQuery mq = getMantisQuery(id);
             if(mq != null) {
                 queries.add(mq);
