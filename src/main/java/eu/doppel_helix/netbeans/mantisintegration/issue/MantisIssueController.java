@@ -17,6 +17,7 @@ import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
 import eu.doppel_helix.netbeans.mantisintegration.swing.NoteDisplay;
 import eu.doppel_helix.netbeans.mantisintegration.swing.RelationshipDisplay;
 import eu.doppel_helix.netbeans.mantisintegration.swing.TagDisplay;
+import eu.doppel_helix.netbeans.mantisintegration.util.SafeAutocloseable;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -83,11 +84,10 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
         List<ObjectRef> states;
         List<ObjectRef> etas;
         List<ObjectRef> projections;
-        private Throwable exception;
 
         @Override
-        protected Object doInBackground() {
-            try {
+        protected Object doInBackground() throws Exception {
+            try(SafeAutocloseable ac = issue.busy()) {
                 MantisRepository mr = issue.getMantisRepository();
                 viewStates = Arrays.asList(mr.getViewStates());
                 
@@ -105,19 +105,14 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 states.add(0, null);
                 etas = Arrays.asList(mr.getEtas());
                 projections = Arrays.asList(mr.getProjections());
-            } catch (Exception ex) {
-                exception = ex;
+                return null;
             }
-            return null;
         }
         
         @Override
         protected void done() {
-            if (exception != null) {
-                NotifyDescriptor nd = new NotifyDescriptor.Exception(exception,
-                        "Failed to update ");
-                DialogDisplayer.getDefault().notifyLater(nd);
-            } else {
+            try {
+                get();
                 projectModel.setBackingList(projects);
                 viewstatesModel.setBackingList(viewStates);
                 viewstatesModel2.setBackingList(viewStates);
@@ -130,16 +125,17 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 etasModel.setBackingList(etas);
                 projectionsModel.setBackingList(projections);
                 updateInfo(null);
+            } catch (Exception ex) {
+                NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                        "Failed to update ");
+                DialogDisplayer.getDefault().notifyLater(nd);
             }
-            issue.setBusy(false);
-
         }
     };
     
     public MantisIssueController(final MantisIssue issue) {
         this.issue = issue;
         issue.addPropertyChangeListener(this);
-        issue.setBusy(true);
         updateModel.execute();
     }
 
@@ -642,8 +638,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
 
     @Override
     public boolean saveChanges() {
-        issue.setBusy(true);
-        try {
+        try(AutoCloseable ac = issue.busy()) {
             if (isValid()) {
                 if (issue.getId() == null) {
                     MantisRepository mr = issue.getMantisRepository();
@@ -663,8 +658,6 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
             } else {
                 assert false : "Should never be reached";
             }
-        } finally {
-            issue.setBusy(false);
         }
         // @todo: Implement correctly
         return true;

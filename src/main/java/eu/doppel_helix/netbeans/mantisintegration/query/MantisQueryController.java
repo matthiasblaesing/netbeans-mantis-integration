@@ -9,6 +9,7 @@ import eu.doppel_helix.netbeans.mantisintegration.data.FlattenedProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
+import eu.doppel_helix.netbeans.mantisintegration.util.SafeAutocloseable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import org.netbeans.modules.bugtracking.spi.QueryController;
@@ -148,11 +150,10 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
         List<ObjectRef> states;
         List<ObjectRef> priorities;
         List<ObjectRef> viewstates;
-        private Exception exception;
 
         @Override
         protected Object doInBackground() throws Exception {
-            try {
+            try (SafeAutocloseable ac = mq.busy()) {
                 projects = new ArrayList<>();
                 projects.add(new FlattenedProjectData(pseudoProject, 0));
                 for (ProjectData pd : mr.getProjects()) {
@@ -178,19 +179,14 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                 viewstates = new ArrayList<>(Arrays.asList(
                         mr.getViewStates()));
                 viewstates.add(0, null);
-            } catch (Exception ex) {
-                exception = ex;
             }
             return null;
         }
 
         @Override
         protected void done() {
-            if (exception != null) {
-                NotifyDescriptor nd = new NotifyDescriptor.Exception(exception,
-                        "Failed to update ");
-                DialogDisplayer.getDefault().notifyLater(nd);
-            } else {
+            try {
+                get();
                 reporterModel.setBackingList(users);
                 assignedToModel.setBackingList(users);
                 categoryModel.setBackingList(categories);
@@ -242,8 +238,11 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                         mqp.matchTypeComboBox.setSelectedIndex(1);
                     }
                 }
+            } catch (Exception ex) {
+                NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
+                        "Failed to update ");
+                DialogDisplayer.getDefault().notifyLater(nd);
             }
-            mq.setBusy(false);
         }
     };
 
@@ -251,7 +250,6 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
         this.mq = mq;
         this.mr = mq.getMantisRepository();
 
-        mq.setBusy(true);
         initialize.execute();
     }
     
@@ -304,23 +302,23 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
             new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
-                    mq.setBusy(true);
-                    mq.save();
-                    mq.refresh();
-                    Collection<MantisIssue> issues = mq.getIssues();
-                    for (MantisIssue mi : issues) {
-                        getComponent(QueryMode.VIEW).getQueryListModel().setIssues(issues);
+                    try (SafeAutocloseable ac = mq.busy()) {
+                        mq.save();
+                        mq.refresh();
+                        Collection<MantisIssue> issues = mq.getIssues();
+                        for (MantisIssue mi : issues) {
+                            getComponent(QueryMode.VIEW).getQueryListModel().setIssues(issues);
+                        }
+                        return null;
                     }
-                    return null;
                 }
 
                 @Override
                 protected void done() {
-                    mq.setBusy(false);
                     try {
                         get();
                     } catch ( InterruptedException | ExecutionException ex) {
-                        Exceptions.printStackTrace(ex);
+                        logger.log(Level.WARNING, "Failed to save query", ex);
                     }
                 }
             }.execute();
@@ -336,7 +334,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     try {
                         get();
                     } catch ( InterruptedException | ExecutionException ex) {
-                        Exceptions.printStackTrace(ex);
+                        logger.log(Level.WARNING, "Failed to delete query", ex);
                     }
                 }
             }.execute();
@@ -373,16 +371,16 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
             SwingWorker sw = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
-                    mq.setBusy(true);
-                    mq.refresh();
-                    Collection<MantisIssue> issues = mq.getIssues();
-                    getComponent(QueryMode.VIEW).getQueryListModel().setIssues(issues);
-                    return null;
+                    try (SafeAutocloseable ac = mq.busy()) {
+                        mq.refresh();
+                        Collection<MantisIssue> issues = mq.getIssues();
+                        getComponent(QueryMode.VIEW).getQueryListModel().setIssues(issues);
+                        return null;
+                    }
                 }
 
                 @Override
                 protected void done() {
-                    mq.setBusy(false);
                     try {
                         get();
                     } catch ( InterruptedException | ExecutionException ex) {

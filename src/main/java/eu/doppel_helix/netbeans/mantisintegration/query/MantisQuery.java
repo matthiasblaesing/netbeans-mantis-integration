@@ -5,6 +5,7 @@ import biz.futureware.mantisconnect.IssueHeaderData;
 import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
+import eu.doppel_helix.netbeans.mantisintegration.util.SafeAutocloseable;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.math.BigInteger;
@@ -51,6 +52,17 @@ public class MantisQuery {
     private final List<String> matchingIds = new ArrayList<>();
     private Integer busy = 0;
     private boolean saved = false;
+    private final SafeAutocloseable busyHelper = new SafeAutocloseable() {
+        @Override
+        public void close() {
+            setBusy(false);
+        }
+    };
+    
+    public SafeAutocloseable busy() {
+        setBusy(true);
+        return busyHelper;
+    }
 
     public MantisQuery(MantisRepository mr) {
         this.mr = mr;
@@ -103,30 +115,28 @@ public class MantisQuery {
     }
 
     public void refresh() throws ServiceException, RemoteException {
-        setBusy(true);
-        
-        if(issueContainer != null) {
-            issueContainer.refreshingStarted();
+        try (SafeAutocloseable ac = busy()) {
+            if (issueContainer != null) {
+                issueContainer.refreshingStarted();
+            }
+
+            Set<String> oldList = new HashSet<>(matchingIds);
+            matchingIds.clear();
+            for (MantisIssue mi : mr.findIssues(this)) {
+                matchingIds.add(mi.getIdAsString());
+            }
+            // Assumption: this is called off the EDT and should do the heavy
+            // lifting, while getIssues is called on the EDT and needs to be
+            // lightweight
+            List<MantisIssue> mis = mr.getIssues(
+                    false, matchingIds.toArray(new String[matchingIds.size()]));
+
+            if (issueContainer != null) {
+                issueContainer.clear();
+                issueContainer.add(mis.toArray(new MantisIssue[mis.size()]));
+                issueContainer.refreshingFinished();
+            }
         }
-        
-        Set<String> oldList = new HashSet<>(matchingIds);
-        matchingIds.clear();
-        for (MantisIssue mi : mr.findIssues(this)) {
-            matchingIds.add(mi.getIdAsString());
-        }
-        // Assumption: this is called off the EDT and should do the heavy
-        // lifting, while getIssues is called on the EDT and needs to be
-        // lightweight
-        List<MantisIssue> mis = mr.getIssues(
-                false, matchingIds.toArray(new String[matchingIds.size()]));
-        
-        if(issueContainer != null) {
-            issueContainer.clear();
-            issueContainer.add(mis.toArray(new MantisIssue[mis.size()]));
-            issueContainer.refreshingFinished();
-        }
-        
-        setBusy(false);
     }
 
     public QueryController getController() {
@@ -152,7 +162,7 @@ public class MantisQuery {
         return busy != 0;
     }
     
-    public synchronized void setBusy(boolean busyBool) {
+    private synchronized void setBusy(boolean busyBool) {
         boolean oldBusy = isBusy();
         if (busyBool) {
             busy++;

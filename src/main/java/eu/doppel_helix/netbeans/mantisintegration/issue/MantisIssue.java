@@ -9,6 +9,7 @@ import biz.futureware.mantisconnect.ObjectRef;
 import biz.futureware.mantisconnect.RelationshipData;
 import eu.doppel_helix.netbeans.mantisintegration.data.Permission;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
+import eu.doppel_helix.netbeans.mantisintegration.util.SafeAutocloseable;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -31,6 +32,17 @@ public class MantisIssue {
     private MantisIssueController mic;
     private Integer busy = 0;
     private Permission timetracking = Permission.NONE;
+    private final SafeAutocloseable busyHelper = new SafeAutocloseable() {
+        @Override
+        public void close() {
+            setBusy(false);
+        }
+    };
+    
+    public SafeAutocloseable busy() {
+        setBusy(true);
+        return busyHelper;
+    }
 
     public MantisIssue(MantisRepository mr) {
         this.mr = mr;
@@ -41,7 +53,7 @@ public class MantisIssue {
         return busy != 0;
     }
     
-    public void setBusy(boolean busyBool) {
+    private void setBusy(boolean busyBool) {
         boolean oldBusy = isBusy();
         synchronized(this) {
             if (busyBool) {
@@ -94,14 +106,14 @@ public class MantisIssue {
     }
 
     public boolean refresh() throws ServiceException, RemoteException {
-        setBusy(true);
-        boolean result = mr.updateIssueFromRepository(MantisIssue.this);
-        timetracking = mr.getCapabilities().getTrackTime(this);
-        if(result) {
-            firePropertyChange(IssueProvider.EVENT_ISSUE_DATA_CHANGED, null, null);
+        try (SafeAutocloseable ac = busy()) {
+            boolean result = mr.updateIssueFromRepository(MantisIssue.this);
+            timetracking = mr.getCapabilities().getTrackTime(this);
+            if (result) {
+                firePropertyChange(IssueProvider.EVENT_ISSUE_DATA_CHANGED, null, null);
+            }
+            return result;
         }
-        setBusy(false);
-        return result;
     }
 
     public void updateFromIssueData(final IssueData id) {
@@ -160,15 +172,15 @@ public class MantisIssue {
     }
 
     public void attachFile(File file, String description) throws ServiceException, RemoteException, IOException {
-        setBusy(true);
-        mr.addFile(this, file, description);
-        setBusy(false);
+        try (SafeAutocloseable ac = busy()) {
+            mr.addFile(this, file, description);
+        }
     }
 
     public void addComment(String comment, boolean closeAsFixed) throws ServiceException, RemoteException {
-        setBusy(true);
-        mr.checkin(this, comment, closeAsFixed);
-        setBusy(false);
+        try (SafeAutocloseable ac = busy()) {
+            mr.checkin(this, comment, closeAsFixed);
+        }
     }
 
     public MantisRepository getMantisRepository() {
@@ -180,49 +192,51 @@ public class MantisIssue {
     }
 
     public void removeRelationship(RelationshipData rd) throws ServiceException, RemoteException {
-        setBusy(true);
-        mr.removeRelationship(this, rd);
-        setBusy(false);
+        try (SafeAutocloseable ac = busy()) {
+            mr.removeRelationship(this, rd);
+        }
     }
 
     public void removeFile(AttachmentData ad) throws ServiceException, RemoteException {
-        setBusy(true);
-        mr.removeFile(this, ad);
-        setBusy(false);
+        try (SafeAutocloseable ac = busy()) {
+            mr.removeFile(this, ad);
+        }
     }
 
     public byte[] getFile(AttachmentData ad) throws ServiceException, RemoteException {
-        return mr.getFile(this, ad);
+        try (SafeAutocloseable ac = busy()) {
+            return mr.getFile(this, ad);
+        }
     }
 
     public void addFile(File f, String comment) throws ServiceException, RemoteException, IOException {
-        setBusy(true);
-        mr.addFile(this, f, comment);
-        setBusy(false);
+        try (SafeAutocloseable ac = busy()) {
+            mr.addFile(this, f, comment);
+        }
     }
 
     public void addComment(String comment, ObjectRef viewState, BigInteger timetracking) throws ServiceException, RemoteException {
-        setBusy(true);
-        mr.addComment(this, comment, viewState, timetracking);
-        setBusy(false);
+        try (SafeAutocloseable ac = busy()) {
+            mr.addComment(this, comment, viewState, timetracking);
+        }
     }
 
     public void addRelationship(ObjectRef type, BigInteger target) throws ServiceException, RemoteException {
-        setBusy(true);
-        mr.addRelationship(this, type, target);
-        setBusy(false);
+        try (SafeAutocloseable ac = busy()) {
+            mr.addRelationship(this, type, target);
+        }
     }
 
     public void addTag(String... tagString) throws ServiceException, RemoteException {
-        setBusy(true);
-        mr.addTag(this, tagString);
-        setBusy(false);
+        try (SafeAutocloseable ac = busy()) {
+            mr.addTag(this, tagString);
+        }
     }
 
     public void removeTag(ObjectRef... tag) throws ServiceException, RemoteException {
-        setBusy(true);
-        mr.removeTag(this, tag);
-        setBusy(false);
+        try (SafeAutocloseable ac = busy()) {
+            mr.removeTag(this, tag);
+        }
     }
 
     public int getNoteCount() {
