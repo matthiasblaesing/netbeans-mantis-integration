@@ -1,6 +1,7 @@
 package eu.doppel_helix.netbeans.mantisintegration.issue;
 
 import biz.futureware.mantisconnect.TagData;
+import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
@@ -10,8 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.xml.rpc.ServiceException;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 
 public class AddTagDialog extends javax.swing.JDialog implements ActionListener {
     private final static Logger logger = Logger.getLogger(AddTagDialog.class.getName());
@@ -60,9 +59,7 @@ public class AddTagDialog extends javax.swing.JDialog implements ActionListener 
                         try {
                             issue.addTag(tags.toArray(new String[0]));
                         } catch (Exception ex) {
-                            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                                    "Failed to add tag to issue");
-                            DialogDisplayer.getDefault().notifyLater(nd);
+                            ExceptionHandler.handleException(logger, "Failed to add tag to issue", ex);
                         }
                     }
                 });

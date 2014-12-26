@@ -3,18 +3,18 @@ package eu.doppel_helix.netbeans.mantisintegration.swing;
 
 import biz.futureware.mantisconnect.RelationshipData;
 import eu.doppel_helix.netbeans.mantisintegration.Mantis;
-import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
+import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import org.jdesktop.swingx.JXHyperlink;
-import org.netbeans.modules.bugtracking.api.Repository;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 
 public class RelationshipDisplay extends DelegatingBaseLineJPanel implements ActionListener {
+    private static final Logger LOG = Logger.getLogger(RelationshipDisplay.class.getName());
+    
     private final String COMMAND_DELETE = "deleteString";
     private final String COMMAND_OPENISSUE = "openIssue";
     private RelationshipData rd;
@@ -56,9 +56,7 @@ public class RelationshipDisplay extends DelegatingBaseLineJPanel implements Act
                     try {
                         issue.removeRelationship(rd);
                     } catch (Exception ex) {
-                        NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                                "Failed to remove relationship from issue");
-                        DialogDisplayer.getDefault().notifyLater(nd);
+                        ExceptionHandler.handleException(LOG, "Failed to remove relationship from issue", ex);
                     }
                 }
             });
@@ -73,9 +71,7 @@ public class RelationshipDisplay extends DelegatingBaseLineJPanel implements Act
                                 issue.getMantisRepository(),
                                 mi);
                     } catch (Exception ex) {
-                        NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                                "Failed to open issue");
-                        DialogDisplayer.getDefault().notifyLater(nd);
+                        ExceptionHandler.handleException(LOG, "Failed to open issue", ex);
                     }
                 }
             });

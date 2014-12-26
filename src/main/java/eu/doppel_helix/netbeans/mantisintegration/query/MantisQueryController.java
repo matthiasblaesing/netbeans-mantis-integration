@@ -9,6 +9,7 @@ import eu.doppel_helix.netbeans.mantisintegration.data.FlattenedProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
+import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import eu.doppel_helix.netbeans.mantisintegration.util.SafeAutocloseable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -239,9 +240,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     }
                 }
             } catch (Exception ex) {
-                NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                        "Failed to update ");
-                DialogDisplayer.getDefault().notifyLater(nd);
+                ExceptionHandler.handleException(logger, "Failed to update", ex);
             }
         }
     };
@@ -274,9 +273,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     filterModel1.addElement(0, null);
                 }
             } catch (Exception ex) {
-                NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                        "Failed to retrieve filterlist");
-                DialogDisplayer.getDefault().notifyLater(nd);
+                ExceptionHandler.handleException(logger, "Failed to retrieve filterlist", ex);
             }
         }
     }
@@ -406,9 +403,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     Mantis.getInstance().getBugtrackingSupport().openIssue(
                             mq.getMantisRepository(), mi);
                 } catch (Exception ex) {
-                    NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                            "Failed to open issue");
-                    DialogDisplayer.getDefault().notifyLater(nd);
+                    ExceptionHandler.handleException(logger, "Failed to open issue", ex);
                 }
             }
         };

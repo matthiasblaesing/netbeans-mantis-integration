@@ -1,16 +1,16 @@
 
 package eu.doppel_helix.netbeans.mantisintegration.issue;
 
+import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Collection;
+import java.util.logging.Logger;
 import org.netbeans.modules.bugtracking.spi.IssueController;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
-import org.netbeans.modules.bugtracking.spi.IssueStatusProvider;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 
 public class MantisIssueProvider implements IssueProvider<MantisIssue> {
+    private static final Logger LOG = Logger.getLogger(MantisIssueProvider.class.getName());
 
     @Override
     public String getDisplayName(MantisIssue data) {
@@ -47,9 +47,7 @@ public class MantisIssueProvider implements IssueProvider<MantisIssue> {
         try {
             return data.refresh();
         } catch (Exception ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                    "Failed to refresh issue");
-            DialogDisplayer.getDefault().notifyLater(nd);
+            ExceptionHandler.handleException(LOG, "Failed to refresh issue", ex);
             return false;
         }
     }
@@ -59,9 +57,7 @@ public class MantisIssueProvider implements IssueProvider<MantisIssue> {
         try {
             data.addComment(comment, closeAsFixed);
         } catch (Exception ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                    "Failed to add comment to issue");
-            DialogDisplayer.getDefault().notifyLater(nd);
+            ExceptionHandler.handleException(LOG, "Failed to add comment to issue", ex);
         }
     }
 
@@ -90,9 +86,7 @@ public class MantisIssueProvider implements IssueProvider<MantisIssue> {
         try {
             data.attachFile(file, description);
         } catch (Exception ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                    "Failed to add patch to issue");
-            DialogDisplayer.getDefault().notifyLater(nd);
+            ExceptionHandler.handleException(LOG, "Failed to add patch to issue", ex);
         }
     }
 }

@@ -3,15 +3,16 @@ package eu.doppel_helix.netbeans.mantisintegration.swing;
 
 import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
+import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import org.jdesktop.swingx.JXHyperlink;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 
 public class TagDisplay extends DelegatingBaseLineJPanel implements ActionListener {
+    private static final Logger LOG = Logger.getLogger(TagDisplay.class.getName());
     private final String COMMAND_DELETE = "deleteString";
     private final ObjectRef tag;
     private final MantisIssue issue;
@@ -46,9 +47,7 @@ public class TagDisplay extends DelegatingBaseLineJPanel implements ActionListen
                     try {
                         issue.removeTag(tag);
                     } catch (Exception ex) {
-                        NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                                "Failed to remove tag from issue");
-                        DialogDisplayer.getDefault().notifyLater(nd);
+                        ExceptionHandler.handleException(LOG, "Failed to remove tag from issue", ex);
                     }
                 }
             }); 

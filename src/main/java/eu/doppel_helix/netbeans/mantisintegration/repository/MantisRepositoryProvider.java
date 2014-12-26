@@ -3,18 +3,19 @@ package eu.doppel_helix.netbeans.mantisintegration.repository;
 
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
+import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Logger;
 import org.netbeans.modules.bugtracking.spi.RepositoryController;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 import org.netbeans.modules.bugtracking.spi.RepositoryProvider;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 
 public class MantisRepositoryProvider implements RepositoryProvider<MantisRepository,MantisQuery,MantisIssue> {
-
+    private static final Logger LOG = Logger.getLogger(MantisRepositoryProvider.class.getName());
+    
     @Override
     public RepositoryInfo getInfo(MantisRepository r) {
         return r.getInfo();
@@ -30,9 +31,7 @@ public class MantisRepositoryProvider implements RepositoryProvider<MantisReposi
         try {
             return r.getIssues(false, ids);
         } catch (Exception ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                    "Failed to get issues");
-            DialogDisplayer.getDefault().notifyLater(nd);
+            ExceptionHandler.handleException(LOG, "Failed to get issues", ex);
             return Collections.EMPTY_LIST;
         }
     }
@@ -62,9 +61,7 @@ public class MantisRepositoryProvider implements RepositoryProvider<MantisReposi
         try {
             return r.simpleSearch(criteria);
         } catch (Exception ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                    "Failed to do simplesearch ");
-            DialogDisplayer.getDefault().notifyLater(nd);
+            ExceptionHandler.handleException(LOG, "Failed to do simplesearch", ex);
             return Collections.EMPTY_LIST;
         }
     }

@@ -20,6 +20,7 @@ import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
 import eu.doppel_helix.netbeans.mantisintegration.swing.NoteDisplay;
 import eu.doppel_helix.netbeans.mantisintegration.swing.RelationshipDisplay;
 import eu.doppel_helix.netbeans.mantisintegration.swing.TagDisplay;
+import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import eu.doppel_helix.netbeans.mantisintegration.util.SafeAutocloseable;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -39,7 +40,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.JComponent;
@@ -52,8 +52,6 @@ import javax.swing.text.DefaultCaret;
 import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.IssueController;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.HelpCtx;
 import org.openide.windows.WindowManager;
 
@@ -133,10 +131,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 projectionsModel.setBackingList(projections);
                 updateInfo(null);
             } catch (Exception ex) {
-                NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                        "Failed to update ");
-                DialogDisplayer.getDefault().notifyLater(nd);
-                logger.log(Level.INFO, "Failed to update", ex);
+                ExceptionHandler.handleException(logger, "Failed to update", ex);
             }
         }
     };
@@ -526,8 +521,8 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                     }
                 }
                 updateData.setCustom_fields(customFieldData);
-            } catch (ServiceException | RemoteException ex) {
-                logger.log(Level.WARNING, "Failed to get custom field definitions", ex);
+            } catch (Exception ex) {
+                ExceptionHandler.handleException(logger, "Failed to get custom field definitions", ex);
             }
         }
         return updateData;
@@ -582,9 +577,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                     try {
                         issue.addComment(comment, viewState, timetracking);
                     } catch (Exception ex) {
-                        NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                                "Failed to comment to issue");
-                        DialogDisplayer.getDefault().notifyLater(nd);
+                        ExceptionHandler.handleException(logger, "Failed to comment to issue", ex);
                     }
                 }
             });
@@ -634,15 +627,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                     panel.addCustomField(cfc);
                 }
             } catch (Exception ex) {
-                if (ex instanceof RemoteException || ex instanceof ServiceException) {
-                    NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                            "Failed to create/add issue");
-                    DialogDisplayer.getDefault().notifyLater(nd);
-                } else if (ex instanceof RuntimeException) {
-                    throw (RuntimeException) ex;
-                } else {
-                    assert false : "Should never be reached";
-                }
+                ExceptionHandler.handleException(logger, "Failed to create/add issue", ex);
             }
         } else if ("refreshIssue".equals(e.getActionCommand())) {
             if (issue.getId() != null) {
@@ -651,9 +636,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                         try {
                             issue.refresh();
                         } catch (Exception ex) {
-                            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                                    "Failed to refresh issue");
-                            DialogDisplayer.getDefault().notifyLater(nd);
+                            ExceptionHandler.handleException(logger, "Failed to refresh issue", ex);
                         }
                     }
                 });
@@ -681,9 +664,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                         try {
                             issue.addFile(fileChooser.getSelectedFile(), null);
                         } catch (Exception ex) {
-                            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                                    "Failed to add file to issue");
-                            DialogDisplayer.getDefault().notifyLater(nd);
+                            ExceptionHandler.handleException(logger, "Failed to add file to issue", ex);
                         }
                     }
                 });
@@ -701,7 +682,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
 
     @Override
     public boolean saveChanges() {
-        try(AutoCloseable ac = issue.busy()) {
+        try(SafeAutocloseable ac = issue.busy()) {
             if (isValid()) {
                 if (issue.getId() == null) {
                     MantisRepository mr = issue.getMantisRepository();
@@ -712,17 +693,8 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 }
             }
         } catch (Exception ex) {
-            if(ex instanceof RemoteException || ex instanceof ServiceException) {
-                NotifyDescriptor nd = new NotifyDescriptor.Exception(ex, 
-                        "Failed to create/add issue");
-                DialogDisplayer.getDefault().notifyLater(nd);
-            } else if (ex instanceof RuntimeException) {
-                throw (RuntimeException) ex;
-            } else {
-                assert false : "Should never be reached";
-            }
+            ExceptionHandler.handleException(logger, "Failed to create/add issue", ex);
         }
-        // @todo: Implement correctly
         return true;
     }
 

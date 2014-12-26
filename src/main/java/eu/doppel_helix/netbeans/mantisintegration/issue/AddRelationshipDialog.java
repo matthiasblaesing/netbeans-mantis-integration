@@ -3,16 +3,18 @@ package eu.doppel_helix.netbeans.mantisintegration.issue;
 import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ObjectRefListCellRenderer;
+import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigInteger;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 
 public class AddRelationshipDialog extends javax.swing.JDialog {
+    private static final Logger LOG = Logger.getLogger(AddRelationshipDialog.class.getName());
+    
     private ActionListener okEnabler = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -64,9 +66,7 @@ public class AddRelationshipDialog extends javax.swing.JDialog {
                         try {
                             issue.addRelationship((ObjectRef) typeComboBox.getSelectedItem(), new BigInteger(idTextField.getText()));
                         } catch (Exception ex) {
-                            NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                                    "Failed add relationship to issue");
-                            DialogDisplayer.getDefault().notifyLater(nd);
+                            ExceptionHandler.handleException(LOG, "Failed add relationship to issue", ex);
                         }
                     }
                 });

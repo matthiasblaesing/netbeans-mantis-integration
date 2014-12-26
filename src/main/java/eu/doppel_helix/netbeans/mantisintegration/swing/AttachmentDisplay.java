@@ -3,20 +3,21 @@ package eu.doppel_helix.netbeans.mantisintegration.swing;
 
 import biz.futureware.mantisconnect.AttachmentData;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
+import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import org.jdesktop.swingx.JXHyperlink;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 
 public class AttachmentDisplay extends DelegatingBaseLineJPanel implements ActionListener {
+    private static final Logger LOG = Logger.getLogger(AttachmentDisplay.class.getName());
     private static File lastDirectory;
     private final String COMMAND_DELETE = "delete";
     private final String COMMAND_DOWNLOAD = "download";
@@ -63,9 +64,7 @@ public class AttachmentDisplay extends DelegatingBaseLineJPanel implements Actio
                     try {
                         issue.removeFile(ad);
                     } catch (Exception ex) {
-                        NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                                "Failed to remove attachment from issue");
-                        DialogDisplayer.getDefault().notifyLater(nd);
+                        ExceptionHandler.handleException(LOG, "Failed to remove attachment from issue", ex);
                     }
 
                 }
@@ -103,9 +102,7 @@ public class AttachmentDisplay extends DelegatingBaseLineJPanel implements Actio
                     }
                 }
             } catch (Exception ex) {
-                NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
-                        "Failed to retrieve attachment from issue");
-                DialogDisplayer.getDefault().notifyLater(nd);
+                ExceptionHandler.handleException(LOG, "Failed to retrieve attachment from issue", ex);
             }
         }
     }
