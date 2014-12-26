@@ -33,11 +33,16 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
@@ -46,6 +51,10 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
 
     private final Map<BigInteger, Color> colorMap = Mantis.getInstance().getStatusColorMap();
     JComponent waitPanel;
+
+    private final static int CUSTOM_ROW_START = 8;
+    private final static int CUSTOM_ROW_END = 17;
+    private final List<CustomFieldComponent> customFields = new ArrayList<>();
     
     public MantisIssuePanel() {        
         initComponents();
@@ -64,6 +73,53 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         this.add(waitPanel, JLayeredPane.MODAL_LAYER);
     }
 
+    public void clearCustomFields() {
+        for (CustomFieldComponent cfc: customFields) {
+            innerPanel.remove(cfc);
+            innerPanel.remove(cfc.getLabel());
+        }
+        customFields.clear();
+    }
+    
+    public void addCustomField(CustomFieldComponent cfc) {
+        int row = CUSTOM_ROW_START + customFields.size();
+        if(row > CUSTOM_ROW_END) {
+            throw new IllegalStateException("Maximum custom field count reached");
+        }
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.BASELINE_LEADING;
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.gridheight = 1;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.weightx = 0;
+        
+        innerPanel.add(cfc.getLabel(), gbc);
+        
+        gbc.weightx = 1;
+        gbc.gridx = 1;
+        gbc.gridwidth = 7;
+        
+        innerPanel.add(cfc, gbc);
+        customFields.add(cfc);
+    }
+    
+    public CustomFieldComponent getCustomFieldById(BigInteger id) {
+        for(CustomFieldComponent cfc: customFields) {
+            if(cfc.getCustomFieldDefinitionData().getField().getId().equals(id)) {
+                return cfc;
+            }
+        }
+        return null;
+    }
+    
+    public List<CustomFieldComponent> getCustomFields() {
+        return Collections.unmodifiableList(customFields);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -264,7 +320,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         org.openide.awt.Mnemonics.setLocalizedText(summaryLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.summaryLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridy = 20;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(summaryLabel, gridBagConstraints);
@@ -272,7 +328,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         summaryTextField.setText(org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.summaryTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridy = 20;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE;
@@ -289,7 +345,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridy = 21;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
@@ -307,7 +363,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 22;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
@@ -325,7 +381,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 19;
+        gridBagConstraints.gridy = 23;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
@@ -498,7 +554,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         org.openide.awt.Mnemonics.setLocalizedText(descriptionLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.descriptionLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridy = 21;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(descriptionLabel, gridBagConstraints);
@@ -507,7 +563,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         org.openide.awt.Mnemonics.setLocalizedText(additionalInformationLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.additionalInformationLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 19;
+        gridBagConstraints.gridy = 23;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(additionalInformationLabel, gridBagConstraints);
@@ -545,7 +601,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         org.openide.awt.Mnemonics.setLocalizedText(stepsToReproduceLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.stepsToReproduceLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 22;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(stepsToReproduceLabel, gridBagConstraints);
@@ -627,7 +683,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(buildLabel, gridBagConstraints);
 
-        buildTextField.setColumns(8);
+        buildTextField.setColumns(20);
         buildTextField.setText(org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.buildTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 7;
@@ -638,6 +694,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(buildTextField, gridBagConstraints);
 
+        platformTextField.setColumns(20);
         platformTextField.setText(org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.platformTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -648,6 +705,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(platformTextField, gridBagConstraints);
 
+        osTextField.setColumns(20);
         osTextField.setText(org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.osTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
@@ -658,6 +716,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(osTextField, gridBagConstraints);
 
+        osVersionTextField.setColumns(20);
         osVersionTextField.setText(org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.osVersionTextField.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
@@ -672,7 +731,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         org.openide.awt.Mnemonics.setLocalizedText(relationsLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.relationsLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 18;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(relationsLabel, gridBagConstraints);
@@ -683,7 +742,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         relationsPanel.setLayout(flowLayout1);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 18;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -693,7 +752,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         org.openide.awt.Mnemonics.setLocalizedText(tagsLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.tagsLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 19;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(tagsLabel, gridBagConstraints);
@@ -704,7 +763,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         tagsPanel.setLayout(flowLayout2);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 19;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -714,7 +773,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         org.openide.awt.Mnemonics.setLocalizedText(attachmentLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.attachmentLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 21;
+        gridBagConstraints.gridy = 25;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(attachmentLabel, gridBagConstraints);
@@ -723,7 +782,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         attachmentPanel.setLayout(new javax.swing.BoxLayout(attachmentPanel, javax.swing.BoxLayout.PAGE_AXIS));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 21;
+        gridBagConstraints.gridy = 25;
         gridBagConstraints.gridwidth = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
@@ -741,7 +800,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 20;
+        gridBagConstraints.gridy = 24;
         gridBagConstraints.gridwidth = 8;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         innerPanel.add(buttonPanel1, gridBagConstraints);
@@ -823,7 +882,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 22;
+        gridBagConstraints.gridy = 26;
         gridBagConstraints.gridwidth = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
@@ -832,7 +891,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         innerPanel.add(notesOuterPanel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 23;
+        gridBagConstraints.gridy = 27;
         gridBagConstraints.gridwidth = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
@@ -905,7 +964,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         scrollablePane.setViewportView(innerPanel);
 
         add(scrollablePane);
-        scrollablePane.setBounds(0, 0, 606, 765);
+        scrollablePane.setBounds(0, 0, 1314, 765);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     javax.swing.JButton addIssueButton;

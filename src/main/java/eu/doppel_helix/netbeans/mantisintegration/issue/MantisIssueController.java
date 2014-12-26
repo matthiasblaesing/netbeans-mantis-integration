@@ -2,12 +2,15 @@ package eu.doppel_helix.netbeans.mantisintegration.issue;
 
 import biz.futureware.mantisconnect.AccountData;
 import biz.futureware.mantisconnect.AttachmentData;
+import biz.futureware.mantisconnect.CustomFieldDefinitionData;
+import biz.futureware.mantisconnect.CustomFieldValueForIssueData;
 import biz.futureware.mantisconnect.IssueData;
 import biz.futureware.mantisconnect.IssueNoteData;
 import biz.futureware.mantisconnect.ObjectRef;
 import biz.futureware.mantisconnect.ProjectData;
 import biz.futureware.mantisconnect.ProjectVersionData;
 import biz.futureware.mantisconnect.RelationshipData;
+import biz.futureware.mantisconnect.UserData;
 import eu.doppel_helix.netbeans.mantisintegration.data.FlattenedProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.data.Permission;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
@@ -33,7 +36,10 @@ import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.JComponent;
@@ -71,8 +77,9 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
     private ListBackedComboBoxModel<ObjectRef> projectionsModel = new ListBackedComboBoxModel<>(ObjectRef.class);
     private ListBackedComboBoxModel<String> categoriesModel = new ListBackedComboBoxModel<>(String.class);
     private ListBackedComboBoxModel<AccountData> assignedModel = new ListBackedComboBoxModel<>(AccountData.class);
+    private Map<BigInteger,String> customFieldValueBackingStore = new HashMap<>();
     private MantisIssuePanel panel;
-    private MantisIssue issue;
+    private final MantisIssue issue;
     private StateMonitor stateMonitor = new StateMonitor();
     private final SwingWorker updateModel = new SwingWorker() {
         List<FlattenedProjectData> projects;
@@ -129,6 +136,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,
                         "Failed to update ");
                 DialogDisplayer.getDefault().notifyLater(nd);
+                logger.log(Level.INFO, "Failed to update", ex);
             }
         }
     };
@@ -439,6 +447,16 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                     }
                 }
             }
+            if (property == null || "custom_fields".equals(property)) {
+                if (issue.getCustom_fields() != null) {
+                    for (CustomFieldValueForIssueData cfvfi : issue.getCustom_fields()) {
+                        CustomFieldComponent cfc = panel.getCustomFieldById(cfvfi.getField().getId());
+                        if (cfc != null) {
+                            cfc.setValue(cfvfi.getValue());
+                        }
+                    }
+                }
+            }
             panel.timetrackInput.setValue(BigInteger.ZERO);
             panel.revalidate();
             panel.repaint();
@@ -490,7 +508,28 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
         updateData.setReporter(issue.getReporter());
         updateData.setDate_submitted(issue.getDate_submitted());
         updateData.setLast_updated(issue.getLast_updated());
-        // @todo: implement custom fields
+        if(pd != null) {
+            try {
+                List<ObjectRef> fields = new ArrayList<>();
+                for (CustomFieldDefinitionData cfdd : issue.getMantisRepository().getCustomFieldDefinitions(pd.getProjectData().getId())) {
+                    fields.add(cfdd.getField());
+                }
+                CustomFieldValueForIssueData[] customFieldData = new CustomFieldValueForIssueData[fields.size()];
+                for(int i = 0; i < customFieldData.length; i++) {
+                    ObjectRef field = fields.get(i);
+                    try {
+                        customFieldData[i] = new CustomFieldValueForIssueData(
+                                field,
+                                panel.getCustomFieldById(field.getId()).getValue()
+                        );
+                    } catch (NullPointerException ex) {
+                    }
+                }
+                updateData.setCustom_fields(customFieldData);
+            } catch (ServiceException | RemoteException ex) {
+                logger.log(Level.WARNING, "Failed to get custom field definitions", ex);
+            }
+        }
         return updateData;
     }
 
@@ -515,6 +554,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
         } else {
             if (IssueProvider.EVENT_ISSUE_DATA_CHANGED.equals(propertyName)) {
                 propertyName = null;
+                customFieldValueBackingStore.clear();
             }
             updateInfo(propertyName);
         }
@@ -553,23 +593,46 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 List<String> categories = new ArrayList<>();
                 List<AccountData> users = new ArrayList<>();
                 List<String> versions = new ArrayList<>();
+                CustomFieldDefinitionData[] customFields = new CustomFieldDefinitionData[0];
                 FlattenedProjectData fpd = (FlattenedProjectData) panel.projectComboBox.getSelectedItem();
                 if (fpd != null) {
                     MantisRepository mr = issue.getMantisRepository();
+                    BigInteger projectId = fpd.getProjectData().getId();
                     categories.add(null);
-                    categories.addAll(Arrays.asList(mr.getCategories(fpd.getProjectData().getId())));
+                    categories.addAll(Arrays.asList(mr.getCategories(projectId)));
                     users.add(null);
-                    users.addAll(Arrays.asList(mr.getUsers(fpd.getProjectData().getId())));
+                    users.addAll(Arrays.asList(mr.getUsers(projectId)));
                     versions.add(null);
-                    for (ProjectVersionData vdata : mr.getVersions(fpd.getProjectData().getId())) {
+                    for (ProjectVersionData vdata : mr.getVersions(projectId)) {
                         versions.add(vdata.getName());
                     }
+                    customFields = mr.getCustomFieldDefinitions(projectId);
                 }
                 categoriesModel.setBackingList(categories);
                 assignedModel.setBackingList(users);
                 targetVersionModel.setBackingList(versions);
                 productVersionModel.setBackingList(versions);
                 fixVersionModel.setBackingList(versions);
+                UserData ud = null;
+                try {
+                    ud = issue.getMantisRepository().getAccount();
+                } catch (ServiceException | RemoteException ex) {};
+                for(CustomFieldComponent cfc: panel.getCustomFields()) {
+                    customFieldValueBackingStore.put(
+                            cfc.getCustomFieldDefinitionData().getField().getId(), 
+                            cfc.getValue());
+                }
+                panel.clearCustomFields();
+                for(CustomFieldDefinitionData cfdd: customFields) {
+                    CustomFieldComponent cfc = CustomFieldComponent.create(cfdd, ud);
+                    BigInteger id = cfc.getCustomFieldDefinitionData().getField().getId();
+                    if(customFieldValueBackingStore.containsKey(id)) {
+                        cfc.setValue(customFieldValueBackingStore.get(id));
+                    } else if (issue.getId() == null || BigInteger.ZERO.equals(issue.getId())) {
+                        cfc.setDefaultValue();
+                    }
+                    panel.addCustomField(cfc);
+                }
             } catch (Exception ex) {
                 if (ex instanceof RemoteException || ex instanceof ServiceException) {
                     NotifyDescriptor nd = new NotifyDescriptor.Exception(ex,

@@ -2,6 +2,7 @@ package eu.doppel_helix.netbeans.mantisintegration.repository;
 
 import biz.futureware.mantisconnect.AccountData;
 import biz.futureware.mantisconnect.AttachmentData;
+import biz.futureware.mantisconnect.CustomFieldDefinitionData;
 import biz.futureware.mantisconnect.FilterData;
 import biz.futureware.mantisconnect.IssueData;
 import biz.futureware.mantisconnect.IssueHeaderData;
@@ -18,6 +19,7 @@ import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
 import eu.doppel_helix.netbeans.mantisintegration.data.Version;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
+import eu.doppel_helix.netbeans.mantisintegration.util.StringUtils;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -34,6 +36,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,6 +79,7 @@ public class MantisRepository {
     private ObjectRef[] severities;
     private ObjectRef[] projections;
     private ObjectRef[] etas;
+    private ObjectRef[] customFieldTypes;
     // Hardcoded, as no api exists to retrieve this info
     private final ObjectRef[] relationships = new ObjectRef[]{
         new ObjectRef(new BigInteger("0"), "duplicate of"),
@@ -89,6 +93,7 @@ public class MantisRepository {
     private final HashMap<BigInteger, AccountData[]> users  = new HashMap<>();
     private final HashMap<BigInteger, ProjectVersionData[]> versions = new HashMap<>();
     private final HashMap<BigInteger, FilterData[]> filters = new HashMap<>();
+    private final HashMap<BigInteger, CustomFieldDefinitionData[]> customFieldDefinitions = new HashMap<>();
     private IssueInfosHandler issueInfosHandler;
     private UserData account = null;
     private MantisRepositoryQueryStore queryStore;
@@ -865,6 +870,77 @@ public class MantisRepository {
 
     public Capabilities getCapabilities() {
         return capabilities;
+    }
+    
+    public ObjectRef[] getCustomFieldTypes(boolean enforceUpdate) throws ServiceException, RemoteException {
+        if (enforceUpdate) {
+            customFieldTypes = null;
+        }
+        if (customFieldTypes == null) {
+            MantisConnectPortType mcpt = getClient();
+            customFieldTypes = mcpt.mc_enum_custom_field_types(
+                    info.getUsername(),
+                    new String(info.getPassword()));
+        }
+        return customFieldTypes;
+    }
+    
+    public CustomFieldDefinitionData[] getCustomFieldDefinitions(BigInteger projectID) throws ServiceException, RemoteException  {
+        if (customFieldDefinitions.get(projectID) == null) {
+            MantisConnectPortType mcpt = getClient();
+            CustomFieldDefinitionData[] cfds = mcpt.mc_project_get_custom_fields(
+                    info.getUsername(),
+                    new String(info.getPassword()),
+                    projectID);
+            for(CustomFieldDefinitionData cfd: cfds) {
+                if(cfd.getPossible_values().startsWith("=")) {
+                    String enumName = cfd.getPossible_values().substring(1).trim();
+                    switch(enumName) {
+                        case "versions":
+                            cfd.setPossible_values(customFieldEnumVersions(projectID));
+                            break;
+                        case "future_versions":
+                            cfd.setPossible_values(customFieldEnumVersionsReleased(projectID, false));
+                            break;
+                        case "released_versions":
+                            cfd.setPossible_values(customFieldEnumVersionsReleased(projectID, true));
+                            break;
+                        case "categories":
+                            cfd.setPossible_values(customFieldEnumCategories(projectID));
+                            break;
+                        default:
+                            cfd.setType(BigInteger.valueOf(-1));
+                            logger.log(Level.WARNING, "Failed to calculate dynamic custom field info: {0}", enumName);
+                    }
+                }
+            }
+            customFieldDefinitions.put(projectID, cfds);
+        }
+        return customFieldDefinitions.get(projectID);
+    }
+    
+    private String customFieldEnumCategories(BigInteger projectID) throws ServiceException, RemoteException {
+        return StringUtils.toCustomFieldList(getCategories(projectID));
+    }
+    
+    private String customFieldEnumVersions(BigInteger projectID) throws ServiceException, RemoteException {
+        List<String> list = new ArrayList<>();
+        for(ProjectVersionData pvd: getVersions(projectID)) {
+            list.add(pvd.getName());
+        }
+        Collections.sort(list);
+        return StringUtils.toCustomFieldList(list);
+    }
+    
+    private String customFieldEnumVersionsReleased(BigInteger projectID, boolean released) throws ServiceException, RemoteException {
+        List<String> list = new ArrayList<>();
+        for(ProjectVersionData pvd: getVersions(projectID)) {
+            if((released && pvd.getReleased()) || ((!released) && (!pvd.getReleased()))) {
+                list.add(pvd.getName());
+            }
+        }
+        Collections.sort(list);
+        return StringUtils.toCustomFieldList(list);
     }
     
     public void addPropertyChangeListener(PropertyChangeListener listener) {

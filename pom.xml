@@ -52,6 +52,17 @@
             <name>NetBeans Snapshots</name>
             <url>http://bits.netbeans.org/netbeans/trunk/maven-snapshot/</url>
         </repository>
+        <repository>
+            <id>repo</id>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>file://${project.basedir}/repo</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -132,8 +143,21 @@
         </dependency>
         <dependency>
             <groupId>org.swinglabs.swingx</groupId>
-            <artifactId>swingx-all</artifactId>
-            <version>1.6.4</version>
+            <artifactId>swingx-graphics</artifactId>
+            <version>1.6.5-1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.swinglabs.swingx</groupId>
+            <artifactId>swingx-core</artifactId>
+            <version>1.6.5-1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.swinglabs.swingx</groupId>
+            <artifactId>swingx-mavensupport</artifactId>
+            <version>1.6.5-1</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <artifactId>org-openide-filesystems</artifactId>
@@ -145,6 +169,17 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-bugtracking</artifactId>
             <version>${mantisintegration.nbtarget}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.clutch.dates</groupId>
+            <artifactId>stringtotime</artifactId>
+            <version>1.0.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-beans</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
