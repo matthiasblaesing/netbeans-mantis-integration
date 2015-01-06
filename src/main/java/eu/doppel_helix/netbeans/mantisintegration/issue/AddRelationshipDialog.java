@@ -66,7 +66,9 @@ public class AddRelationshipDialog extends javax.swing.JDialog {
                         try {
                             issue.addRelationship((ObjectRef) typeComboBox.getSelectedItem(), new BigInteger(idTextField.getText()));
                         } catch (Exception ex) {
-                            ExceptionHandler.handleException(LOG, "Failed add relationship to issue", ex);
+                            issue.getMantisRepository()
+                                    .getExceptionHandler()
+                                    .handleException(LOG, "Failed add relationship to issue", ex);
                         }
                     }
                 });

@@ -3,7 +3,7 @@ package eu.doppel_helix.netbeans.mantisintegration.swing;
 
 import biz.futureware.mantisconnect.AttachmentData;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
-import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
+import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -57,14 +57,16 @@ public class AttachmentDisplay extends DelegatingBaseLineJPanel implements Actio
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        final MantisRepository mr = issue.getMantisRepository();
         if(COMMAND_DELETE.equals(e.getActionCommand())) {
-            issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
+            mr.getRequestProcessor().submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         issue.removeFile(ad);
                     } catch (Exception ex) {
-                        ExceptionHandler.handleException(LOG, "Failed to remove attachment from issue", ex);
+                        mr.getExceptionHandler()
+                                .handleException(LOG, "Failed to remove attachment from issue", ex);
                     }
 
                 }
@@ -102,7 +104,8 @@ public class AttachmentDisplay extends DelegatingBaseLineJPanel implements Actio
                     }
                 }
             } catch (Exception ex) {
-                ExceptionHandler.handleException(LOG, "Failed to retrieve attachment from issue", ex);
+                mr.getExceptionHandler()
+                        .handleException(LOG, "Failed to retrieve attachment from issue", ex);
             }
         }
     }

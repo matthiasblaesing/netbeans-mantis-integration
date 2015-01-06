@@ -31,7 +31,7 @@ public class MantisRepositoryProvider implements RepositoryProvider<MantisReposi
         try {
             return r.getIssues(false, ids);
         } catch (Exception ex) {
-            ExceptionHandler.handleException(LOG, "Failed to get issues", ex);
+            r.getExceptionHandler().handleException(LOG, "Failed to get issues", ex);
             return Collections.EMPTY_LIST;
         }
     }
@@ -61,7 +61,7 @@ public class MantisRepositoryProvider implements RepositoryProvider<MantisReposi
         try {
             return r.simpleSearch(criteria);
         } catch (Exception ex) {
-            ExceptionHandler.handleException(LOG, "Failed to do simplesearch", ex);
+            r.getExceptionHandler().handleException(LOG, "Failed to do simplesearch", ex);
             return Collections.EMPTY_LIST;
         }
     }

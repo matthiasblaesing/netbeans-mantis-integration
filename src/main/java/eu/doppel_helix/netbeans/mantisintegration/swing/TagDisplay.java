@@ -3,7 +3,7 @@ package eu.doppel_helix.netbeans.mantisintegration.swing;
 
 import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
-import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
+import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
@@ -41,13 +41,15 @@ public class TagDisplay extends DelegatingBaseLineJPanel implements ActionListen
     @Override
     public void actionPerformed(ActionEvent e) {
         if(COMMAND_DELETE.equals(e.getActionCommand())) {
-            issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
+            final MantisRepository mr = issue.getMantisRepository();
+            mr.getRequestProcessor().submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         issue.removeTag(tag);
                     } catch (Exception ex) {
-                        ExceptionHandler.handleException(LOG, "Failed to remove tag from issue", ex);
+                        mr.getExceptionHandler()
+                                .handleException(LOG, "Failed to remove tag from issue", ex);
                     }
                 }
             }); 

@@ -131,7 +131,9 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 projectionsModel.setBackingList(projections);
                 updateInfo(null);
             } catch (Exception ex) {
-                ExceptionHandler.handleException(logger, "Failed to update", ex);
+                issue.getMantisRepository()
+                        .getExceptionHandler()
+                        .handleException(logger, "Failed to update", ex);
             }
         }
     };
@@ -522,7 +524,9 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 }
                 updateData.setCustom_fields(customFieldData);
             } catch (Exception ex) {
-                ExceptionHandler.handleException(logger, "Failed to get custom field definitions", ex);
+                issue.getMantisRepository()
+                        .getExceptionHandler()
+                        .handleException(logger, "Failed to get custom field definitions", ex);
             }
         }
         return updateData;
@@ -577,7 +581,9 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                     try {
                         issue.addComment(comment, viewState, timetracking);
                     } catch (Exception ex) {
-                        ExceptionHandler.handleException(logger, "Failed to comment to issue", ex);
+                        issue.getMantisRepository()
+                                .getExceptionHandler()
+                                .handleException(logger, "Failed to comment to issue", ex);
                     }
                 }
             });
@@ -627,7 +633,9 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                     panel.addCustomField(cfc);
                 }
             } catch (Exception ex) {
-                ExceptionHandler.handleException(logger, "Failed to create/add issue", ex);
+                issue.getMantisRepository()
+                        .getExceptionHandler()
+                        .handleException(logger, "Failed to create/add issue", ex);
             }
         } else if ("refreshIssue".equals(e.getActionCommand())) {
             if (issue.getId() != null) {
@@ -636,7 +644,9 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                         try {
                             issue.refresh();
                         } catch (Exception ex) {
-                            ExceptionHandler.handleException(logger, "Failed to refresh issue", ex);
+                            issue.getMantisRepository()
+                                    .getExceptionHandler()
+                                    .handleException(logger, "Failed to refresh issue", ex);
                         }
                     }
                 });
@@ -664,7 +674,9 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                         try {
                             issue.addFile(fileChooser.getSelectedFile(), null);
                         } catch (Exception ex) {
-                            ExceptionHandler.handleException(logger, "Failed to add file to issue", ex);
+                            issue.getMantisRepository()
+                                    .getExceptionHandler()
+                                    .handleException(logger, "Failed to add file to issue", ex);
                         }
                     }
                 });
@@ -693,7 +705,9 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 }
             }
         } catch (Exception ex) {
-            ExceptionHandler.handleException(logger, "Failed to create/add issue", ex);
+            issue.getMantisRepository()
+                    .getExceptionHandler()
+                    .handleException(logger, "Failed to create/add issue", ex);
         }
         return true;
     }

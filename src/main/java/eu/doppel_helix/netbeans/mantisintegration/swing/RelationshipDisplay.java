@@ -56,7 +56,9 @@ public class RelationshipDisplay extends DelegatingBaseLineJPanel implements Act
                     try {
                         issue.removeRelationship(rd);
                     } catch (Exception ex) {
-                        ExceptionHandler.handleException(LOG, "Failed to remove relationship from issue", ex);
+                        issue.getMantisRepository()
+                                .getExceptionHandler()
+                                .handleException(LOG, "Failed to remove relationship from issue", ex);
                     }
                 }
             });
@@ -71,7 +73,9 @@ public class RelationshipDisplay extends DelegatingBaseLineJPanel implements Act
                                 issue.getMantisRepository(),
                                 mi);
                     } catch (Exception ex) {
-                        ExceptionHandler.handleException(LOG, "Failed to open issue", ex);
+                        issue.getMantisRepository()
+                                .getExceptionHandler()
+                                .handleException(LOG, "Failed to open issue", ex);
                     }
                 }
             });

@@ -240,7 +240,9 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     }
                 }
             } catch (Exception ex) {
-                ExceptionHandler.handleException(logger, "Failed to update", ex);
+                mq.getMantisRepository()
+                        .getExceptionHandler()
+                        .handleException(logger, "Failed to update", ex);
             }
         }
     };
@@ -273,7 +275,9 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     filterModel1.addElement(0, null);
                 }
             } catch (Exception ex) {
-                ExceptionHandler.handleException(logger, "Failed to retrieve filterlist", ex);
+                mq.getMantisRepository()
+                        .getExceptionHandler()
+                        .handleException(logger, "Failed to retrieve filterlist", ex);
             }
         }
     }
@@ -403,7 +407,9 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     Mantis.getInstance().getBugtrackingSupport().openIssue(
                             mq.getMantisRepository(), mi);
                 } catch (Exception ex) {
-                    ExceptionHandler.handleException(logger, "Failed to open issue", ex);
+                    mq.getMantisRepository()
+                            .getExceptionHandler()
+                            .handleException(logger, "Failed to open issue", ex);
                 }
             }
         };

@@ -1,7 +1,7 @@
 package eu.doppel_helix.netbeans.mantisintegration.issue;
 
 import biz.futureware.mantisconnect.TagData;
-import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
+import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
@@ -46,20 +46,21 @@ public class AddTagDialog extends javax.swing.JDialog implements ActionListener 
             AddTagDialog.this.dispose();
         } else if ("ok".equals(e.getActionCommand())) {
             if (checkValidity()) {
-
+                final MantisRepository mr = issue.getMantisRepository();
                 final List<String> tags = new ArrayList<>();
                 for (String tag : ((String) tagsComboBox.getSelectedItem()).split(",")) {
                     if (!tag.trim().isEmpty()) {
                         tags.add(tag.trim());
                     }
                 }
-                issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
+                mr.getRequestProcessor().submit(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             issue.addTag(tags.toArray(new String[0]));
                         } catch (Exception ex) {
-                            ExceptionHandler.handleException(logger, "Failed to add tag to issue", ex);
+                            mr.getExceptionHandler()
+                                    .handleException(logger, "Failed to add tag to issue", ex);
                         }
                     }
                 });

@@ -1,7 +1,6 @@
 
 package eu.doppel_helix.netbeans.mantisintegration.issue;
 
-import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Collection;
@@ -47,7 +46,9 @@ public class MantisIssueProvider implements IssueProvider<MantisIssue> {
         try {
             return data.refresh();
         } catch (Exception ex) {
-            ExceptionHandler.handleException(LOG, "Failed to refresh issue", ex);
+            data.getMantisRepository()
+                    .getExceptionHandler()
+                    .handleException(LOG, "Failed to refresh issue", ex);
             return false;
         }
     }
@@ -57,7 +58,9 @@ public class MantisIssueProvider implements IssueProvider<MantisIssue> {
         try {
             data.addComment(comment, closeAsFixed);
         } catch (Exception ex) {
-            ExceptionHandler.handleException(LOG, "Failed to add comment to issue", ex);
+            data.getMantisRepository()
+                    .getExceptionHandler()
+                    .handleException(LOG, "Failed to add comment to issue", ex);
         }
     }
 
@@ -86,7 +89,9 @@ public class MantisIssueProvider implements IssueProvider<MantisIssue> {
         try {
             data.attachFile(file, description);
         } catch (Exception ex) {
-            ExceptionHandler.handleException(LOG, "Failed to add patch to issue", ex);
+            data.getMantisRepository()
+                    .getExceptionHandler()
+                    .handleException(LOG, "Failed to add patch to issue", ex);
         }
     }
 }

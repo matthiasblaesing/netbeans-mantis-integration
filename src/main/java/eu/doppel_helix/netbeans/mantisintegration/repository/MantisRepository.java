@@ -19,6 +19,7 @@ import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
 import eu.doppel_helix.netbeans.mantisintegration.data.Version;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
+import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import eu.doppel_helix.netbeans.mantisintegration.util.StringUtils;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
@@ -39,6 +40,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -97,6 +99,7 @@ public class MantisRepository {
     private IssueInfosHandler issueInfosHandler;
     private UserData account = null;
     private MantisRepositoryQueryStore queryStore;
+    private ExceptionHandler exceptionHandler;
 
     String getBaseConfigPath() {
         return String.format("%s/%s", BASE_CONFIG_PATH, getInfo().getID());
@@ -919,6 +922,31 @@ public class MantisRepository {
         return customFieldDefinitions.get(projectID);
     }
     
+    /**
+     * Get a custom field definition by id.
+     * 
+     * The function only accesses cached values, so it is save to be called on
+     * the EDT.
+     * 
+     * The idea: this is used to translate error messages when updating/setting
+     * custom fields. At this point the definition has to be fetched already.
+     * 
+     * @param id of custom field definition
+     * @return the corresponding definition or null if definition was not found
+     */
+    public CustomFieldDefinitionData getCustomFieldDefinition(BigInteger id) {
+        Iterator<CustomFieldDefinitionData[]> it = customFieldDefinitions.values().iterator();
+        while(it.hasNext()) {
+            CustomFieldDefinitionData[] cfds = it.next();
+            for(CustomFieldDefinitionData cfd: cfds) {
+                if(id.equals(cfd.getField().getId())) {
+                    return cfd;
+                }
+            }
+        }
+        return null;
+    }
+    
     private String customFieldEnumCategories(BigInteger projectID) throws ServiceException, RemoteException {
         return StringUtils.toCustomFieldList(getCategories(projectID));
     }
@@ -963,4 +991,10 @@ public class MantisRepository {
         return baos.toByteArray();
     }
 
+    public ExceptionHandler getExceptionHandler() {
+        if(exceptionHandler == null) {
+            exceptionHandler = new ExceptionHandler(this);
+        }
+        return exceptionHandler;
+    }
 }
