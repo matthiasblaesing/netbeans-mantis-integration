@@ -20,7 +20,6 @@ import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
 import eu.doppel_helix.netbeans.mantisintegration.swing.NoteDisplay;
 import eu.doppel_helix.netbeans.mantisintegration.swing.RelationshipDisplay;
 import eu.doppel_helix.netbeans.mantisintegration.swing.TagDisplay;
-import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import eu.doppel_helix.netbeans.mantisintegration.util.SafeAutocloseable;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -50,9 +49,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultCaret;
 import javax.xml.rpc.ServiceException;
+import javax.xml.ws.Holder;
 import org.netbeans.modules.bugtracking.spi.IssueController;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
 import org.openide.util.HelpCtx;
+import org.openide.util.Mutex;
 import org.openide.windows.WindowManager;
 
 public class MantisIssueController implements PropertyChangeListener, ActionListener, IssueController {
@@ -179,46 +180,49 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
         return panel;
     }
 
-    private void updateInputState() {
-        panel.updateIssueButton.setVisible(false);
-        panel.addIssueButton.setVisible(false);
-        panel.notesOuterPanel.setVisible(false);
-        panel.statusComboBox.setEnabled(false);
-        panel.resolutionComboBox.setEnabled(false);
-        panel.headerPanel.setVisible(false);
-        panel.subheaderPanel.setVisible(false);
-        panel.relationsLabel.setVisible(false);
-        panel.relationsPanel.setVisible(false);
-        panel.tagsLabel.setVisible(false);
-        panel.tagsPanel.setVisible(false);
-        panel.attachmentLabel.setVisible(false);
-        panel.attachmentPanel.setVisible(false);
-        panel.filler1.setVisible(false);
-        if (issue.getId() == null) {
-            setUpdateEnabledFields(true);
-            panel.addIssueButton.setVisible(true);
-            panel.filler1.setVisible(true);
-        } else {
-            if(issue.canUpdate()) {
-                panel.updateIssueButton.setVisible(true);
-                panel.statusComboBox.setEnabled(true);
-                panel.resolutionComboBox.setEnabled(true);
+    private final Runnable updateInputState = new Runnable() {
+        @Override
+        public void run() {
+            panel.updateIssueButton.setVisible(false);
+            panel.addIssueButton.setVisible(false);
+            panel.notesOuterPanel.setVisible(false);
+            panel.statusComboBox.setEnabled(false);
+            panel.resolutionComboBox.setEnabled(false);
+            panel.headerPanel.setVisible(false);
+            panel.subheaderPanel.setVisible(false);
+            panel.relationsLabel.setVisible(false);
+            panel.relationsPanel.setVisible(false);
+            panel.tagsLabel.setVisible(false);
+            panel.tagsPanel.setVisible(false);
+            panel.attachmentLabel.setVisible(false);
+            panel.attachmentPanel.setVisible(false);
+            panel.filler1.setVisible(false);
+            if (issue.getId() == null) {
+                setUpdateEnabledFields(true);
+                panel.addIssueButton.setVisible(true);
+                panel.filler1.setVisible(true);
+            } else {
+                if (issue.canUpdate()) {
+                    panel.updateIssueButton.setVisible(true);
+                    panel.statusComboBox.setEnabled(true);
+                    panel.resolutionComboBox.setEnabled(true);
+                }
+                setUpdateEnabledFields(issue.canUpdate());
+                panel.notesOuterPanel.setVisible(true);
+                panel.headerPanel.setVisible(true);
+                panel.subheaderPanel.setVisible(true);
+                panel.relationsLabel.setVisible(true);
+                panel.relationsPanel.setVisible(true);
+                panel.tagsLabel.setVisible(true);
+                panel.tagsPanel.setVisible(true);
+                panel.attachmentLabel.setVisible(true);
+                panel.attachmentPanel.setVisible(true);
+                boolean timeTracking = issue.getTimetracking() == Permission.WRITE;
+                panel.timetrackInput.setVisible(timeTracking);
+                panel.timetrackLabel.setVisible(timeTracking);
             }
-            setUpdateEnabledFields(issue.canUpdate());
-            panel.notesOuterPanel.setVisible(true);
-            panel.headerPanel.setVisible(true);
-            panel.subheaderPanel.setVisible(true);
-            panel.relationsLabel.setVisible(true);
-            panel.relationsPanel.setVisible(true);
-            panel.tagsLabel.setVisible(true);
-            panel.tagsPanel.setVisible(true);
-            panel.attachmentLabel.setVisible(true);
-            panel.attachmentPanel.setVisible(true);
-            boolean timeTracking = issue.getTimetracking() == Permission.WRITE;
-            panel.timetrackInput.setVisible(timeTracking);
-            panel.timetrackLabel.setVisible(timeTracking);
         }
-    }
+    };
     
     private void setUpdateEnabledFields(boolean enabled) {
         panel.projectComboBox.setEnabled(enabled);
@@ -246,7 +250,8 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
     private void updateInfo(String property) {
         if (panel != null) {
             if (property == null || "id".equals(property)) {
-                updateInputState();
+                issue.getMantisRepository().getRequestProcessor()
+                        .execute(updateInputState);
                 panel.issueHeader.setText(issue.getDisplayValue());
             }
             if (property == null || "summary".equals(property)) {
@@ -561,9 +566,10 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        final MantisRepository repository = issue.getMantisRepository();
         if ("addIssue".equals(e.getActionCommand())
                 || "updateIssue".equals(e.getActionCommand())) {
-            issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
+            repository.getRequestProcessor().submit(new Runnable() {
                 public void run() {
                     saveChanges();
                 }
@@ -575,76 +581,92 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
             panel.addNoteViewStateComboBox.setSelectedIndex(0);
             panel.addNoteEditorPane.setText("");
             panel.timetrackInput.setValue(BigInteger.ZERO);
-            issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
+            repository.getRequestProcessor().submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         issue.addComment(comment, viewState, timetracking);
                     } catch (Exception ex) {
-                        issue.getMantisRepository()
+                        repository
                                 .getExceptionHandler()
                                 .handleException(logger, "Failed to comment to issue", ex);
                     }
                 }
             });
         } else if ("selectProject".equals(e.getActionCommand())) {
-            try {
-                List<String> categories = new ArrayList<>();
-                List<AccountData> users = new ArrayList<>();
-                List<String> versions = new ArrayList<>();
-                CustomFieldDefinitionData[] customFields = new CustomFieldDefinitionData[0];
-                FlattenedProjectData fpd = (FlattenedProjectData) panel.projectComboBox.getSelectedItem();
-                if (fpd != null) {
-                    MantisRepository mr = issue.getMantisRepository();
-                    BigInteger projectId = fpd.getProjectData().getId();
-                    categories.add(null);
-                    categories.addAll(Arrays.asList(mr.getCategories(projectId)));
-                    users.add(null);
-                    users.addAll(Arrays.asList(mr.getUsers(projectId)));
-                    versions.add(null);
-                    for (ProjectVersionData vdata : mr.getVersions(projectId)) {
-                        versions.add(vdata.getName());
+            final FlattenedProjectData fpd = (FlattenedProjectData) panel.projectComboBox.getSelectedItem();
+            repository.getRequestProcessor().submit(new Runnable() {
+                @Override
+                public void run() {
+                    try (SafeAutocloseable saf = issue.busy()) {
+                        final List<String> categories = new ArrayList<>();
+                        final List<AccountData> users = new ArrayList<>();
+                        final List<String> versions = new ArrayList<>();
+                        final Holder<CustomFieldDefinitionData[]> customFields = new Holder<>();
+                        if (fpd != null) {
+                            BigInteger projectId = fpd.getProjectData().getId();
+                            categories.add(null);
+                            categories.addAll(Arrays.asList(repository.getCategories(projectId)));
+                            users.add(null);
+                            users.addAll(Arrays.asList(repository.getUsers(projectId)));
+                            versions.add(null);
+                            for (ProjectVersionData vdata : repository.getVersions(projectId)) {
+                                versions.add(vdata.getName());
+                            }
+                            customFields.value = repository.getCustomFieldDefinitions(projectId);
+                        } else {
+                            customFields.value = new CustomFieldDefinitionData[0];
+                        }
+                        
+                        final Holder<UserData> ud = new Holder<>();
+                        try {
+                            ud.value = repository.getAccount();
+                        } catch (ServiceException | RemoteException ex) {
+                        };
+                        
+                        Mutex.EVENT.writeAccess(new Mutex.Action<Void>() {
+                            public Void run() {
+                                categoriesModel.setBackingList(categories);
+                                assignedModel.setBackingList(users);
+                                targetVersionModel.setBackingList(versions);
+                                productVersionModel.setBackingList(versions);
+                                fixVersionModel.setBackingList(versions);
+
+                                for (CustomFieldComponent cfc : panel.getCustomFields()) {
+                                    customFieldValueBackingStore.put(
+                                            cfc.getCustomFieldDefinitionData().getField().getId(),
+                                            cfc.getValue());
+                                }
+                                panel.clearCustomFields();
+                                for (CustomFieldDefinitionData cfdd : customFields.value) {
+                                    CustomFieldComponent cfc = CustomFieldComponent.create(cfdd, ud.value);
+                                    BigInteger id = cfc.getCustomFieldDefinitionData().getField().getId();
+                                    if (customFieldValueBackingStore.containsKey(id)) {
+                                        cfc.setValue(customFieldValueBackingStore.get(id));
+                                    } else if (issue.getId() == null
+                                            || BigInteger.ZERO.equals(issue.getId())) {
+                                        cfc.setDefaultValue();
+                                    }
+                                    panel.addCustomField(cfc);
+                                }
+                                return null;
+                            }
+                        });
+                    } catch (Exception ex) {
+                        repository
+                                .getExceptionHandler()
+                                .handleException(logger, "Failed to create/add issue", ex);
                     }
-                    customFields = mr.getCustomFieldDefinitions(projectId);
                 }
-                categoriesModel.setBackingList(categories);
-                assignedModel.setBackingList(users);
-                targetVersionModel.setBackingList(versions);
-                productVersionModel.setBackingList(versions);
-                fixVersionModel.setBackingList(versions);
-                UserData ud = null;
-                try {
-                    ud = issue.getMantisRepository().getAccount();
-                } catch (ServiceException | RemoteException ex) {};
-                for(CustomFieldComponent cfc: panel.getCustomFields()) {
-                    customFieldValueBackingStore.put(
-                            cfc.getCustomFieldDefinitionData().getField().getId(), 
-                            cfc.getValue());
-                }
-                panel.clearCustomFields();
-                for(CustomFieldDefinitionData cfdd: customFields) {
-                    CustomFieldComponent cfc = CustomFieldComponent.create(cfdd, ud);
-                    BigInteger id = cfc.getCustomFieldDefinitionData().getField().getId();
-                    if(customFieldValueBackingStore.containsKey(id)) {
-                        cfc.setValue(customFieldValueBackingStore.get(id));
-                    } else if (issue.getId() == null || BigInteger.ZERO.equals(issue.getId())) {
-                        cfc.setDefaultValue();
-                    }
-                    panel.addCustomField(cfc);
-                }
-            } catch (Exception ex) {
-                issue.getMantisRepository()
-                        .getExceptionHandler()
-                        .handleException(logger, "Failed to create/add issue", ex);
-            }
+            });
         } else if ("refreshIssue".equals(e.getActionCommand())) {
             if (issue.getId() != null) {
-                issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
+                repository.getRequestProcessor().submit(new Runnable() {
                     public void run() {
                         try {
                             issue.refresh();
                         } catch (Exception ex) {
-                            issue.getMantisRepository()
+                            repository
                                     .getExceptionHandler()
                                     .handleException(logger, "Failed to refresh issue", ex);
                         }
@@ -652,7 +674,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 });
             }
         } else if ("openIssueWebbrowser".equals(e.getActionCommand())) {
-            URI uri = issue.getMantisRepository().getIssueUrl(issue);
+            URI uri = repository.getIssueUrl(issue);
             try {
                 Desktop.getDesktop().browse(uri);
             } catch (IOException ex) {
@@ -668,13 +690,13 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
             int result = fileChooser.showOpenDialog(getComponent());
             if (result == JFileChooser.APPROVE_OPTION) {
                 lastDirectory = fileChooser.getCurrentDirectory();
-                issue.getMantisRepository().getRequestProcessor().submit(new Runnable() {
+                repository.getRequestProcessor().submit(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             issue.addFile(fileChooser.getSelectedFile(), null);
                         } catch (Exception ex) {
-                            issue.getMantisRepository()
+                            repository
                                     .getExceptionHandler()
                                     .handleException(logger, "Failed to add file to issue", ex);
                         }

@@ -19,6 +19,7 @@ import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
 import eu.doppel_helix.netbeans.mantisintegration.data.Version;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
+import eu.doppel_helix.netbeans.mantisintegration.swing.EDTInvocationHandler;
 import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import eu.doppel_helix.netbeans.mantisintegration.util.StringUtils;
 import java.awt.Image;
@@ -28,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -48,6 +50,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import javax.swing.SwingUtilities;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
@@ -354,7 +357,7 @@ public class MantisRepository {
         return account;
     }
     
-    protected MantisConnectPortType getClient() throws ServiceException {
+    protected synchronized MantisConnectPortType getClient() throws ServiceException {
         if (client == null) {
             ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
@@ -370,6 +373,13 @@ public class MantisRepository {
                         new QName("http://futureware.biz/mantisconnect", "MantisConnect"));
                 try {
                     client = mcl.getMantisConnectPort(new URL(baseUrl));
+                    if(getClass().desiredAssertionStatus()) {
+                        EDTInvocationHandler invocationHandler = new EDTInvocationHandler(client);
+                        client = (MantisConnectPortType) Proxy.newProxyInstance(
+                                getClass().getClassLoader(),
+                                new Class[] {MantisConnectPortType.class}, 
+                                invocationHandler);
+                    }
                 } catch (MalformedURLException ex) {
                     throw new ServiceException("Broken client url:" + baseUrl, ex);
                 }

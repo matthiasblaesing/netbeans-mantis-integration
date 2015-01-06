@@ -9,7 +9,6 @@ import eu.doppel_helix.netbeans.mantisintegration.data.FlattenedProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
-import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import eu.doppel_helix.netbeans.mantisintegration.util.SafeAutocloseable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,16 +22,19 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
+import javax.xml.ws.Holder;
 import org.netbeans.modules.bugtracking.spi.QueryController;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
+import org.openide.util.Mutex;
 import org.openide.util.RequestProcessor;
 
 public class MantisQueryController implements ActionListener, PropertyChangeListener, QueryController {
@@ -117,23 +119,23 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
 
         @Override
         public void keyReleased(KeyEvent e) {
-                    if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-                        int viewRow = mqp.issueTable.getSelectedRow();
-                        if(viewRow == -1) {
-                            return;
-                        }
-                        int modelRow = mqp.issueTable.convertRowIndexToModel(viewRow);
-                        MantisIssue mi = mqp.getQueryListModel().getIssue(modelRow);
-                        Mantis.getInstance().getBugtrackingSupport().openIssue(
-                                mi.getMantisRepository(),
-                                mi);
-                        e.consume();
-                    }
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                int viewRow = mqp.issueTable.getSelectedRow();
+                if (viewRow == -1) {
+                    return;
+                }
+                int modelRow = mqp.issueTable.convertRowIndexToModel(viewRow);
+                MantisIssue mi = mqp.getQueryListModel().getIssue(modelRow);
+                Mantis.getInstance().getBugtrackingSupport().openIssue(
+                        mi.getMantisRepository(),
+                        mi);
+                e.consume();
+            }
         }
     }
 
     IssueTableIssueOpener issueTableIssueOpener = new IssueTableIssueOpener();
-    
+
     static {
         pseudoProject = new ProjectData();
         pseudoProject.setAccess_min(new ObjectRef(BigInteger.ZERO, "None"));
@@ -142,118 +144,116 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
         pseudoProject.setName("All");
     }
 
-    private final SwingWorker initialize = new SwingWorker() {
-        List<FlattenedProjectData> projects;
-        List<AccountData> users;
-        List<String> categories;
-        List<ObjectRef> severities;
-        List<ObjectRef> resolutions;
-        List<ObjectRef> states;
-        List<ObjectRef> priorities;
-        List<ObjectRef> viewstates;
-
-        @Override
-        protected Object doInBackground() throws Exception {
-            try (SafeAutocloseable ac = mq.busy()) {
-                projects = new ArrayList<>();
-                projects.add(new FlattenedProjectData(pseudoProject, 0));
-                for (ProjectData pd : mr.getProjects()) {
-                    projects.addAll(FlattenedProjectData.buildList(pd));
-                }
-                users = new ArrayList<>(Arrays.asList(mr.getUsers(
-                        BigInteger.ZERO)));
-                users.add(0, null);
-                categories = new ArrayList<>(Arrays.asList(
-                        mr.getCategories(BigInteger.ZERO)));
-                categories.add(0, null);
-                severities = new ArrayList<>(Arrays.asList(
-                        mr.getSeverities()));
-                severities.add(0, null);
-                resolutions = new ArrayList<>(Arrays.asList(
-                        mr.getResolutions()));
-                resolutions.add(0, null);
-                states = new ArrayList<>(Arrays.asList(mr.getStates()));
-                states.add(0, null);
-                priorities = new ArrayList<>(Arrays.asList(
-                        mr.getPriorities()));
-                priorities.add(0, null);
-                viewstates = new ArrayList<>(Arrays.asList(
-                        mr.getViewStates()));
-                viewstates.add(0, null);
-            }
-            return null;
-        }
-
-        @Override
-        protected void done() {
-            try {
-                get();
-                reporterModel.setBackingList(users);
-                assignedToModel.setBackingList(users);
-                categoryModel.setBackingList(categories);
-                severityModel.setBackingList(severities);
-                resolutionModel.setBackingList(resolutions);
-                statusModel.setBackingList(states);
-                priorityModel.setBackingList(priorities);
-                viewstatusModel.setBackingList(viewstates);
-                projectModel1.setBackingList(projects);
-
-                projectModel1.setSelectedItem(new FlattenedProjectData(
-                        pseudoProject, 0));
-                reporterModel.setSelectedItem(mq.getReporter());
-                assignedToModel.setSelectedItem(mq.getAssignedTo());
-                categoryModel.setSelectedItem(mq.getCategory());
-                severityModel.setSelectedItem(mq.getSeverity());
-                resolutionModel.setSelectedItem(mq.getResolution());
-                statusModel.setSelectedItem(mq.getStatus());
-                priorityModel.setSelectedItem(mq.getPriority());
-                viewstatusModel.setSelectedItem(mq.getViewStatus());
-                if (mq.getProjectId() != null) {
-                    FlattenedProjectData foundFpd = null;
-                    for (FlattenedProjectData fpd : projects) {
-                        if (fpd.getProjectData().getId().equals(
-                                mq.getProjectId())) {
-                            projectModel1.setSelectedItem(fpd);
-                            break;
-                        }
-                    }
-                }
-                updateFilterList();
-
-                if (mq.getServersideFilterId() != null) {
-                    for (FilterData fd : filterModel1.getBackingList()) {
-                        if (mq.getServersideFilterId().equals(fd.getId())) {
-                            filterModel1.setSelectedItem(fd);
-                            break;
-                        }
-                    }
-                }
-
-                if (mqp != null) {
-                    mqp.lastUpdateAfterDatePicker.setDate(
-                            mq.getLastUpdateAfter());
-                    mqp.lastUpdateBeforeDatePicker.setDate(
-                            mq.getLastUpdateBefore());
-                    mqp.summaryTextField.setText(mq.getSummaryFilter());
-                    if (mq.getCombination() == MantisQuery.Combination.ANY) {
-                        mqp.matchTypeComboBox.setSelectedIndex(1);
-                    }
-                }
-            } catch (Exception ex) {
-                mq.getMantisRepository()
-                        .getExceptionHandler()
-                        .handleException(logger, "Failed to update", ex);
-            }
-        }
-    };
-
     public MantisQueryController(final MantisQuery mq) {
         this.mq = mq;
         this.mr = mq.getMantisRepository();
 
-        initialize.execute();
+        Runnable initializer = new Runnable() {
+            public void run() {
+                try (SafeAutocloseable ac = mq.busy()) {
+                    final FilterData[] filter = mr.getFilters(mq.getProjectId());
+
+                    final List<FlattenedProjectData> projects = new ArrayList<>();
+                    projects.add(new FlattenedProjectData(pseudoProject, 0));
+                    for (ProjectData pd : mr.getProjects()) {
+                        projects.addAll(FlattenedProjectData.buildList(pd));
+                    }
+                    final List<AccountData> users = new ArrayList<>(
+                            Arrays.asList(mr.getUsers(BigInteger.ZERO)));
+                    users.add(0, null);
+                    final List<String> categories = new ArrayList<>(
+                            Arrays.asList(mr.getCategories(BigInteger.ZERO)));
+                    categories.add(0, null);
+                    final List<ObjectRef> severities = new ArrayList<>(
+                            Arrays.asList(mr.getSeverities()));
+                    severities.add(0, null);
+                    final List<ObjectRef> resolutions = new ArrayList<>(
+                            Arrays.asList(mr.getResolutions()));
+                    resolutions.add(0, null);
+                    final List<ObjectRef> states = new ArrayList<>(
+                            Arrays.asList(mr.getStates()));
+                    states.add(0, null);
+                    final List<ObjectRef> priorities = new ArrayList<>(
+                            Arrays.asList(mr.getPriorities()));
+                    priorities.add(0, null);
+                    final List<ObjectRef> viewstates = new ArrayList<>(
+                            Arrays.asList(mr.getViewStates()));
+                    viewstates.add(0, null);
+
+                    Mutex.EVENT.writeAccess(new Mutex.Action<Void>() {
+
+                        @Override
+                        public Void run() {
+                            reporterModel.setBackingList(users);
+                            assignedToModel.setBackingList(users);
+                            categoryModel.setBackingList(categories);
+                            severityModel.setBackingList(severities);
+                            resolutionModel.setBackingList(resolutions);
+                            statusModel.setBackingList(states);
+                            priorityModel.setBackingList(priorities);
+                            viewstatusModel.setBackingList(viewstates);
+                            projectModel1.setBackingList(projects);
+
+                            projectModel1.setSelectedItem(new FlattenedProjectData(
+                                    pseudoProject, 0));
+                            reporterModel.setSelectedItem(mq.getReporter());
+                            assignedToModel.setSelectedItem(mq.getAssignedTo());
+                            categoryModel.setSelectedItem(mq.getCategory());
+                            severityModel.setSelectedItem(mq.getSeverity());
+                            resolutionModel.setSelectedItem(mq.getResolution());
+                            statusModel.setSelectedItem(mq.getStatus());
+                            priorityModel.setSelectedItem(mq.getPriority());
+                            viewstatusModel.setSelectedItem(mq.getViewStatus());
+                            if (mq.getProjectId() != null) {
+                                FlattenedProjectData foundFpd = null;
+                                for (FlattenedProjectData fpd : projects) {
+                                    if (fpd.getProjectData().getId().equals(
+                                            mq.getProjectId())) {
+                                        projectModel1.setSelectedItem(fpd);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (filter != null) {
+                                filterModel1.setBackingList(Arrays.asList(filter));
+                                filterModel1.addElement(0, null);
+                            }
+
+                            if (mq.getServersideFilterId() != null) {
+                                for (FilterData fd : filterModel1.getBackingList()) {
+                                    if (mq.getServersideFilterId().equals(fd.getId())) {
+                                        filterModel1.setSelectedItem(fd);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (mqp != null) {
+                                mqp.lastUpdateAfterDatePicker.setDate(
+                                        mq.getLastUpdateAfter());
+                                mqp.lastUpdateBeforeDatePicker.setDate(
+                                        mq.getLastUpdateBefore());
+                                mqp.summaryTextField.setText(mq.getSummaryFilter());
+                                if (mq.getCombination() == MantisQuery.Combination.ANY) {
+                                    mqp.matchTypeComboBox.setSelectedIndex(1);
+                                }
+                            }
+                            return null;
+                        }
+                    });
+
+                } catch (Exception ex) {
+                    mq.getMantisRepository()
+                            .getExceptionHandler()
+                            .handleException(logger, "Failed to update", ex);
+                }
+            }
+        };
+
+        this.mr.getRequestProcessor().execute(initializer);
     }
-    
+
     private void onSaveState() {
         if (mq.isSaved()) {
             mqp.gotoIssuePanel.setVisible(false);
@@ -264,23 +264,46 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
         }
     }
 
-    private void updateFilterList() {
-        FlattenedProjectData selected = (FlattenedProjectData) projectModel1.getSelectedItem();
-        if (selected != null) {
-            try {
-                FilterData[] filter = mr.getFilters(
-                        selected.getProjectData().getId());
-                if (filter != null) {
-                    filterModel1.setBackingList(Arrays.asList(filter));
-                    filterModel1.addElement(0, null);
+    private Runnable updateProjectDependendLists = new Runnable() {
+        // @todo: also update the other lists that are project dependend
+        public void run() {
+            try (SafeAutocloseable saf = mq.busy()) {
+                FlattenedProjectData selected = Mutex.EVENT.writeAccess(
+                        new Mutex.Action<FlattenedProjectData>() {
+                            @Override
+                            public FlattenedProjectData run() {
+                                return (FlattenedProjectData) projectModel1.getSelectedItem();
+                            }
+                        });
+                
+                final Holder<FilterData[]> filter = new Holder<>();
+                
+                if (selected != null) {
+                    filter.value = mr.getFilters(
+                            selected.getProjectData().getId());
                 }
+                
+                Mutex.EVENT.writeAccess(new Mutex.Action<Void>() {
+                    @Override
+                    public Void run() {
+                        if (filter != null) {
+                            filterModel1.setBackingList(Arrays.asList(filter.value));
+                            filterModel1.addElement(0, null);
+                        } else {
+                            filterModel1.setBackingList(Collections.EMPTY_LIST);
+                        }
+                        return null;
+                    }
+                });
+
+                
             } catch (Exception ex) {
                 mq.getMantisRepository()
                         .getExceptionHandler()
                         .handleException(logger, "Failed to retrieve filterlist", ex);
             }
         }
-    }
+    };
 
     @Override
     public HelpCtx getHelpCtx() {
@@ -292,7 +315,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
         if (COMMAND_OPEN_ISSUE.equals(e.getActionCommand())) {
             gotoIssue();
         } else if (COMMAND_SELECT_PROJECT1.equals(e.getActionCommand())) {
-            updateFilterList();
+            mr.getRequestProcessor().execute(updateProjectDependendLists);
         } else if (COMMAND_SAVE_QUERY.equals(e.getActionCommand())) {
             if (mq.getName() == null || mq.getName().isEmpty()) {
                 NotifyDescriptor.InputLine nd = new NotifyDescriptor.InputLine(
@@ -318,7 +341,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                 protected void done() {
                     try {
                         get();
-                    } catch ( InterruptedException | ExecutionException ex) {
+                    } catch (InterruptedException | ExecutionException ex) {
                         logger.log(Level.WARNING, "Failed to save query", ex);
                     }
                 }
@@ -330,11 +353,12 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     mq.remove();
                     return null;
                 }
+
                 @Override
                 protected void done() {
                     try {
                         get();
-                    } catch ( InterruptedException | ExecutionException ex) {
+                    } catch (InterruptedException | ExecutionException ex) {
                         logger.log(Level.WARNING, "Failed to delete query", ex);
                     }
                 }
@@ -384,7 +408,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                 protected void done() {
                     try {
                         get();
-                    } catch ( InterruptedException | ExecutionException ex) {
+                    } catch (InterruptedException | ExecutionException ex) {
                         Exceptions.printStackTrace(ex);
                     }
                 }
@@ -426,7 +450,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
 
     @Override
     public boolean providesMode(QueryMode mode) {
-        if(mode == QueryMode.EDIT) {
+        if (mode == QueryMode.EDIT) {
             return true;
         } else {
             return false;
@@ -458,7 +482,6 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
             mqp.deleteQueryLinkButton.addActionListener(this);
             mq.addPropertyChangeListener(this);
             mqp.waitPanel.setVisible(mq.isBusy());
-            updateFilterList();
             mqp.lastUpdateAfterDatePicker.setDate(mq.getLastUpdateAfter());
             mqp.lastUpdateBeforeDatePicker.setDate(mq.getLastUpdateBefore());
             mqp.summaryTextField.setText(mq.getSummaryFilter());
@@ -493,7 +516,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
 
     @Override
     public boolean isChanged() {
-        return ! mq.isSaved();
+        return !mq.isSaved();
     }
 
     @Override
