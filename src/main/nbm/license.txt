@@ -8,15 +8,15 @@ Apache Licence 2.0, http://ws.apache.org/axis/
 WSDL4J: wsdl4j-1.6.2.jar
 Common Public License 1.0 (CPL), http://sourceforge.net/projects/wsdl4j
 
-TwelveMonkeys ImageIO Plugins (ICO Support)
-2-Clause BSD-License, http://java.net/projects/twelvemonkeys-imageio
-
-SwingX: swingx-all-1.6.4.jar
+SwingX: swingx-all-1.6.5.jar
 GNU LESSER GENERAL PUBLIC LICENSE 2.1 (LGPL 2.1)
 
 Netbeans IDE (http://netbeans.org)
 Common Development and Distribution License (CDDL) and 
 the GNU General Public License version 2 with Classpath exception
+
+Stringtotime: stringtotime-1.0.6.jar
+Public Domain
 
                                  Apache License
                            Version 2.0, January 2004
