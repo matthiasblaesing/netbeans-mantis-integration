@@ -3,7 +3,7 @@
 
     <groupId>eu.doppel_helix.netbeans</groupId>
     <artifactId>MantisIntegration</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <packaging>nbm</packaging>
 
     <name>MantisIntegration</name>
@@ -250,8 +250,7 @@
                         } else {
                             value = value.trim() + "";
                         }
-                        for(var i = 0; i < dependencies.length; i++) { if(value != "") { value += ", ";
-                            }
+                        for(var i = 0; i < dependencies.length; i++) { if(value != "") { value += ", "; }
                             value += dependencies[i];
                         }
                         attributes.putValue(entry, value);
