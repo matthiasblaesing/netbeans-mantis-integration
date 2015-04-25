@@ -4,13 +4,13 @@ import biz.futureware.mantisconnect.TagData;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
-import javax.xml.rpc.ServiceException;
+import javax.swing.SwingWorker;
 
 public class AddTagDialog extends javax.swing.JDialog implements ActionListener {
     private final static Logger logger = Logger.getLogger(AddTagDialog.class.getName());
@@ -21,18 +21,33 @@ public class AddTagDialog extends javax.swing.JDialog implements ActionListener 
         setLocationByPlatform(true);
         initComponents();
         this.issue = issue;
-        DefaultComboBoxModel<String> types = new DefaultComboBoxModel<>();
-        try {
-            for(TagData tag: issue.getMantisRepository().getTags()) {
-                types.addElement(tag.getName());
+        final DefaultComboBoxModel<String> types = new DefaultComboBoxModel<>();
+        new SwingWorker<List<TagData>,Object>() {
+            @Override
+            protected List<TagData> doInBackground() throws Exception {
+                return issue.getMantisRepository().getTags();
             }
-        } catch (ServiceException | RemoteException ex) {
-            // Log on Level Info => don't force display, as situation is not fatal
-            // though it will surely get fatal ...
-            logger.log(Level.INFO, "Failed to retrieve taglist", ex);
-        }
+
+            @Override
+            protected void done() {
+                try {
+                    for (TagData tag : get()) {
+                        types.addElement(tag.getName());
+                    }
+                } catch (ExecutionException ex) {
+                    // Log on Level Info => don't force display, as situation is not fatal
+                    // though it will surely get fatal ...
+                    logger.log(Level.INFO, "Failed to retrieve taglist", ex.getCause());
+                } catch (InterruptedException ex) {
+                    logger.log(Level.INFO, "Failed to retrieve taglist", ex);
+                }
+                tagsComboBox.setEnabled(true);
+            }
+
+        }.execute();
         tagsComboBox.setModel(types);
         tagsComboBox.setSelectedItem("");
+        tagsComboBox.setEnabled(false);
         closeButton.setActionCommand("cancel");
         closeButton.addActionListener(this);
         okButton.addActionListener(this);
