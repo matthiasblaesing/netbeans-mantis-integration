@@ -15,7 +15,6 @@
  */
 package eu.doppel_helix.netbeans.mantisintegration.query;
 
-import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.Mantis;
 import eu.doppel_helix.netbeans.mantisintegration.swing.AccountDataListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.BusyPanel;
@@ -26,12 +25,12 @@ import eu.doppel_helix.netbeans.mantisintegration.swing.PriorityListCellRenderer
 import eu.doppel_helix.netbeans.mantisintegration.swing.ProjectListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.StringNullSaveListCellRenderer;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.math.BigInteger;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
+import javax.swing.JTable;
+import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 
@@ -53,80 +52,67 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         
         DefaultTableColumnModelExt  tcm = new DefaultTableColumnModelExt();
         
+        ColumnFactory cf = issueTable.getColumnFactory();
+        
         TableColumnExt tce;
         
-        tce = new TableColumnExt(0);
+        tce = cf.createTableColumn(0);
         tce.setTitle("ID");
         tce.setToolTipText("Identifier");
-        tce.setMinWidth(0);
         tce.setPreferredWidth(40);
-        tce.setMaxWidth(40);
         tcm.addColumn(tce);
         
-        tce = new TableColumnExt(1);
+        tce = cf.createTableColumn(1);
         tce.setTitle("#");
         tce.setToolTipText("Note count");
-        tce.setMinWidth(0);
         tce.setPreferredWidth(40);
-        tce.setMaxWidth(40);
         tcm.addColumn(tce);
         
-        tce = new TableColumnExt(2);
+        tce = cf.createTableColumn(2);
         tce.setTitle("Category");
         tce.setToolTipText("Category");
-        tce.setMinWidth(0);
         tce.setPreferredWidth(80);
-        tce.setMaxWidth(80);
         tcm.addColumn(tce);
         
-        tce = new TableColumnExt(3);
+        tce = cf.createTableColumn(3);
         tce.setTitle("Severity");
         tce.setToolTipText("Severity");
         tce.setCellRenderer(new MantisObjectRefCellRenderer());
-        tce.setMinWidth(0);
         tce.setPreferredWidth(80);
-        tce.setMaxWidth(80);
         tcm.addColumn(tce);
         
-        tce = new TableColumnExt(4);
+        tce = cf.createTableColumn(4);
         tce.setTitle("Priority");
         tce.setToolTipText("Priority");
         tce.setCellRenderer(new PriorityCellRenderer());
-        tce.setMinWidth(0);
         tce.setPreferredWidth(80);
-        tce.setMaxWidth(80);
         tcm.addColumn(tce);
         
-        tce = new TableColumnExt(5);
+        tce = cf.createTableColumn(5);
         tce.setTitle("Status");
         tce.setToolTipText("Status");
         tce.setCellRenderer(new MantisObjectRefCellRenderer());
         tce.setHighlighters(new MantisStatusHighlighter());
-        tce.setMinWidth(0);
         tce.setPreferredWidth(80);
-        tce.setMaxWidth(80);
         tcm.addColumn(tce);
         
-        tce = new TableColumnExt(6);
+        tce = cf.createTableColumn(6);
         tce.setTitle("Updated");
         tce.setToolTipText("Updated");
         tce.setCellRenderer(new MantisCalendarCellRenderer());
-        tce.setMinWidth(0);
         tce.setPreferredWidth(80);
-        tce.setMaxWidth(80);
         tcm.addColumn(tce);
         
-        tce = new TableColumnExt(7);
+        tce = cf.createTableColumn(7);
         tce.setTitle("Summary");
         tce.setToolTipText("Summary");
         tce.setPrototypeValue("Ein doch recht langer Text als Prototyp sollte genug Platz sichern!");
-        tce.setPreferredWidth(250);
+        tce.setPreferredWidth(700);
         tcm.addColumn(tce);
 
         issueTable.getTableHeader().setReorderingAllowed(false);
         issueTable.setColumnModel(tcm);
         issueTable.setColumnControlVisible(true);
-        issueTable.doLayout();
     }
 
     /**
