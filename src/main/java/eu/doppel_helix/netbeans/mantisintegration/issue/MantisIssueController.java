@@ -196,11 +196,11 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
             panel.tagsPanel.setVisible(false);
             panel.attachmentLabel.setVisible(false);
             panel.attachmentPanel.setVisible(false);
-            panel.filler1.setVisible(false);
+//            panel.filler1.setVisible(false);
             if (issue.getId() == null) {
                 setUpdateEnabledFields(true);
                 panel.addIssueButton.setVisible(true);
-                panel.filler1.setVisible(true);
+//                panel.filler1.setVisible(true);
             } else {
                 if (issue.canUpdate()) {
                     panel.updateIssueButton.setVisible(true);

@@ -211,7 +211,7 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         mainPanel.setBackground(javax.swing.UIManager.getDefaults().getColor("TextArea.background"));
         mainPanel.setLayout(new java.awt.GridBagLayout());
 
-        filterPanel.setBackground(new java.awt.Color(255, 255, 255));
+        filterPanel.setOpaque(false);
         filterPanel.setLayout(new java.awt.GridBagLayout());
 
         reporterLabel.setFont(reporterLabel.getFont().deriveFont(reporterLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
@@ -345,25 +345,6 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         filterPanel.add(statusComboBox, gridBagConstraints);
-        statusComboBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Object value = statusComboBox.getSelectedItem();
-
-                Color color = null;
-
-                if(value instanceof ObjectRef) {
-                    ObjectRef or = (ObjectRef)value;
-                    BigInteger level = or.getId();
-                    color = colorMap.get(level);
-                }
-
-                if(color == null) {
-                    color = Color.WHITE;
-                }
-
-                statusComboBox.setBackground(color);
-            }
-        });
 
         priorityLabel.setFont(priorityLabel.getFont().deriveFont(priorityLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(priorityLabel, org.openide.util.NbBundle.getMessage(MantisQueryPanel.class, "MantisQueryPanel.priorityLabel.text")); // NOI18N

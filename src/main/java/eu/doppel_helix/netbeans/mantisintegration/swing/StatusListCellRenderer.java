@@ -3,6 +3,7 @@ package eu.doppel_helix.netbeans.mantisintegration.swing;
 
 import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.Mantis;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.math.BigInteger;
@@ -10,25 +11,28 @@ import java.util.Map;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JPanel;
 
 public class StatusListCellRenderer extends DefaultListCellRenderer {
-    private Map<BigInteger,Color> colorMap = Mantis.getInstance().getStatusColorMap();
+
+    private final Map<BigInteger,Color> colorMap = Mantis.getInstance().getStatusColorMap();
+    private final JPanel protectionPanel = new JPanel(new BorderLayout());
+    
+    private final DefaultListCellRenderer fallback = new DefaultListCellRenderer();
     
     @Override
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        Color color = null;
-        
+        Color foreground = null;
+        Color background = null;
+
         if(value instanceof ObjectRef) {
             ObjectRef or = (ObjectRef)value;
             value = or.getName();
             BigInteger level = or.getId();
-            color = colorMap.get(level);
+            foreground = colorMap.get(level);
+            background = Color.BLACK;
         } else if (value == null) {
-            value = " ";
-        }
-        
-        if(color == null) {
-            color = Color.WHITE;
+            return fallback.getListCellRendererComponent(list, " ", index, isSelected, cellHasFocus);
         }
         
         Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
@@ -36,9 +40,15 @@ public class StatusListCellRenderer extends DefaultListCellRenderer {
         if(c instanceof JComponent) {
             ((JComponent)c).setOpaque(true);
         }
-        c.setBackground(color);
+        c.setBackground(foreground);
+        c.setForeground(background);
         
-        return c;
+        protectionPanel.removeAll();
+        protectionPanel.add(c);
+        
+        return protectionPanel;
     }
+    
+    
     
 }

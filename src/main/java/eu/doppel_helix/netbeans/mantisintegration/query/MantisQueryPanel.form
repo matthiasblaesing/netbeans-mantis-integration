@@ -140,9 +140,7 @@
           <SubComponents>
             <Container class="javax.swing.JPanel" name="filterPanel">
               <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
-                </Property>
+                <Property name="opaque" type="boolean" value="false"/>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -392,9 +390,6 @@
                       <Connection code="new eu.doppel_helix.netbeans.mantisintegration.swing.StatusListCellRenderer()" type="code"/>
                     </Property>
                   </Properties>
-                  <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="statusComboBox.addActionListener(new ActionListener() {&#xa;    public void actionPerformed(ActionEvent e) {&#xa;        Object value = statusComboBox.getSelectedItem();&#xa;&#xa;        Color color = null;&#xa;        &#xa;        if(value instanceof ObjectRef) {&#xa;            ObjectRef or = (ObjectRef)value;&#xa;            BigInteger level = or.getId();&#xa;            color = colorMap.get(level);&#xa;        }&#xa;        &#xa;        if(color == null) {&#xa;            color = Color.WHITE;&#xa;        }&#xa;        &#xa;        statusComboBox.setBackground(color);&#xa;      }&#xa;});"/>
-                  </AuxValues>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
                       <GridBagConstraints gridX="0" gridY="8" gridWidth="1" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="2" insetsLeft="2" insetsBottom="2" insetsRight="2" anchor="512" weightX="1.0" weightY="0.0"/>

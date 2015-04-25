@@ -206,20 +206,20 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         addNoteEditorPane = new eu.doppel_helix.netbeans.mantisintegration.swing.DirectionalEditorPane();
         timetrackLabel = new javax.swing.JLabel();
         timetrackInput = new javax.swing.JFormattedTextField();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 32767));
         targetVersionLabel = new javax.swing.JLabel();
         targetVersionComboBox = new javax.swing.JComboBox();
         versionLabel = new javax.swing.JLabel();
         versionComboBox = new javax.swing.JComboBox();
         fixVersionLabel = new javax.swing.JLabel();
         fixVersionComboBox = new javax.swing.JComboBox();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 32767));
 
         setBackground(javax.swing.UIManager.getDefaults().getColor("TextArea.background"));
 
         scrollablePane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollablePane.setOpaque(false);
 
-        innerPanel.setBackground(new java.awt.Color(255, 255, 255));
+        innerPanel.setBackground(javax.swing.UIManager.getDefaults().getColor("TextArea.background"));
         innerPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         innerPanel.setAlignmentY(0.0F);
         innerPanel.setLayout(new java.awt.GridBagLayout());
@@ -335,11 +335,12 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(summaryTextField, gridBagConstraints);
 
-        descriptionScrollPane.setBackground(new java.awt.Color(255, 255, 255));
+        descriptionScrollPane.setBackground(javax.swing.UIManager.getDefaults().getColor("EditorPane.background"));
         descriptionScrollPane.setMinimumSize(new java.awt.Dimension(10, 100));
         descriptionScrollPane.setPreferredSize(new java.awt.Dimension(10, 100));
 
         descriptionEditorPane.setMinimumSize(new java.awt.Dimension(6, 95));
+        descriptionEditorPane.setPreferredSize(new java.awt.Dimension(6, 100));
         descriptionEditorPane.setScrollableTracksViewportWidth(true);
         descriptionScrollPane.setViewportView(descriptionEditorPane);
 
@@ -351,13 +352,13 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(descriptionScrollPane, gridBagConstraints);
-        descriptionScrollPane.getViewport().setBackground(descriptionScrollPane.getBackground());
 
-        stepsToReproduceScrollPane.setBackground(new java.awt.Color(255, 255, 255));
+        stepsToReproduceScrollPane.setBackground(javax.swing.UIManager.getDefaults().getColor("EditorPane.background"));
         stepsToReproduceScrollPane.setMinimumSize(new java.awt.Dimension(10, 75));
         stepsToReproduceScrollPane.setPreferredSize(new java.awt.Dimension(10, 75));
 
         stepsToReproduceEditorPane.setMinimumSize(new java.awt.Dimension(6, 70));
+        stepsToReproduceEditorPane.setPreferredSize(new java.awt.Dimension(6, 75));
         stepsToReproduceEditorPane.setScrollableTracksViewportWidth(true);
         stepsToReproduceScrollPane.setViewportView(stepsToReproduceEditorPane);
 
@@ -369,13 +370,13 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(stepsToReproduceScrollPane, gridBagConstraints);
-        stepsToReproduceScrollPane.getViewport().setBackground(stepsToReproduceScrollPane.getBackground());
 
-        additionalInformationScrollPane.setBackground(new java.awt.Color(255, 255, 255));
+        additionalInformationScrollPane.setBackground(javax.swing.UIManager.getDefaults().getColor("EditorPane.background"));
         additionalInformationScrollPane.setMinimumSize(new java.awt.Dimension(10, 75));
         additionalInformationScrollPane.setPreferredSize(new java.awt.Dimension(10, 75));
 
         additionalInformationEditorPane.setMinimumSize(new java.awt.Dimension(6, 70));
+        additionalInformationEditorPane.setPreferredSize(new java.awt.Dimension(6, 75));
         additionalInformationEditorPane.setScrollableTracksViewportWidth(true);
         additionalInformationScrollPane.setViewportView(additionalInformationEditorPane);
 
@@ -387,7 +388,6 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(additionalInformationScrollPane, gridBagConstraints);
-        additionalInformationScrollPane.getViewport().setBackground(additionalInformationScrollPane.getBackground());
 
         severityLabel.setFont(severityLabel.getFont().deriveFont(severityLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(severityLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.severityLabel.text")); // NOI18N
@@ -528,27 +528,6 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(statusComboBox, gridBagConstraints);
-        statusComboBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Object value = statusComboBox.getSelectedItem();
-
-                Color color = null;
-
-                if(value instanceof ObjectRef) {
-                    ObjectRef or = (ObjectRef)value;
-                    BigInteger level = or.getId();
-                    color = colorMap.get(level);
-                } else if (value == null) {
-                    value = " ";
-                }
-
-                if(color == null) {
-                    color = Color.WHITE;
-                }
-
-                statusComboBox.setBackground(color);
-            }
-        });
 
         descriptionLabel.setFont(descriptionLabel.getFont().deriveFont(descriptionLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(descriptionLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.descriptionLabel.text")); // NOI18N
@@ -843,11 +822,12 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         addNotesPanel.add(buttonPanel2, gridBagConstraints);
 
-        addNoteScrollPane.setBackground(new java.awt.Color(255, 255, 255));
+        addNoteScrollPane.setBackground(javax.swing.UIManager.getDefaults().getColor("EditorPane.background"));
         addNoteScrollPane.setMinimumSize(new java.awt.Dimension(10, 75));
         addNoteScrollPane.setPreferredSize(new java.awt.Dimension(10, 75));
 
-        addNoteEditorPane.setMinimumSize(new java.awt.Dimension(6, 70));
+        addNoteEditorPane.setMinimumSize(new java.awt.Dimension(6, 75));
+        addNoteEditorPane.setPreferredSize(new java.awt.Dimension(6, 75));
         addNoteEditorPane.setScrollableTracksViewportWidth(true);
         addNoteScrollPane.setViewportView(addNoteEditorPane);
 
@@ -858,7 +838,6 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         addNotesPanel.add(addNoteScrollPane, gridBagConstraints);
-        addNoteScrollPane.getViewport().setBackground(addNoteScrollPane.getBackground());
 
         org.openide.awt.Mnemonics.setLocalizedText(timetrackLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.timetrackLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -886,17 +865,8 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.gridwidth = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(notesOuterPanel, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 27;
-        gridBagConstraints.gridwidth = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        innerPanel.add(filler1, gridBagConstraints);
 
         targetVersionLabel.setFont(targetVersionLabel.getFont().deriveFont(targetVersionLabel.getFont().getStyle() & ~java.awt.Font.BOLD));
         org.openide.awt.Mnemonics.setLocalizedText(targetVersionLabel, org.openide.util.NbBundle.getMessage(MantisIssuePanel.class, "MantisIssuePanel.targetVersionLabel.text")); // NOI18N
@@ -960,6 +930,14 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         innerPanel.add(fixVersionComboBox, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 27;
+        gridBagConstraints.gridwidth = 8;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        innerPanel.add(filler1, gridBagConstraints);
 
         scrollablePane.setViewportView(innerPanel);
 
