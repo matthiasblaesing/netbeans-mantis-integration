@@ -300,16 +300,16 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 panel.projectComboBox.setSelectedItem(current);
             }
             if (property == null || "category".equals(property)) {
-                panel.categoryComboBox.setSelectedItem(issue.getCategory());
+                categoriesModel.setSelectedItem(issue.getCategory());
             }
             if (property == null || "target_version".equals(property)) {
-                panel.targetVersionComboBox.setSelectedItem(issue.getTarget_version());
+                targetVersionModel.setSelectedItem(issue.getTarget_version());
             }
             if (property == null || "version".equals(property)) {
-                panel.versionComboBox.setSelectedItem(issue.getVersion());
+                productVersionModel.setSelectedItem(issue.getVersion());
             }
             if (property == null || "fixed_in_version".equals(property)) {
-                panel.fixVersionComboBox.setSelectedItem(issue.getFixed_in_version());
+                fixVersionModel.setSelectedItem(issue.getFixed_in_version());
             }
             if (property == null || "view_state".equals(property)) {
                 panel.viewStatusComboBox.setSelectedItem(issue.getView_state());
@@ -325,10 +325,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
             }
             if (property == null || "handler".equals(property)) {
                 AccountData target = issue.getHandler();
-                if(! assignedModel.getBackingList().contains(target)) {
-                    assignedModel.addElement(target);
-                }
-                panel.assignedToComboBox.setSelectedItem(target);
+                assignedModel.setSelectedItem(target);
             }
             if (property == null || "resolution".equals(property)) {
                 panel.resolutionComboBox.setSelectedItem(issue.getResolution());
@@ -471,11 +468,11 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
         updateData.setAdditional_information(panel.additionalInformationEditorPane.getText());
         // Skip attachments
         updateData.setBuild(panel.buildTextField.getText());
-        updateData.setCategory((String) panel.categoryComboBox.getSelectedItem());
+        updateData.setCategory((String) categoriesModel.getSelectedItem());
         // Skip updating submitdate
         updateData.setDescription(panel.descriptionEditorPane.getText());
         updateData.setEta((ObjectRef) panel.etaComboBox.getSelectedItem());
-        updateData.setHandler((AccountData) panel.assignedToComboBox.getSelectedItem());
+        updateData.setHandler((AccountData) assignedModel.getSelectedItem());
         // Skip notes
         // Skip tags
         updateData.setOs(panel.osTextField.getText());
@@ -499,9 +496,9 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
         updateData.setSteps_to_reproduce(panel.stepsToReproduceEditorPane.getText());
         updateData.setSummary(panel.summaryTextField.getText());
         updateData.setView_state((ObjectRef) panel.viewStatusComboBox.getSelectedItem());
-        String targetVersion = (String)panel.targetVersionComboBox.getSelectedItem();
-        String version = (String)panel.versionComboBox.getSelectedItem();
-        String fixedInVersion = (String)panel.fixVersionComboBox.getSelectedItem();
+        String targetVersion = (String) targetVersionModel.getSelectedItem();
+        String version = (String)productVersionModel.getSelectedItem();
+        String fixedInVersion = (String)fixVersionModel.getSelectedItem();
         updateData.setTarget_version(targetVersion == null ? "" : targetVersion);
         updateData.setVersion(version == null ? "" : version);
         updateData.setFixed_in_version(fixedInVersion == null ? "" : fixedInVersion);

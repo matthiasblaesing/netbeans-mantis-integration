@@ -33,11 +33,11 @@ public class ListBackedComboBoxModel<E> implements ComboBoxModel<E> {
             fireIntervalRemoved(0, oldLength - 1);
         }
         backingList.addAll(elements);
+        if(! backingList.contains(selectedItem)) {
+            backingList.add(selectedItem);
+        }
         if (backingList.size() > 0) {
             fireIntervalAdded(0, backingList.size() - 1);
-        }
-        if (!backingList.contains(selectedItem)) {
-            setSelectedItem(null);
         }
     }
     
@@ -80,12 +80,30 @@ public class ListBackedComboBoxModel<E> implements ComboBoxModel<E> {
         }
     }
     
+    protected void fireContentsChanged(int start, int end) {
+        Iterator<ListDataListener> i = listener.iterator();
+        ListDataEvent lde = new ListDataEvent(
+                this, ListDataEvent.CONTENTS_CHANGED, start, end);
+        while (i.hasNext()) {
+            i.next().contentsChanged(lde);
+        }
+    }
+    
     @Override
     public void setSelectedItem(Object anItem) {
         if(anItem != null && (! (klass.isAssignableFrom(anItem.getClass())))) {
             throw new IllegalArgumentException("Wrong type for List");
         } else {
             selectedItem = (E) anItem;
+            if(selectedItem != null) {
+                if(! backingList.contains(selectedItem)) {
+                    backingList.add(selectedItem);
+                    fireIntervalAdded(backingList.size() - 1, backingList.size() - 1);
+                }
+            }
+            if(! backingList.isEmpty()) {
+                fireContentsChanged(0, backingList.size() - 1);
+            }
         }
     }
 
