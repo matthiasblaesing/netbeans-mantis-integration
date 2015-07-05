@@ -634,6 +634,10 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                                             cfc.getCustomFieldDefinitionData().getField().getId(),
                                             cfc.getValue());
                                 }
+                                Map<BigInteger,String> issueData = new HashMap<>();
+                                for(CustomFieldValueForIssueData cfvfid: issue.getCustom_fields()) {
+                                    issueData.put(cfvfid.getField().getId(), cfvfid.getValue());
+                                }
                                 panel.clearCustomFields();
                                 for (CustomFieldDefinitionData cfdd : customFields.value) {
                                     CustomFieldComponent cfc = CustomFieldComponent.create(cfdd, ud.value);
@@ -643,6 +647,8 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                                     } else if (issue.getId() == null
                                             || BigInteger.ZERO.equals(issue.getId())) {
                                         cfc.setDefaultValue();
+                                    } else {
+                                        cfc.setValue(issueData.get(id));
                                     }
                                     panel.addCustomField(cfc);
                                 }
