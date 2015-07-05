@@ -124,31 +124,43 @@ public class MantisRepository {
         return issueInfosHandler;
     }
     
-    public static Version checkConnection(String url, String username, String password) throws ServiceException, RemoteException {
-        String baseUrl = cleanUpUrl(url);
-
-        if (!baseUrl.endsWith("/api/soap/mantisconnect.php")) {
-            baseUrl += "/api/soap/mantisconnect.php";
-        }
-
+    private static MantisConnectPortType initClient(String baseUrl) throws ServiceException, MalformedURLException {
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(MantisRepository.class.getClassLoader());
+        MantisConnectPortType result = null;
         try {
+            if (!baseUrl.endsWith("/api/soap/mantisconnect.php")) {
+                baseUrl += "/api/soap/mantisconnect.php";
+            }
 
             MantisConnectLocator mcl = new MantisConnectLocator(
                     baseUrl + "?wsdl",
                     new QName("http://futureware.biz/mantisconnect", "MantisConnect"));
-            try {
-                MantisConnectPortType mcpt = mcl.getMantisConnectPort(new URL(baseUrl));
-                // Test Authentication information
-                mcpt.mc_projects_get_user_accessible(username, password);
-                // Return version for user information
-                return new Version(mcpt.mc_version());
-            } catch (MalformedURLException ex) {
-                throw new ServiceException("Broken client url:" + baseUrl, ex);
+
+            result = mcl.getMantisConnectPort(new URL(baseUrl));
+            if (MantisRepository.class.desiredAssertionStatus()) {
+                EDTInvocationHandler invocationHandler = new EDTInvocationHandler(result);
+                result = (MantisConnectPortType) Proxy.newProxyInstance(
+                        MantisRepository.class.getClassLoader(),
+                        new Class[]{MantisConnectPortType.class},
+                        invocationHandler);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(origLoader);
+        }
+        return result;
+    }
+
+    
+    public static Version checkConnection(String url, String username, String password) throws ServiceException, RemoteException {
+        try {
+            MantisConnectPortType mcpt = initClient(url);
+            // Test Authentication information
+            mcpt.mc_projects_get_user_accessible(username, password);
+            // Return version for user information
+            return new Version(mcpt.mc_version());
+        } catch (MalformedURLException ex) {
+            throw new ServiceException("Broken client url:" + url, ex);
         }
     }
     
@@ -359,33 +371,13 @@ public class MantisRepository {
     
     protected synchronized MantisConnectPortType getClient() throws ServiceException {
         if (client == null) {
-            ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+            String baseUrl = getBaseUrl();
             try {
-                String baseUrl = getBaseUrl();
-                
-                if (!baseUrl.endsWith("/api/soap/mantisconnect.php")) {
-                    baseUrl += "/api/soap/mantisconnect.php";
-                }
-                
-                MantisConnectLocator mcl = new MantisConnectLocator(
-                        baseUrl + "?wsdl",
-                        new QName("http://futureware.biz/mantisconnect", "MantisConnect"));
-                try {
-                    client = mcl.getMantisConnectPort(new URL(baseUrl));
-                    if(getClass().desiredAssertionStatus()) {
-                        EDTInvocationHandler invocationHandler = new EDTInvocationHandler(client);
-                        client = (MantisConnectPortType) Proxy.newProxyInstance(
-                                getClass().getClassLoader(),
-                                new Class[] {MantisConnectPortType.class}, 
-                                invocationHandler);
-                    }
-                } catch (MalformedURLException ex) {
-                    throw new ServiceException("Broken client url:" + baseUrl, ex);
-                }
-            } finally {
-                Thread.currentThread().setContextClassLoader(origLoader);
+                client = initClient(baseUrl);
+            } catch (MalformedURLException ex) {
+                throw new ServiceException("Broken client url:" + baseUrl, ex);
             }
+
         }
         return client;
     }
