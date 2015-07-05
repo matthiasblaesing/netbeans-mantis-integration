@@ -337,7 +337,7 @@ public class MantisRepository {
             baseUrl = baseUrl.replaceAll("/api/soap/mantisconnect.php$", "");
         }
         if (baseUrl.endsWith("/")) {
-            baseUrl = baseUrl.substring(0, baseUrl.length() - 2);
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
         return baseUrl;
     }
