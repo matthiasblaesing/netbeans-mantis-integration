@@ -61,6 +61,8 @@ import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.InstanceContent;
 
 public class MantisRepository {
+    public static final String PROP_SCHEDULE_DATE_FIELD = "MantisRepository.scheduleDateField";
+    public static final String PROP_SCHEDULE_LENGTH_FIELD = "MantisRepository.scheduleLengthField";
     private static final String BASE_CONFIG_PATH = "MantisIntegration"; // NOI18N
     private static final Logger logger = Logger.getLogger(MantisRepository.class.getName());
     private static final Image ICON = ImageUtilities.loadImage(

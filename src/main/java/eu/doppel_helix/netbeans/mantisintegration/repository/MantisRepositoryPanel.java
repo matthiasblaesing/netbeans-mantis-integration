@@ -1,15 +1,42 @@
 package eu.doppel_helix.netbeans.mantisintegration.repository;
 
 import java.awt.TextComponent;
+import javax.swing.ButtonGroup;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 public class MantisRepositoryPanel extends javax.swing.JPanel {
-
+    
     /**
      * Creates new form MantisRepositoryPanel
      */
     public MantisRepositoryPanel() {
         initComponents();
+        
+        scheduleDateFieldCustom.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if(scheduleDateFieldCustom.isSelected()) {
+                    scheduleDateFieldCustomName.setEnabled(true);
+                } else {
+                    scheduleDateFieldCustomName.setEnabled(false);
+                }
+            }
+        });
+      
+        scheduleLengthFieldCustom.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if(scheduleLengthFieldCustom.isSelected()) {
+                    scheduleLengthFieldCustomName.setEnabled(true);
+                } else {
+                    scheduleLengthFieldCustomName.setEnabled(false);
+                }
+            }
+        });
     }
 
     /**
@@ -20,7 +47,10 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
+        scheduleDateButtonGroup = new javax.swing.ButtonGroup();
+        scheduleLengthButtonGroup = new javax.swing.ButtonGroup();
         nameLabel = new javax.swing.JLabel();
         urlLabel = new javax.swing.JLabel();
         usernameLabel = new javax.swing.JLabel();
@@ -31,6 +61,15 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
         checkResult = new javax.swing.JLabel();
         checkButton = new javax.swing.JButton();
         passwordTextField = new javax.swing.JPasswordField();
+        scheduleConfigPanel = new javax.swing.JPanel();
+        scheduleDateFieldLabel = new javax.swing.JLabel();
+        scheduleDateFieldBuiltIn = new javax.swing.JRadioButton();
+        scheduleDateFieldCustom = new javax.swing.JRadioButton();
+        scheduleDateFieldCustomName = new javax.swing.JTextField();
+        scheduleLengthFieldLabel = new javax.swing.JLabel();
+        scheduleLengthFieldBuiltIn = new javax.swing.JRadioButton();
+        scheduleLengthFieldCustom = new javax.swing.JRadioButton();
+        scheduleLengthFieldCustomName = new javax.swing.JTextField();
 
         nameLabel.setText("Name:");
 
@@ -71,31 +110,111 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
             }
         });
 
+        scheduleConfigPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Schedule"));
+        scheduleConfigPanel.setLayout(new java.awt.GridBagLayout());
+
+        scheduleDateFieldLabel.setText("Date-Field:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        scheduleConfigPanel.add(scheduleDateFieldLabel, gridBagConstraints);
+
+        scheduleDateButtonGroup.add(scheduleDateFieldBuiltIn);
+        scheduleDateFieldBuiltIn.setSelected(true);
+        scheduleDateFieldBuiltIn.setText("built-in");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        scheduleConfigPanel.add(scheduleDateFieldBuiltIn, gridBagConstraints);
+
+        scheduleDateButtonGroup.add(scheduleDateFieldCustom);
+        scheduleDateFieldCustom.setText("Custom-Field:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        scheduleConfigPanel.add(scheduleDateFieldCustom, gridBagConstraints);
+
+        scheduleDateFieldCustomName.setColumns(20);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        scheduleConfigPanel.add(scheduleDateFieldCustomName, gridBagConstraints);
+
+        scheduleLengthFieldLabel.setText("Length-Field:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        scheduleConfigPanel.add(scheduleLengthFieldLabel, gridBagConstraints);
+
+        scheduleLengthButtonGroup.add(scheduleLengthFieldBuiltIn);
+        scheduleLengthFieldBuiltIn.setSelected(true);
+        scheduleLengthFieldBuiltIn.setText("built-in");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        scheduleConfigPanel.add(scheduleLengthFieldBuiltIn, gridBagConstraints);
+
+        scheduleLengthButtonGroup.add(scheduleLengthFieldCustom);
+        scheduleLengthFieldCustom.setText("Custom-Field:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        scheduleConfigPanel.add(scheduleLengthFieldCustom, gridBagConstraints);
+
+        scheduleLengthFieldCustomName.setColumns(20);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        scheduleConfigPanel.add(scheduleLengthFieldCustomName, gridBagConstraints);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(urlLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(nameLabel)
-                    .addComponent(usernameLabel)
-                    .addComponent(passwordLabel)
-                    .addComponent(checkButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(3, 3, 3)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(urlTextField)
-                    .addComponent(usernameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
-                    .addComponent(nameTextField)
-                    .addComponent(checkResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(passwordTextField))
-                .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(urlLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(nameLabel)
+                            .addComponent(usernameLabel)
+                            .addComponent(passwordLabel)
+                            .addComponent(checkButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(36, 36, 36)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(urlTextField)
+                            .addComponent(usernameTextField)
+                            .addComponent(nameTextField)
+                            .addComponent(checkResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(passwordTextField)))
+                    .addComponent(scheduleConfigPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(3, 3, 3))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(nameLabel)
                     .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -115,7 +234,8 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(checkButton)
                     .addComponent(checkResult))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scheduleConfigPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -126,6 +246,7 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
             ((TextComponent) evt.getComponent()).selectAll();
         }
     }//GEN-LAST:event_selectAllOnFocusGain
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     javax.swing.JButton checkButton;
     javax.swing.JLabel checkResult;
@@ -133,6 +254,17 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
     javax.swing.JTextField nameTextField;
     javax.swing.JLabel passwordLabel;
     javax.swing.JPasswordField passwordTextField;
+    javax.swing.JPanel scheduleConfigPanel;
+    private javax.swing.ButtonGroup scheduleDateButtonGroup;
+    javax.swing.JRadioButton scheduleDateFieldBuiltIn;
+    javax.swing.JRadioButton scheduleDateFieldCustom;
+    javax.swing.JTextField scheduleDateFieldCustomName;
+    javax.swing.JLabel scheduleDateFieldLabel;
+    private javax.swing.ButtonGroup scheduleLengthButtonGroup;
+    javax.swing.JRadioButton scheduleLengthFieldBuiltIn;
+    javax.swing.JRadioButton scheduleLengthFieldCustom;
+    javax.swing.JTextField scheduleLengthFieldCustomName;
+    javax.swing.JLabel scheduleLengthFieldLabel;
     javax.swing.JLabel urlLabel;
     javax.swing.JTextField urlTextField;
     javax.swing.JLabel usernameLabel;

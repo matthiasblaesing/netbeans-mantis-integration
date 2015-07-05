@@ -6,7 +6,6 @@ import eu.doppel_helix.netbeans.mantisintegration.data.Version;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -96,6 +95,20 @@ public class MantisRepositoryController implements RepositoryController, Documen
             panel.urlTextField.setText(ri.getUrl());
             panel.usernameTextField.setText(ri.getUsername());
             panel.passwordTextField.setText(new String(ri.getPassword()));
+            if(ri.getValue(MantisRepository.PROP_SCHEDULE_DATE_FIELD) != null) {
+                panel.scheduleDateFieldCustom.setSelected(true);
+                panel.scheduleDateFieldCustomName.setText(ri.getValue(MantisRepository.PROP_SCHEDULE_DATE_FIELD));
+            } else {
+                panel.scheduleDateFieldBuiltIn.setSelected(true);
+                panel.scheduleDateFieldCustomName.setText("");
+            }
+            if(ri.getValue(MantisRepository.PROP_SCHEDULE_LENGTH_FIELD) != null) {
+                panel.scheduleLengthFieldCustom.setSelected(true);
+                panel.scheduleLengthFieldCustomName.setText(ri.getValue(MantisRepository.PROP_SCHEDULE_LENGTH_FIELD));
+            } else {
+                panel.scheduleLengthFieldBuiltIn.setSelected(true);
+                panel.scheduleLengthFieldCustomName.setText("");
+            }
         }
     }
 
@@ -206,6 +219,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
 
     @Override
     public void cancelChanges() {
+        this.populate();
     }
 
     @Override
@@ -224,6 +238,14 @@ public class MantisRepositoryController implements RepositoryController, Documen
             id = MantisConnector.ID + System.currentTimeMillis();
         }
         ri = new RepositoryInfo(id, MantisConnector.ID, url, name, "", username, "", password.toCharArray(), "".toCharArray());
+        if (panel.scheduleDateFieldCustom.isSelected()) {
+            ri.putValue(MantisRepository.PROP_SCHEDULE_DATE_FIELD, 
+                    panel.scheduleDateFieldCustomName.getText());
+        }
+        if (panel.scheduleLengthFieldCustom.isSelected()) {
+           ri.putValue(MantisRepository.PROP_SCHEDULE_LENGTH_FIELD, 
+                    panel.scheduleLengthFieldCustomName.getText());
+        }
         repository.setInfo(ri);
     }
     
