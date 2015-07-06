@@ -157,6 +157,7 @@
             <TitledBorder title="Schedule"/>
           </Border>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;MantisIntegration has an integrated schedule handling,&lt;br&gt;&#xa;by specifying a custom field the schedule information can&lt;br&gt;&#xa;be published/read to/from to the bugtracker."/>
       </Properties>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout"/>
@@ -164,6 +165,7 @@
         <Component class="javax.swing.JLabel" name="scheduleDateFieldLabel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Date-Field:"/>
+            <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Where should date part of schedule be saved to/read from?&lt;br&gt;&#xa;Field needs to be a calendar type."/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -201,6 +203,10 @@
         <Component class="javax.swing.JTextField" name="scheduleDateFieldCustomName">
           <Properties>
             <Property name="columns" type="int" value="20"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection component="scheduleDateFieldLabel" name="toolTipText" type="property"/>
+            </Property>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -211,6 +217,7 @@
         <Component class="javax.swing.JLabel" name="scheduleLengthFieldLabel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Length-Field:"/>
+            <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Where should length part of schedule be saved to/read from?&lt;br&gt;&#xa;Field needs to be a number type and may only contain integer values."/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -248,6 +255,10 @@
         <Component class="javax.swing.JTextField" name="scheduleLengthFieldCustomName">
           <Properties>
             <Property name="columns" type="int" value="20"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection component="scheduleLengthFieldLabel" name="toolTipText" type="property"/>
+            </Property>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">

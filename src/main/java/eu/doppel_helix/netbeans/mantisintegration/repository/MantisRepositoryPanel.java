@@ -111,9 +111,11 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
         });
 
         scheduleConfigPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Schedule"));
+        scheduleConfigPanel.setToolTipText("<html>\nMantisIntegration has an integrated schedule handling,<br>\nby specifying a custom field the schedule information can<br>\nbe published/read to/from to the bugtracker.");
         scheduleConfigPanel.setLayout(new java.awt.GridBagLayout());
 
         scheduleDateFieldLabel.setText("Date-Field:");
+        scheduleDateFieldLabel.setToolTipText("<html>\nWhere should date part of schedule be saved to/read from?<br>\nField needs to be a calendar type.");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -141,6 +143,8 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
         scheduleConfigPanel.add(scheduleDateFieldCustom, gridBagConstraints);
 
         scheduleDateFieldCustomName.setColumns(20);
+        scheduleDateFieldCustomName.setToolTipText(scheduleDateFieldLabel.getToolTipText());
+        scheduleDateFieldCustomName.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -151,6 +155,7 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
         scheduleConfigPanel.add(scheduleDateFieldCustomName, gridBagConstraints);
 
         scheduleLengthFieldLabel.setText("Length-Field:");
+        scheduleLengthFieldLabel.setToolTipText("<html>\nWhere should length part of schedule be saved to/read from?<br>\nField needs to be a number type and may only contain integer values.");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -178,6 +183,8 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
         scheduleConfigPanel.add(scheduleLengthFieldCustom, gridBagConstraints);
 
         scheduleLengthFieldCustomName.setColumns(20);
+        scheduleLengthFieldCustomName.setToolTipText(scheduleLengthFieldLabel.getToolTipText());
+        scheduleLengthFieldCustomName.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
