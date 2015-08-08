@@ -6,6 +6,10 @@ import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -16,6 +20,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * @author matthias
  */
 @XmlRootElement(name = "mantisQuery")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class MantisQueryXml {
     @XmlAttribute
     private static int version = 1;
@@ -34,7 +39,9 @@ public class MantisQueryXml {
     private Date lastUpdateAfter;
     private Date lastUpdateBefore;
     private String summaryFilter;
+    @XmlJavaTypeAdapter(MantisQueryCombinationAdapter.class)
     private MantisQuery.Combination combination;
+    private Set<String> matchingIssues = new HashSet<>();
 
     public MantisQueryXml() {
     }
@@ -56,6 +63,8 @@ public class MantisQueryXml {
         this.lastUpdateBefore = mq.getLastUpdateBefore();
         this.summaryFilter = mq.getSummaryFilter();
         this.combination = mq.getCombination();
+        this.matchingIssues.clear();
+        this.matchingIssues.addAll(mq.getMatchingIds());
     }
     
     public void toMantisQuery(MantisQuery target) {
@@ -75,6 +84,8 @@ public class MantisQueryXml {
         target.setLastUpdateBefore(this.lastUpdateBefore);
         target.setSummaryFilter(this.summaryFilter);
         target.setCombination(this.combination);
+        target.getMatchingIds().clear();
+        target.getMatchingIds().addAll(matchingIssues);
     }
 
     public String getId() {
@@ -197,13 +208,16 @@ public class MantisQueryXml {
         this.summaryFilter = summaryFilter;
     }
 
-    @XmlJavaTypeAdapter(MantisQueryCombinationAdapter.class)
     public MantisQuery.Combination getCombination() {
         return combination;
     }
 
     public void setCombination(MantisQuery.Combination combination) {
         this.combination = combination;
+    }
+
+    public Set<String> getMatchingIssues() {
+        return matchingIssues;
     }
 
     @Override

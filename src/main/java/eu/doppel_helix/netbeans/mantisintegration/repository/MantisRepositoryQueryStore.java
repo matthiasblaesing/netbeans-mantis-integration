@@ -129,7 +129,7 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
         return result;
     }
 
-    public synchronized void saveMantisQuery(final MantisQuery mq) {
+    public synchronized void saveMantisQuery(final MantisQuery mq, final boolean createIfNotExists) {
         openIssues.put(mq.getId(), new WeakReference<>(mq));
         try {
             getStorage().getFileSystem().runAtomicAction(new FileSystem.AtomicAction() {
@@ -137,7 +137,11 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
                 public void run() throws IOException {
                     FileObject targetFile = backingFileMap.get(mq.getId());
                     if (targetFile == null) {
-                        targetFile = storage.createData(mq.getId(), "xml");
+                        if(createIfNotExists) {
+                            targetFile = storage.createData(mq.getId(), "xml");
+                        } else {
+                            return;
+                        }
                     }
                     try (OutputStream os = targetFile.getOutputStream()) {
                         Marshaller marshaller = jaxbContext.createMarshaller();

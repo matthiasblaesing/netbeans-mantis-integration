@@ -10,7 +10,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.math.BigInteger;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -49,7 +48,7 @@ public class MantisQuery {
     private Date lastUpdateBefore;
     private String summaryFilter;
     private Combination combination = Combination.ALL;
-    private final List<String> matchingIds = new ArrayList<>();
+    private final Set<String> matchingIds = new HashSet<>();
     private Integer busy = 0;
     private boolean saved = false;
     private final SafeAutocloseable busyHelper = new SafeAutocloseable() {
@@ -97,7 +96,7 @@ public class MantisQuery {
     }
     
     public void save() {
-        mr.saveQuery(this);
+        mr.saveQuery(this, true);
         setSaved(true);
     }
     
@@ -108,6 +107,15 @@ public class MantisQuery {
 
     public Collection<MantisIssue> getIssues() throws ServiceException, RemoteException {
         return mr.getIssues(true, matchingIds.toArray(new String[matchingIds.size()]));
+    }
+    
+    /**
+     * DO NOT USE THIS! It is only here for serialization!
+     * 
+     * @return 
+     */
+    public Set<String> getMatchingIds() {
+        return matchingIds;
     }
 
     public boolean contains(String id) {
@@ -120,11 +128,15 @@ public class MantisQuery {
                 issueContainer.refreshingStarted();
             }
 
-            Set<String> oldList = new HashSet<>(matchingIds);
             matchingIds.clear();
             for (MantisIssue mi : mr.findIssues(this)) {
                 matchingIds.add(mi.getIdAsString());
             }
+            
+            if(isSaved()) {
+                mr.saveQuery(this, false);
+            }
+            
             // Assumption: this is called off the EDT and should do the heavy
             // lifting, while getIssues is called on the EDT and needs to be
             // lightweight

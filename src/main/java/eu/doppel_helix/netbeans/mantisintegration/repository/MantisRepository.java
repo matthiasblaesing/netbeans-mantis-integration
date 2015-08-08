@@ -304,8 +304,8 @@ public class MantisRepository {
         return queryStore.getMantisQuery(id);
     }
     
-    public void saveQuery(MantisQuery mq) {
-        queryStore.saveMantisQuery(mq);
+    public void saveQuery(MantisQuery mq, boolean createIfNotExists) {
+        queryStore.saveMantisQuery(mq, createIfNotExists);
     }
    
     public MantisIssue createIssue() {
