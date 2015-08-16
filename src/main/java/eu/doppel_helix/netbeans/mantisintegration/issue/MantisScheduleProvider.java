@@ -14,9 +14,8 @@ import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.IssueScheduleInfo;
 import org.netbeans.modules.bugtracking.spi.IssueScheduleProvider;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
-import org.openide.util.Exceptions;
 
-public class MantisScheduleProvider implements IssueScheduleProvider<MantisIssue>{
+public class MantisScheduleProvider implements IssueScheduleProvider<MantisIssue> {
     private static final Logger LOG = Logger.getLogger(MantisScheduleProvider.class.getName());
     
     @Override

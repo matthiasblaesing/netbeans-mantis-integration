@@ -12,18 +12,13 @@ public class IssueInfo implements Cloneable {
     private BigInteger id;
     private Date scheduleDate;
     private int scheduleLength;
+    private Date readState;
 
     public IssueInfo() {
     }
 
     public IssueInfo(BigInteger id) {
         this.id = id;
-    }
-    
-    public IssueInfo(BigInteger id, Date scheduleDate, int scheduleLength) {
-        this.id = id;
-        this.scheduleDate = scheduleDate;
-        this.scheduleLength = scheduleLength;
     }
 
     @XmlSchemaType(name = "date")
@@ -43,6 +38,14 @@ public class IssueInfo implements Cloneable {
         this.scheduleLength = scheduleLength;
     }
 
+    public Date getReadState() {
+        return readState;
+    }
+
+    public void setReadState(Date readState) {
+        this.readState = readState;
+    }
+    
     @XmlAttribute
     public BigInteger getId() {
         return id;
@@ -54,7 +57,7 @@ public class IssueInfo implements Cloneable {
 
     @XmlTransient
     public boolean isEmpty() {
-        return scheduleLength == 0 && scheduleDate == null;
+        return scheduleLength == 0 && scheduleDate == null && readState == null;
     }
     
     @Override

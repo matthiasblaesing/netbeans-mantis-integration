@@ -29,7 +29,7 @@ import java.math.BigInteger;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
-import javax.swing.JTable;
+import javax.swing.JPopupMenu;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -38,6 +38,7 @@ public class MantisQueryPanel extends javax.swing.JPanel {
 
     private final Map<BigInteger, Color> colorMap = Mantis.getInstance().getStatusColorMap();
     private final QueryListModel queryListModel = new QueryListModel();
+    private JPopupMenu issuePopup;
     JComponent waitPanel;
 
     public QueryListModel getQueryListModel() {
@@ -46,6 +47,9 @@ public class MantisQueryPanel extends javax.swing.JPanel {
     
     public MantisQueryPanel() {
         initComponents();
+        
+        issuePopup = new JPopupMenu();
+        
         waitPanel = new BusyPanel();
         innerQuery.add(waitPanel, JLayeredPane.MODAL_LAYER);
         innerQuery.setLayout(new FullSizeLayout());
@@ -113,6 +117,7 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         issueTable.getTableHeader().setReorderingAllowed(false);
         issueTable.setColumnModel(tcm);
         issueTable.setColumnControlVisible(true);
+        issueTable.addHighlighter(new MantisReadStatusHighlighter());
     }
 
     /**

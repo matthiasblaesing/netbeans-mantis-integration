@@ -3,6 +3,8 @@ package eu.doppel_helix.netbeans.mantisintegration;
 
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssueProvider;
+import eu.doppel_helix.netbeans.mantisintegration.issue.MantisScheduleProvider;
+import eu.doppel_helix.netbeans.mantisintegration.issue.MantisStatusProvider;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQueryProvider;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
@@ -20,6 +22,8 @@ public class Mantis {
     private MantisRepositoryProvider mrp;
     private MantisQueryProvider mqp;
     private MantisIssueProvider mip; 
+    private MantisScheduleProvider msp;
+    private MantisStatusProvider statusProvider;
     private BugtrackingSupport<MantisRepository, MantisQuery, MantisIssue> bf;
     
     private Mantis() {}
@@ -50,6 +54,20 @@ public class Mantis {
             mrp = new MantisRepositoryProvider();
         }
         return mrp;
+    }
+    
+    public MantisScheduleProvider getScheduleProvider() {
+        if(msp == null) {
+            msp = new MantisScheduleProvider();
+        }
+        return msp;
+    }
+
+    public MantisStatusProvider getStatusProvider() {
+        if(statusProvider == null) {
+            statusProvider = new MantisStatusProvider();
+        }
+        return statusProvider;
     }
     
     public BugtrackingSupport<MantisRepository, MantisQuery, MantisIssue> getBugtrackingSupport() {

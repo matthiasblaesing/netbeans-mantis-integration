@@ -8,6 +8,7 @@ import biz.futureware.mantisconnect.IssueNoteData;
 import biz.futureware.mantisconnect.ObjectRef;
 import biz.futureware.mantisconnect.RelationshipData;
 import eu.doppel_helix.netbeans.mantisintegration.data.Permission;
+import eu.doppel_helix.netbeans.mantisintegration.issue.serialization.IssueInfo;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.util.SafeAutocloseable;
 import java.beans.PropertyChangeListener;
@@ -18,10 +19,12 @@ import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
+import org.netbeans.modules.bugtracking.spi.IssueStatusProvider;
 import org.openide.util.Mutex;
 
 public class MantisIssue {
@@ -601,5 +604,39 @@ public class MantisIssue {
         ObjectRef[] oldValue = issueData.getTags();
         issueData.setTags(tags);
         firePropertyChange("tags", oldValue, tags);
+    }
+    
+    public IssueStatusProvider.Status getReadStatus() {
+        Date readDate = getReadDate();
+        if (readDate == null) {
+            return IssueStatusProvider.Status.INCOMING_NEW;
+        } else if (getLast_updated().getTime().after(readDate)) {
+            return IssueStatusProvider.Status.INCOMING_MODIFIED;
+        } else {
+            return IssueStatusProvider.Status.SEEN;
+        }
+    }
+    
+    public Date getReadDate() {
+        IssueInfo ii = getMantisRepository().getIssueInfosHandler().getIssueInfo(getId());
+        if (ii == null) {
+            return null;
+        } else {
+            return ii.getReadState();
+        }
+    }
+
+    public void setRead(boolean read) {
+        IssueInfo ii = getMantisRepository().getIssueInfosHandler().getIssueInfo(getId());
+        if (ii == null) {
+            ii = new IssueInfo(getId());
+        }
+        if (read) {
+            ii.setReadState(new Date());
+        } else {
+            ii.setReadState(null);
+        }
+        getMantisRepository().getIssueInfosHandler().putIssueInfo(ii);
+        firePropertyChange(IssueStatusProvider.EVENT_STATUS_CHANGED, null, null);
     }
 }

@@ -3,19 +3,37 @@ package eu.doppel_helix.netbeans.mantisintegration.query;
 
 import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import org.openide.util.WeakListeners;
 
-public class QueryListModel extends AbstractTableModel{
-
+public class QueryListModel extends AbstractTableModel implements PropertyChangeListener {
+    
     private List<MantisIssue> issues = new ArrayList<>();
+    private Map<BigInteger,PropertyChangeListener> listener = new HashMap<>();
 
     public void setIssues(Collection<MantisIssue> issues) {
+        assert SwingUtilities.isEventDispatchThread();
+        for(MantisIssue mi: this.issues) {
+            PropertyChangeListener pcl = listener.get(mi.getId());
+            if(pcl != null) {
+                mi.removePropertyChangeListener(pcl);
+            }
+        }
         this.issues = new ArrayList<>(issues);
+        for (MantisIssue mi : this.issues) {
+            PropertyChangeListener pcl = WeakListeners.propertyChange(this, mi);
+            mi.addPropertyChangeListener(pcl);
+        }
         fireTableDataChanged();
     }
     
@@ -30,7 +48,7 @@ public class QueryListModel extends AbstractTableModel{
 
     @Override
     public int getColumnCount() {
-        return 8;
+        return 9;
     }
 
     @Override
@@ -52,6 +70,8 @@ public class QueryListModel extends AbstractTableModel{
                 return Calendar.class;
             case 7:
                 return String.class;
+            case 8:
+                return MantisIssue.class;
             default:
                 return null;
         }
@@ -77,9 +97,16 @@ public class QueryListModel extends AbstractTableModel{
                 return mi.getLast_updated();
             case 7:
                 return mi.getSummary();
+            case 8:
+                return mi;
             default:
                 return null;
         }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        this.fireTableDataChanged();
     }
     
 }
