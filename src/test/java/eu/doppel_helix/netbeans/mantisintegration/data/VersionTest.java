@@ -24,7 +24,7 @@ public class VersionTest {
     public void testCorrectComparison() {
         Version v1 = new Version("1.20");
         Version v2 = new Version("1.3");
-        List<Version> versions = new ArrayList<Version>();
+        List<Version> versions = new ArrayList<>();
         versions.add(v1);
         versions.add(v2);
         Collections.sort(versions);

@@ -12,10 +12,8 @@ import javax.swing.text.DefaultCaret;
 
 public class NoteDisplay extends javax.swing.JPanel {
     private final static BigInteger privateVal = BigInteger.valueOf(50);
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-    private IssueNoteData noteData;
-    private boolean showTimeTrack = false;
-    private LayoutManager layout = new LayoutManager() {
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private final LayoutManager layout = new LayoutManager() {
 
         @Override
         public void addLayoutComponent(String name, Component comp) {
@@ -87,8 +85,6 @@ public class NoteDisplay extends javax.swing.JPanel {
     }
     
     public void setNoteData(IssueNoteData noteData, boolean showTimeTrack) {
-        this.showTimeTrack = showTimeTrack;
-        this.noteData = noteData;
         reporterLabel.setText(noteData.getReporter().getName());
         submitDateLabel.setText(sdf.format(noteData.getDate_submitted().getTime()));
         if(noteData.getLast_modified() != null) {

@@ -236,7 +236,7 @@ public class Capabilities {
                     trackTimeGlobal = Permission.NONE;
                 }
                 return trackTimeGlobal;
-            } catch (Exception ex) {
+            } catch (ServiceException | RemoteException ex) {
                 logger.log(Level.INFO, "Failed to retrieve accesslevel for user", ex);
                 userIsUpdater = null;
             }

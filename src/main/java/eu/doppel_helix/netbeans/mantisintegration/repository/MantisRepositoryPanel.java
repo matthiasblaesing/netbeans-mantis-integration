@@ -1,7 +1,6 @@
 package eu.doppel_helix.netbeans.mantisintegration.repository;
 
 import java.awt.TextComponent;
-import javax.swing.ButtonGroup;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;

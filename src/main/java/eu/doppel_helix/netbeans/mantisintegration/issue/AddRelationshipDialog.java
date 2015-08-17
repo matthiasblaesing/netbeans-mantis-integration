@@ -3,14 +3,15 @@ package eu.doppel_helix.netbeans.mantisintegration.issue;
 import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ObjectRefListCellRenderer;
-import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigInteger;
+import java.rmi.RemoteException;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.xml.rpc.ServiceException;
 
 public class AddRelationshipDialog extends javax.swing.JDialog {
     private static final Logger LOG = Logger.getLogger(AddRelationshipDialog.class.getName());
@@ -65,7 +66,7 @@ public class AddRelationshipDialog extends javax.swing.JDialog {
                     public void run() {
                         try {
                             issue.addRelationship((ObjectRef) typeComboBox.getSelectedItem(), new BigInteger(idTextField.getText()));
-                        } catch (Exception ex) {
+                        } catch (ServiceException | RemoteException | RuntimeException ex) {
                             issue.getMantisRepository()
                                     .getExceptionHandler()
                                     .handleException(LOG, "Failed add relationship to issue", ex);

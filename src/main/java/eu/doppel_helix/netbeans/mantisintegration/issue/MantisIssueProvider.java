@@ -3,8 +3,10 @@ package eu.doppel_helix.netbeans.mantisintegration.issue;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.logging.Logger;
+import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.IssueController;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
 
@@ -57,7 +59,7 @@ public class MantisIssueProvider implements IssueProvider<MantisIssue> {
     public void addComment(MantisIssue data, String comment, boolean closeAsFixed) {
         try {
             data.addComment(comment, closeAsFixed);
-        } catch (Exception ex) {
+        } catch (ServiceException | RemoteException | RuntimeException ex) {
             data.getMantisRepository()
                     .getExceptionHandler()
                     .handleException(LOG, "Failed to add comment to issue", ex);

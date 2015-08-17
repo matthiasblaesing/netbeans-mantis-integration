@@ -19,7 +19,7 @@ import org.openide.util.WeakListeners;
 public class QueryListModel extends AbstractTableModel implements PropertyChangeListener {
     
     private List<MantisIssue> issues = new ArrayList<>();
-    private Map<BigInteger,PropertyChangeListener> listener = new HashMap<>();
+    private final Map<BigInteger,PropertyChangeListener> listener = new HashMap<>();
 
     public void setIssues(Collection<MantisIssue> issues) {
         assert SwingUtilities.isEventDispatchThread();

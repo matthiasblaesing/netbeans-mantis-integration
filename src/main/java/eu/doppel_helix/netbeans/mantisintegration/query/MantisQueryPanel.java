@@ -38,7 +38,7 @@ public class MantisQueryPanel extends javax.swing.JPanel {
 
     private final Map<BigInteger, Color> colorMap = Mantis.getInstance().getStatusColorMap();
     private final QueryListModel queryListModel = new QueryListModel();
-    private JPopupMenu issuePopup;
+    private final JPopupMenu issuePopup;
     JComponent waitPanel;
 
     public QueryListModel getQueryListModel() {

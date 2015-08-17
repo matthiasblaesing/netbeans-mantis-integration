@@ -15,7 +15,6 @@
  */
 package eu.doppel_helix.netbeans.mantisintegration.issue;
 
-import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.Mantis;
 import eu.doppel_helix.netbeans.mantisintegration.swing.AccountDataListCellRenderer;
 import eu.doppel_helix.netbeans.mantisintegration.swing.BusyPanel;
@@ -36,8 +35,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.LayoutManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.math.BigInteger;
 import java.util.ArrayList;

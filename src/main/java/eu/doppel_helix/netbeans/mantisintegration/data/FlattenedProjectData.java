@@ -61,7 +61,7 @@ public class FlattenedProjectData {
      * Flatten the supplied ProjectData and Subprojects
      */
     public static List<FlattenedProjectData> buildList(ProjectData pd) {
-        List<FlattenedProjectData> result = new ArrayList<FlattenedProjectData>();
+        List<FlattenedProjectData> result = new ArrayList<>();
         buildList(pd, 0, result);
         return result;
     }

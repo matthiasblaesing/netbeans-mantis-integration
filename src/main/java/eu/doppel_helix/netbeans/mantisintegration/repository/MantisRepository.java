@@ -50,7 +50,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import javax.swing.SwingUtilities;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
@@ -247,7 +246,7 @@ public class MantisRepository {
     
     public Collection<MantisIssue> simpleSearch(String criteria) throws ServiceException, RemoteException {
         int pageSize = 1000;
-        List<MantisIssue> result = new ArrayList<MantisIssue>();
+        List<MantisIssue> result = new ArrayList<>();
 
         try {
             BigInteger possibleId = new BigInteger(criteria);
@@ -266,7 +265,7 @@ public class MantisRepository {
             }
 
             MantisConnectPortType mcpt = getClient();
-            List<BigInteger> matchingIds = new ArrayList<BigInteger>();
+            List<BigInteger> matchingIds = new ArrayList<>();
             OUTER:
             for (BigInteger projectID : projects.keySet()) {
                 for (int i = 0; i < 1000; i++) {
@@ -615,7 +614,7 @@ public class MantisRepository {
     private void initProjectList() throws ServiceException, RemoteException {
         if (projects == null) {
             MantisConnectPortType mcpt = getClient();
-            projects = new HashMap<BigInteger, ProjectData>();
+            projects = new HashMap<>();
             ProjectData[] projectList = mcpt.mc_projects_get_user_accessible(
                     info.getUsername(),
                     new String(info.getPassword()));
@@ -641,7 +640,7 @@ public class MantisRepository {
         if (result == null) {
             MantisConnectPortType mcpt = getClient();
             if (BigInteger.ZERO.equals(projectID)) {
-                TreeSet<String> categoriesSet = new TreeSet<String>();
+                TreeSet<String> categoriesSet = new TreeSet<>();
                 for (ProjectData pd : getProjects()) {
                     String[] projCategories = mcpt.mc_project_get_categories(
                             info.getUsername(),
@@ -723,7 +722,7 @@ public class MantisRepository {
     public List<MantisIssue> findIssues(MantisQuery mq) throws ServiceException, RemoteException  {
         BigInteger PAGE_SIZE = BigInteger.valueOf(500);
         MantisConnectPortType mcpt = getClient();
-        Set<BigInteger> matchingIds = new HashSet<BigInteger>();
+        Set<BigInteger> matchingIds = new HashSet<>();
         if (mq.getServersideFilterId() != null) {
             for (int i = 0; i < 1000; i++) {
                 IssueHeaderData[] ids = mcpt.mc_filter_get_issue_headers(
@@ -774,7 +773,7 @@ public class MantisRepository {
             tags = null;
         }
         if (tags == null) {
-            tags = new HashMap<BigInteger, TagData>();
+            tags = new HashMap<>();
             MantisConnectPortType mcpt = getClient();
             BigInteger PAGE_SIZE = BigInteger.valueOf(1000);
             for (int i = 0; i < 1000; i++) {
@@ -797,7 +796,7 @@ public class MantisRepository {
         initTags(false);
         MantisConnectPortType mcpt = getClient();
         ObjectRef[] oldList = issue.getTags();
-        List<TagData> newList = new ArrayList<TagData>();
+        List<TagData> newList = new ArrayList<>();
         if (oldList != null) {
             for (ObjectRef or : oldList) {
                 newList.add(tags.get(or.getId()));
@@ -844,12 +843,12 @@ public class MantisRepository {
 
     public void removeTag(MantisIssue issue, ObjectRef... tagsToBeRemoved) throws ServiceException, RemoteException  {
         initTags(false);
-        List<BigInteger> toBeRemoved = new ArrayList<BigInteger>();
+        List<BigInteger> toBeRemoved = new ArrayList<>();
         for (ObjectRef tag : tagsToBeRemoved) {
             toBeRemoved.add(tag.getId());
         }
         ObjectRef[] oldList = issue.getTags();
-        List<TagData> newList = new ArrayList<TagData>();
+        List<TagData> newList = new ArrayList<>();
         if (oldList != null) {
             for (ObjectRef or : oldList) {
                 if (!toBeRemoved.contains(or.getId())) {
@@ -872,7 +871,7 @@ public class MantisRepository {
 
     public List<TagData> getTags() throws ServiceException, RemoteException  {
         initTags(false);
-        return new ArrayList<TagData>(tags.values());
+        return new ArrayList<>(tags.values());
     }
 
     public Capabilities getCapabilities() {
@@ -985,13 +984,13 @@ public class MantisRepository {
 
     private static byte[] fileGetContents(File f) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        FileInputStream fis = new FileInputStream(f);
-        int read = 0;
-        byte[] buffer = new byte[1024];
-        while ((read = fis.read(buffer)) > 0) {
-            baos.write(buffer, 0, read);
+        try (FileInputStream fis = new FileInputStream(f)) {
+            int read = 0;
+            byte[] buffer = new byte[1024];
+            while ((read = fis.read(buffer)) > 0) {
+                baos.write(buffer, 0, read);
+            }
         }
-        fis.close();
         return baos.toByteArray();
     }
 

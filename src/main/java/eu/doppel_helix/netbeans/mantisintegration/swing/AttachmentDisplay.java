@@ -4,15 +4,18 @@ package eu.doppel_helix.netbeans.mantisintegration.swing;
 import biz.futureware.mantisconnect.AttachmentData;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.xml.rpc.ServiceException;
 import org.jdesktop.swingx.JXHyperlink;
 import org.openide.util.Exceptions;
 
@@ -103,7 +106,7 @@ public class AttachmentDisplay extends DelegatingBaseLineJPanel implements Actio
                         }
                     }
                 }
-            } catch (Exception ex) {
+            } catch (ServiceException | RemoteException | RuntimeException ex) {
                 mr.getExceptionHandler()
                         .handleException(LOG, "Failed to retrieve attachment from issue", ex);
             }

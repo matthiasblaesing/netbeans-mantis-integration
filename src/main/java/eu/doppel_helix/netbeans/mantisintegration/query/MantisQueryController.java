@@ -7,7 +7,6 @@ import biz.futureware.mantisconnect.ProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.Mantis;
 import eu.doppel_helix.netbeans.mantisintegration.data.FlattenedProjectData;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
-import eu.doppel_helix.netbeans.mantisintegration.issue.MantisScheduleProvider;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisStatusProvider;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import eu.doppel_helix.netbeans.mantisintegration.swing.ListBackedComboBoxModel;
@@ -21,6 +20,7 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigInteger;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
+import javax.xml.rpc.ServiceException;
 import javax.xml.ws.Holder;
 import org.netbeans.modules.bugtracking.spi.IssueStatusProvider;
 import org.netbeans.modules.bugtracking.spi.QueryController;
@@ -203,6 +204,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
         this.mr = mq.getMantisRepository();
 
         Runnable initializer = new Runnable() {
+            @Override
             public void run() {
                 try (SafeAutocloseable ac = mq.busy()) {
                     final FilterData[] filter = mr.getFilters(mq.getProjectId());
@@ -318,8 +320,9 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
         }
     }
 
-    private Runnable updateProjectDependendLists = new Runnable() {
+    private final Runnable updateProjectDependendLists = new Runnable() {
         // @todo: also update the other lists that are project dependend
+        @Override
         public void run() {
             try (SafeAutocloseable saf = mq.busy()) {
                 FlattenedProjectData selected = Mutex.EVENT.writeAccess(
@@ -366,103 +369,103 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (COMMAND_OPEN_ISSUE.equals(e.getActionCommand())) {
-            gotoIssue();
-        } else if (COMMAND_SELECT_PROJECT1.equals(e.getActionCommand())) {
-            mr.getRequestProcessor().execute(updateProjectDependendLists);
-        } else if (COMMAND_SAVE_QUERY.equals(e.getActionCommand())) {
-            if (mq.getName() == null || mq.getName().isEmpty()) {
-                NotifyDescriptor.InputLine nd = new NotifyDescriptor.InputLine(
-                        "Name", "Save query");
-                DialogDisplayer.getDefault().notify(nd);
-                mq.setName((String) nd.getInputText());
-            }
-            new SwingWorker<Collection<MantisIssue>, Object>() {
-                @Override
-                protected Collection<MantisIssue> doInBackground() throws Exception {
-                    try (SafeAutocloseable ac = mq.busy()) {
-                        mq.save();
-                        mq.refresh();
-                        return mq.getIssues();
+        if (null != e.getActionCommand()) switch (e.getActionCommand()) {
+            case COMMAND_OPEN_ISSUE:
+                gotoIssue();
+                break;
+            case COMMAND_SELECT_PROJECT1:
+                mr.getRequestProcessor().execute(updateProjectDependendLists);
+                break;
+            case COMMAND_SAVE_QUERY:
+                if (mq.getName() == null || mq.getName().isEmpty()) {
+                    NotifyDescriptor.InputLine nd = new NotifyDescriptor.InputLine(
+                            "Name", "Save query");
+                    DialogDisplayer.getDefault().notify(nd);
+                    mq.setName((String) nd.getInputText());
+                }   new SwingWorker<Collection<MantisIssue>, Object>() {
+                    @Override
+                    protected Collection<MantisIssue> doInBackground() throws Exception {
+                        try (SafeAutocloseable ac = mq.busy()) {
+                            mq.save();
+                            mq.refresh();
+                            return mq.getIssues();
+                        }
                     }
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        getComponent(QueryMode.VIEW).getQueryListModel().setIssues(get());
-                    } catch (InterruptedException | ExecutionException ex) {
-                        logger.log(Level.WARNING, "Failed to save query", ex);
+                    
+                    @Override
+                    protected void done() {
+                        try {
+                            getComponent(QueryMode.VIEW).getQueryListModel().setIssues(get());
+                        } catch (InterruptedException | ExecutionException ex) {
+                            logger.log(Level.WARNING, "Failed to save query", ex);
+                        }
                     }
-                }
-            }.execute();
-        } else if (COMMAND_DELETE_QUERY.equals(e.getActionCommand())) {
-            new SwingWorker() {
-                @Override
-                protected Object doInBackground() throws Exception {
-                    mq.remove();
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        get();
-                    } catch (InterruptedException | ExecutionException ex) {
-                        logger.log(Level.WARNING, "Failed to delete query", ex);
+                }.execute();
+                break;
+            case COMMAND_DELETE_QUERY:
+                new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        mq.remove();
+                        return null;
                     }
-                }
-            }.execute();
-        } else if (COMMAND_EXECUTE_QUERY.equals(e.getActionCommand())) {
-            if (projectModel1.getSelectedItem() != null) {
-                mq.setProjectId(
-                        ((FlattenedProjectData) projectModel1.getSelectedItem()).getProjectData().getId());
-            } else {
-                mq.setProjectId(null);
-            }
-            if (filterModel1.getSelectedItem() != null) {
-                mq.setServersideFilterId(
-                        ((FilterData) filterModel1.getSelectedItem()).getId());
-            } else {
-                mq.setServersideFilterId(null);
-            }
-            mq.setReporter((AccountData) reporterModel.getSelectedItem());
-            mq.setAssignedTo((AccountData) assignedToModel.getSelectedItem());
-            mq.setCategory((String) categoryModel.getSelectedItem());
-            mq.setSeverity((ObjectRef) severityModel.getSelectedItem());
-            mq.setResolution((ObjectRef) resolutionModel.getSelectedItem());
-            mq.setStatus((ObjectRef) statusModel.getSelectedItem());
-            mq.setPriority((ObjectRef) priorityModel.getSelectedItem());
-            mq.setViewStatus((ObjectRef) viewstatusModel.getSelectedItem());
-            mq.setLastUpdateAfter(mqp.lastUpdateAfterDatePicker.getDate());
-            mq.setLastUpdateBefore(mqp.lastUpdateBeforeDatePicker.getDate());
-            if (mqp.matchTypeComboBox.getSelectedIndex() == 1) {
-                mq.setCombination(MantisQuery.Combination.ANY);
-            } else {
-                mq.setCombination(MantisQuery.Combination.ALL);
-            }
-            mq.setSummaryFilter(mqp.summaryTextField.getText());
-
-            SwingWorker sw = new SwingWorker<Collection<MantisIssue>,Object>() {
-                @Override
-                protected Collection<MantisIssue> doInBackground() throws Exception {
-                    try (SafeAutocloseable ac = mq.busy()) {
-                        mq.refresh();
-                        return mq.getIssues();
+                    
+                    @Override
+                    protected void done() {
+                        try {
+                            get();
+                        } catch (InterruptedException | ExecutionException ex) {
+                            logger.log(Level.WARNING, "Failed to delete query", ex);
+                        }
                     }
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        getComponent(QueryMode.VIEW).getQueryListModel().setIssues(get());
-                    } catch (InterruptedException | ExecutionException ex) {
-                        Exceptions.printStackTrace(ex);
+                }.execute();
+                break;
+            case COMMAND_EXECUTE_QUERY:
+                if (projectModel1.getSelectedItem() != null) {
+                    mq.setProjectId(
+                            ((FlattenedProjectData) projectModel1.getSelectedItem()).getProjectData().getId());
+                } else {
+                    mq.setProjectId(null);
+                }   if (filterModel1.getSelectedItem() != null) {
+                    mq.setServersideFilterId(
+                            ((FilterData) filterModel1.getSelectedItem()).getId());
+                } else {
+                    mq.setServersideFilterId(null);
+                }   mq.setReporter((AccountData) reporterModel.getSelectedItem());
+                mq.setAssignedTo((AccountData) assignedToModel.getSelectedItem());
+                mq.setCategory((String) categoryModel.getSelectedItem());
+                mq.setSeverity((ObjectRef) severityModel.getSelectedItem());
+                mq.setResolution((ObjectRef) resolutionModel.getSelectedItem());
+                mq.setStatus((ObjectRef) statusModel.getSelectedItem());
+                mq.setPriority((ObjectRef) priorityModel.getSelectedItem());
+                mq.setViewStatus((ObjectRef) viewstatusModel.getSelectedItem());
+                mq.setLastUpdateAfter(mqp.lastUpdateAfterDatePicker.getDate());
+                mq.setLastUpdateBefore(mqp.lastUpdateBeforeDatePicker.getDate());
+                if (mqp.matchTypeComboBox.getSelectedIndex() == 1) {
+                    mq.setCombination(MantisQuery.Combination.ANY);
+                } else {
+                    mq.setCombination(MantisQuery.Combination.ALL);
+                }   mq.setSummaryFilter(mqp.summaryTextField.getText());
+                SwingWorker sw = new SwingWorker<Collection<MantisIssue>,Object>() {
+                    @Override
+                    protected Collection<MantisIssue> doInBackground() throws Exception {
+                        try (SafeAutocloseable ac = mq.busy()) {
+                            mq.refresh();
+                            return mq.getIssues();
+                        }
                     }
-                }
-            };
-
-            sw.execute();
+                    
+                    @Override
+                    protected void done() {
+                        try {
+                            getComponent(QueryMode.VIEW).getQueryListModel().setIssues(get());
+                        } catch (InterruptedException | ExecutionException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+                    }
+                };  sw.execute();
+                break;
+            default:
         }
     }
 
@@ -478,7 +481,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
 
                     Mantis.getInstance().getBugtrackingSupport().openIssue(
                             mq.getMantisRepository(), mi);
-                } catch (Exception ex) {
+                } catch (ServiceException | RemoteException | RuntimeException ex) {
                     mq.getMantisRepository()
                             .getExceptionHandler()
                             .handleException(logger, "Failed to open issue", ex);
@@ -498,11 +501,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
 
     @Override
     public boolean providesMode(QueryMode mode) {
-        if (mode == QueryMode.EDIT) {
-            return true;
-        } else {
-            return false;
-        }
+        return mode == QueryMode.EDIT;
     }
 
     @Override

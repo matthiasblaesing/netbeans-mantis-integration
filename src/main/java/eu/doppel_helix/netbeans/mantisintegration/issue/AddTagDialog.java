@@ -4,6 +4,7 @@ import biz.futureware.mantisconnect.TagData;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -11,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingWorker;
+import javax.xml.rpc.ServiceException;
 
 public class AddTagDialog extends javax.swing.JDialog implements ActionListener {
     private final static Logger logger = Logger.getLogger(AddTagDialog.class.getName());
@@ -73,7 +75,7 @@ public class AddTagDialog extends javax.swing.JDialog implements ActionListener 
                     public void run() {
                         try {
                             issue.addTag(tags.toArray(new String[0]));
-                        } catch (Exception ex) {
+                        } catch (ServiceException | RemoteException | RuntimeException ex) {
                             mr.getExceptionHandler()
                                     .handleException(logger, "Failed to add tag to issue", ex);
                         }

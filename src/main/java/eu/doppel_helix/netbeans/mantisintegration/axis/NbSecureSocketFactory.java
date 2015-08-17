@@ -15,8 +15,6 @@
  */
 package eu.doppel_helix.netbeans.mantisintegration.axis;
 
-import org.apache.axis.utils.Messages;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.axis.utils.StringUtils;
 
 import javax.net.ssl.SSLSocket;
@@ -27,12 +25,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import static java.lang.Math.log;
-import java.net.Authenticator;
 import java.net.InetSocketAddress;
-import java.net.PasswordAuthentication;
 import java.net.Proxy;
-import java.net.Proxy.Type;
 import java.net.ProxySelector;
 import java.net.Socket;
 import java.net.URI;
@@ -98,63 +92,59 @@ public class NbSecureSocketFactory extends NbBaseSocketFactory implements Secure
             for (Proxy p : proxies) {
                 try {
                     Socket baseSocket = null;
-                    if (p.type() == Type.DIRECT) {
-                        baseSocket = new Socket();
-                        baseSocket.connect(new InetSocketAddress(host, port), timeout);
-                    } else if (p.type() == Type.SOCKS) {
-                        baseSocket = new Socket(p);
-                        baseSocket.connect(new InetSocketAddress(host, port), timeout);
-                    } else if (p.type() == Type.HTTP) {
-                        baseSocket = new Socket();
-                        baseSocket.connect(p.address());
-
-                        // The tunnel handshake method (condensed and made reflexive)
-                        OutputStream tunnelOutputStream = baseSocket.getOutputStream();
-                        PrintWriter out = new PrintWriter(
-                                new BufferedWriter(new OutputStreamWriter(tunnelOutputStream)));
-
-                        out.print("CONNECT " + host + ":" + port
-                                + " HTTP/1.0\r\n"
-                                + "User-Agent: AxisClient");
-                        String authorization = getAuthorizationHeader();
-                        if (!authorization.isEmpty()) {
-                            out.write("\n");
-                            out.write(authorization);
-                        }
-                        out.print("\nContent-Length: 0");
-                        out.print("\nPragma: no-cache");
-                        out.print("\r\n\r\n");
-                        out.flush();
-                        InputStream tunnelInputStream = baseSocket.getInputStream();
-
-                        String replyStr = "";
-
-                        // Make sure to read all the response from the proxy to prevent SSL negotiation failure
-                        // Response message terminated by two sequential newlines
-                        int newlinesSeen = 0;
-                        boolean headerDone = false;    /* Done on first newline */
-
-                        while (newlinesSeen < 2) {
-                            int i = tunnelInputStream.read();
-
-                            if (i < 0) {
-                                throw new IOException("Unexpected EOF from proxy");
-                            }
-                            if (i == '\n') {
-                                headerDone = true;
-                                ++newlinesSeen;
-                            } else if (i != '\r') {
-                                newlinesSeen = 0;
-                                if (!headerDone) {
-                                    replyStr += String.valueOf((char) i);
+                    if (null != p.type()) switch (p.type()) {
+                        case DIRECT:
+                            baseSocket = new Socket();
+                            baseSocket.connect(new InetSocketAddress(host, port), timeout);
+                            break;
+                        case SOCKS:
+                            baseSocket = new Socket(p);
+                            baseSocket.connect(new InetSocketAddress(host, port), timeout);
+                            break;
+                        case HTTP:
+                            baseSocket = new Socket();
+                            baseSocket.connect(p.address());
+                            // The tunnel handshake method (condensed and made reflexive)
+                            OutputStream tunnelOutputStream = baseSocket.getOutputStream();
+                            PrintWriter out = new PrintWriter(
+                                    new BufferedWriter(new OutputStreamWriter(tunnelOutputStream)));
+                            out.print("CONNECT " + host + ":" + port
+                                    + " HTTP/1.0\r\n"
+                                    + "User-Agent: AxisClient");
+                            String authorization = getAuthorizationHeader();
+                            if (!authorization.isEmpty()) {
+                                out.write("\n");
+                                out.write(authorization);
+                            }   out.print("\nContent-Length: 0");
+                            out.print("\nPragma: no-cache");
+                            out.print("\r\n\r\n");
+                            out.flush();
+                            InputStream tunnelInputStream = baseSocket.getInputStream();
+                            String replyStr = "";
+                            // Make sure to read all the response from the proxy to prevent SSL negotiation failure
+                            // Response message terminated by two sequential newlines
+                            int newlinesSeen = 0;
+                            boolean headerDone = false;    /* Done on first newline */
+                            while (newlinesSeen < 2) {
+                                int i = tunnelInputStream.read();
+                                
+                                if (i < 0) {
+                                    throw new IOException("Unexpected EOF from proxy");
                                 }
-                            }
-                        }
-                        if (!(StringUtils.startsWithIgnoreWhitespaces("HTTP/1.0 200", replyStr)
-                                || StringUtils.startsWithIgnoreWhitespaces("HTTP/1.1 200", replyStr))) {
-                            throw new IOException();
-                        }
-
+                                if (i == '\n') {
+                                    headerDone = true;
+                                    ++newlinesSeen;
+                                } else if (i != '\r') {
+                                    newlinesSeen = 0;
+                                    if (!headerDone) {
+                                        replyStr += String.valueOf((char) i);
+                                    }
+                                }
+                            }   if (!(StringUtils.startsWithIgnoreWhitespaces("HTTP/1.0 200", replyStr)
+                                    || StringUtils.startsWithIgnoreWhitespaces("HTTP/1.1 200", replyStr))) {
+                                throw new IOException();
+                            }   break;
+                        default:
                     }
                     if (baseSocket != null) {
                         // End of condensed reflective tunnel handshake method

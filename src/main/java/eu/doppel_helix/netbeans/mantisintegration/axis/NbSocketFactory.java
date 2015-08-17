@@ -3,7 +3,6 @@ package eu.doppel_helix.netbeans.mantisintegration.axis;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.net.Proxy.Type;
 import java.net.ProxySelector;
 import java.net.Socket;
 import java.net.URI;
@@ -46,17 +45,22 @@ public class NbSocketFactory extends NbBaseSocketFactory implements org.apache.a
         if (s == null) {
             for (Proxy p : proxies) {
                 try {
-                    if (p.type() == Type.DIRECT) {
-                        s = new Socket();
-                        s.connect(new InetSocketAddress(host, port), timeout);
-                    } else if (p.type() == Type.SOCKS) {
-                        s = new Socket(p);
-                        s.connect(new InetSocketAddress(host, port), timeout);
-                    } else if (p.type() == Type.HTTP) {
-                        s = new Socket();
-                        s.connect(p.address());
-                        useFullURL.value = true;
-                        addProxyAuthenticationIfPresent(otherHeaders);
+                    if (null != p.type()) switch (p.type()) {
+                        case DIRECT:
+                            s = new Socket();
+                            s.connect(new InetSocketAddress(host, port), timeout);
+                            break;
+                        case SOCKS:
+                            s = new Socket(p);
+                            s.connect(new InetSocketAddress(host, port), timeout);
+                            break;
+                        case HTTP:
+                            s = new Socket();
+                            s.connect(p.address());
+                            useFullURL.value = true;
+                            addProxyAuthenticationIfPresent(otherHeaders);
+                            break;
+                        default:
                     }
                     break;
                 } catch (IOException | IllegalArgumentException ex) {

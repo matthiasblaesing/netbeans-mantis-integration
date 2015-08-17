@@ -6,6 +6,7 @@ import eu.doppel_helix.netbeans.mantisintegration.data.Version;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -74,9 +75,8 @@ public class MantisRepositoryController implements RepositoryController, Documen
         }
         
         try {
-            new URI(url);
             URI.create(url).toURL();
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException | MalformedURLException ex) {
             errorMessages.add("Invalid URL provided");
         }
         
@@ -84,7 +84,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
             errorMessages.add("Username or password empty");
         }
         
-        return errorMessages.size() == 0 && (! checking);
+        return errorMessages.isEmpty() && (! checking);
     }
 
     @Override

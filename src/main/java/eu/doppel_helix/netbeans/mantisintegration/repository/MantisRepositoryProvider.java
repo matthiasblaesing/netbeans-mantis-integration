@@ -3,7 +3,6 @@ package eu.doppel_helix.netbeans.mantisintegration.repository;
 
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.query.MantisQuery;
-import eu.doppel_helix.netbeans.mantisintegration.util.ExceptionHandler;
 import java.awt.Image;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;

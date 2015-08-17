@@ -76,6 +76,7 @@ public class MantisScheduleProvider implements IssueScheduleProvider<MantisIssue
         }
         
         Runnable updater = new Runnable() {
+            @Override
             public void run() {
                 try {
                     MantisRepository mr = i.getMantisRepository();

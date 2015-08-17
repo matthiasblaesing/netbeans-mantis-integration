@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class DispatchingListener implements MouseListener {
-    private Component delegate;
+    private final Component delegate;
 
     public DispatchingListener(Component delegate) {
         this.delegate = delegate;

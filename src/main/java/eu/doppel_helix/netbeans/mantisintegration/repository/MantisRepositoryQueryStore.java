@@ -31,7 +31,7 @@ import org.openide.filesystems.FileUtil;
 public class MantisRepositoryQueryStore implements FileChangeListener {
     private static final Logger LOG = Logger.getLogger(MantisRepositoryQueryStore.class.getName());
     private static final JAXBContext jaxbContext;
-    private Map<String,WeakReference<MantisQuery>> openIssues = new HashMap<>();
+    private final Map<String,WeakReference<MantisQuery>> openIssues = new HashMap<>();
     
     static {
         JAXBContext tempJaxbContext = null;

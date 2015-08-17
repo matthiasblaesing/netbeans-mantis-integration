@@ -99,7 +99,7 @@ public class MantisIssue {
     }
 
     public List<String> getSubtasks() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (RelationshipData rd : getRelationships()) {
             if (rd.getType().getId().intValue() == 2) {
                 result.add(rd.getTarget_id().toString());
