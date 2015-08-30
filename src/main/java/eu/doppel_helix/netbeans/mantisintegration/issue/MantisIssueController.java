@@ -95,22 +95,22 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
         protected Object doInBackground() throws Exception {
             try(SafeAutocloseable ac = issue.busy()) {
                 MantisRepository mr = issue.getMantisRepository();
-                viewStates = Arrays.asList(mr.getViewStates());
+                viewStates = Arrays.asList(mr.getMasterData().getViewStates());
                 
                 projects = new ArrayList<>();
                 projects.add(null);
-                for(ProjectData pd: mr.getProjects()) {
+                for(ProjectData pd: mr.getMasterData().getProjects()) {
                     projects.addAll(FlattenedProjectData.buildList(pd));
                 }
                 
-                severities = Arrays.asList(mr.getSeverities());
-                reproducibilities = Arrays.asList(mr.getReproducibilities());
-                resolutions = Arrays.asList(mr.getResolutions());
-                priorities = Arrays.asList(mr.getPriorities());
-                states = new ArrayList<>(Arrays.asList(mr.getStates()));
+                severities = Arrays.asList(mr.getMasterData().getSeverities());
+                reproducibilities = Arrays.asList(mr.getMasterData().getReproducibilities());
+                resolutions = Arrays.asList(mr.getMasterData().getResolutions());
+                priorities = Arrays.asList(mr.getMasterData().getPriorities());
+                states = new ArrayList<>(Arrays.asList(mr.getMasterData().getStates()));
                 states.add(0, null);
-                etas = Arrays.asList(mr.getEtas());
-                projections = Arrays.asList(mr.getProjections());
+                etas = Arrays.asList(mr.getMasterData().getEtas());
+                projections = Arrays.asList(mr.getMasterData().getProjections());
                 return null;
             }
         }
@@ -510,7 +510,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
         if(pd != null) {
             try {
                 List<ObjectRef> fields = new ArrayList<>();
-                for (CustomFieldDefinitionData cfdd : issue.getMantisRepository().getCustomFieldDefinitions(pd.getProjectData().getId())) {
+                for (CustomFieldDefinitionData cfdd : issue.getMantisRepository().getMasterData().getCustomFieldDefinitions(pd.getProjectData().getId())) {
                     fields.add(cfdd.getField());
                 }
                 CustomFieldValueForIssueData[] customFieldData = new CustomFieldValueForIssueData[fields.size()];
@@ -563,10 +563,10 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        final MantisRepository repository = issue.getMantisRepository();
+        final MantisRepository mr = issue.getMantisRepository();
         if ("addIssue".equals(e.getActionCommand())
                 || "updateIssue".equals(e.getActionCommand())) {
-            repository.getRequestProcessor().submit(new Runnable() {
+            mr.getRequestProcessor().submit(new Runnable() {
                 public void run() {
                     saveChanges();
                 }
@@ -578,13 +578,13 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
             panel.addNoteViewStateComboBox.setSelectedIndex(0);
             panel.addNoteEditorPane.setText("");
             panel.timetrackInput.setValue(BigInteger.ZERO);
-            repository.getRequestProcessor().submit(new Runnable() {
+            mr.getRequestProcessor().submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         issue.addComment(comment, viewState, timetracking);
                     } catch (Exception ex) {
-                        repository
+                        mr
                                 .getExceptionHandler()
                                 .handleException(logger, "Failed to comment to issue", ex);
                     }
@@ -592,7 +592,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
             });
         } else if ("selectProject".equals(e.getActionCommand())) {
             final FlattenedProjectData fpd = (FlattenedProjectData) panel.projectComboBox.getSelectedItem();
-            repository.getRequestProcessor().submit(new Runnable() {
+            mr.getRequestProcessor().submit(new Runnable() {
                 @Override
                 public void run() {
                     try (SafeAutocloseable saf = issue.busy()) {
@@ -603,21 +603,21 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                         if (fpd != null) {
                             BigInteger projectId = fpd.getProjectData().getId();
                             categories.add(null);
-                            categories.addAll(Arrays.asList(repository.getCategories(projectId)));
+                            categories.addAll(Arrays.asList(mr.getMasterData().getCategories(projectId)));
                             users.add(null);
-                            users.addAll(Arrays.asList(repository.getUsers(projectId)));
+                            users.addAll(Arrays.asList(mr.getMasterData().getUsers(projectId)));
                             versions.add(null);
-                            for (ProjectVersionData vdata : repository.getVersions(projectId)) {
+                            for (ProjectVersionData vdata : mr.getMasterData().getVersions(projectId)) {
                                 versions.add(vdata.getName());
                             }
-                            customFields.value = repository.getCustomFieldDefinitions(projectId);
+                            customFields.value = mr.getMasterData().getCustomFieldDefinitions(projectId);
                         } else {
                             customFields.value = new CustomFieldDefinitionData[0];
                         }
                         
                         final Holder<UserData> ud = new Holder<>();
                         try {
-                            ud.value = repository.getAccount();
+                            ud.value = mr.getAccount();
                         } catch (ServiceException | RemoteException ex) {
                         };
                         
@@ -656,7 +656,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                             }
                         });
                     } catch (Exception ex) {
-                        repository
+                        mr
                                 .getExceptionHandler()
                                 .handleException(logger, "Failed to create/add issue", ex);
                     }
@@ -664,12 +664,12 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
             });
         } else if ("refreshIssue".equals(e.getActionCommand())) {
             if (issue.getId() != null) {
-                repository.getRequestProcessor().submit(new Runnable() {
+                mr.getRequestProcessor().submit(new Runnable() {
                     public void run() {
                         try {
                             issue.refresh();
                         } catch (Exception ex) {
-                            repository
+                            mr
                                     .getExceptionHandler()
                                     .handleException(logger, "Failed to refresh issue", ex);
                         }
@@ -677,7 +677,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 });
             }
         } else if ("openIssueWebbrowser".equals(e.getActionCommand())) {
-            URI uri = repository.getIssueUrl(issue);
+            URI uri = mr.getIssueUrl(issue);
             try {
                 Desktop.getDesktop().browse(uri);
             } catch (IOException ex) {
@@ -693,13 +693,13 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
             int result = fileChooser.showOpenDialog(getComponent());
             if (result == JFileChooser.APPROVE_OPTION) {
                 lastDirectory = fileChooser.getCurrentDirectory();
-                repository.getRequestProcessor().submit(new Runnable() {
+                mr.getRequestProcessor().submit(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             issue.addFile(fileChooser.getSelectedFile(), null);
                         } catch (Exception ex) {
-                            repository
+                            mr
                                     .getExceptionHandler()
                                     .handleException(logger, "Failed to add file to issue", ex);
                         }

@@ -207,33 +207,33 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
             @Override
             public void run() {
                 try (SafeAutocloseable ac = mq.busy()) {
-                    final FilterData[] filter = mr.getFilters(mq.getProjectId());
+                    final FilterData[] filter = mr.getMasterData().getFilters(mq.getProjectId());
 
                     final List<FlattenedProjectData> projects = new ArrayList<>();
                     projects.add(new FlattenedProjectData(pseudoProject, 0));
-                    for (ProjectData pd : mr.getProjects()) {
+                    for (ProjectData pd : mr.getMasterData().getProjects()) {
                         projects.addAll(FlattenedProjectData.buildList(pd));
                     }
                     final List<AccountData> users = new ArrayList<>(
-                            Arrays.asList(mr.getUsers(BigInteger.ZERO)));
+                            Arrays.asList(mr.getMasterData().getUsers(BigInteger.ZERO)));
                     users.add(0, null);
                     final List<String> categories = new ArrayList<>(
-                            Arrays.asList(mr.getCategories(BigInteger.ZERO)));
+                            Arrays.asList(mr.getMasterData().getCategories(BigInteger.ZERO)));
                     categories.add(0, null);
                     final List<ObjectRef> severities = new ArrayList<>(
-                            Arrays.asList(mr.getSeverities()));
+                            Arrays.asList(mr.getMasterData().getSeverities()));
                     severities.add(0, null);
                     final List<ObjectRef> resolutions = new ArrayList<>(
-                            Arrays.asList(mr.getResolutions()));
+                            Arrays.asList(mr.getMasterData().getResolutions()));
                     resolutions.add(0, null);
                     final List<ObjectRef> states = new ArrayList<>(
-                            Arrays.asList(mr.getStates()));
+                            Arrays.asList(mr.getMasterData().getStates()));
                     states.add(0, null);
                     final List<ObjectRef> priorities = new ArrayList<>(
-                            Arrays.asList(mr.getPriorities()));
+                            Arrays.asList(mr.getMasterData().getPriorities()));
                     priorities.add(0, null);
                     final List<ObjectRef> viewstates = new ArrayList<>(
-                            Arrays.asList(mr.getViewStates()));
+                            Arrays.asList(mr.getMasterData().getViewStates()));
                     viewstates.add(0, null);
 
                     Mutex.EVENT.writeAccess(new Mutex.Action<Void>() {
@@ -336,7 +336,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                 final Holder<FilterData[]> filter = new Holder<>();
                 
                 if (selected != null) {
-                    filter.value = mr.getFilters(
+                    filter.value = mr.getMasterData().getFilters(
                             selected.getProjectData().getId());
                 }
                 

@@ -27,7 +27,7 @@ public class AddTagDialog extends javax.swing.JDialog implements ActionListener 
         new SwingWorker<List<TagData>,Object>() {
             @Override
             protected List<TagData> doInBackground() throws Exception {
-                return issue.getMantisRepository().getTags();
+                return issue.getMantisRepository().getMasterData().getTags();
             }
 
             @Override

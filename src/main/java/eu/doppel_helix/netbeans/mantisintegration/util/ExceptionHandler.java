@@ -44,7 +44,7 @@ public class ExceptionHandler {
         if(customFieldMatcher.matches()) {
             String intro = customFieldMatcher.group(1);
             String id = customFieldMatcher.group(2);
-            CustomFieldDefinitionData cfd = repository.getCustomFieldDefinition(
+            CustomFieldDefinitionData cfd = repository.getMasterData().getCustomFieldDefinition(
                     new BigInteger(id));
             if(cfd != null) {
                 fault = String.format("%s '%s (ID: %s)'",

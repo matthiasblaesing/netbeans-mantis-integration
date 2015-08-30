@@ -45,7 +45,7 @@ public class AddRelationshipDialog extends javax.swing.JDialog {
         setLocationByPlatform(true);
         initComponents();
         final MantisRepository mr = issue.getMantisRepository();
-        DefaultComboBoxModel<ObjectRef> types = new DefaultComboBoxModel<>(mr.getRelationships());
+        DefaultComboBoxModel<ObjectRef> types = new DefaultComboBoxModel<>(mr.getMasterData().getRelationships());
         types.insertElementAt(null, 0);
         types.setSelectedItem(null);
         typeComboBox.setModel(types);
