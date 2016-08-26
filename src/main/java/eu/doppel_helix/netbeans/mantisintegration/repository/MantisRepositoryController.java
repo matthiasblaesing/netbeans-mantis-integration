@@ -49,6 +49,9 @@ public class MantisRepositoryController implements RepositoryController, Documen
             panel.urlTextField.getDocument().addDocumentListener(this);
             panel.usernameTextField.getDocument().addDocumentListener(this);
             panel.passwordTextField.getDocument().addDocumentListener(this);
+            panel.httpAuthEnabled.addActionListener(this);
+            panel.httpUserField.getDocument().addDocumentListener(this);
+            panel.httpPwdField.getDocument().addDocumentListener(this);
             cs.addChangeListener(this);
             panel.checkButton.addActionListener(this);
             panel.checkButton.setActionCommand(COMMAND_CHECKCONNECTION);
@@ -109,6 +112,16 @@ public class MantisRepositoryController implements RepositoryController, Documen
                 panel.scheduleLengthFieldBuiltIn.setSelected(true);
                 panel.scheduleLengthFieldCustomName.setText("");
             }
+            if(ri.getHttpUsername() != null && (! ri.getHttpUsername().isEmpty())
+                    && ri.getHttpPassword() != null && ri.getHttpPassword().length > 0) {
+                panel.httpAuthEnabled.setSelected(true);
+            } else {
+                panel.httpAuthEnabled.setSelected(false);
+            }
+            panel.httpPwdField.setEnabled((! checking) && panel.httpAuthEnabled.isSelected());
+            panel.httpUserField.setEnabled((! checking) && panel.httpAuthEnabled.isSelected());
+            panel.httpUserField.setText(ri.getHttpUsername());
+            panel.httpPwdField.setText(new String(ri.getHttpPassword()));
         }
     }
 
@@ -169,6 +182,9 @@ public class MantisRepositoryController implements RepositoryController, Documen
                 panel.urlTextField.setEnabled(! checking);
                 panel.usernameTextField.setEnabled(! checking);
                 panel.passwordTextField.setEnabled(! checking);
+                panel.httpAuthEnabled.setEnabled(! checking);
+                panel.httpPwdField.setEnabled((! checking) && panel.httpAuthEnabled.isSelected());
+                panel.httpUserField.setEnabled((! checking) && panel.httpAuthEnabled.isSelected());
             }
         });
         if(isValid()) {
@@ -182,6 +198,18 @@ public class MantisRepositoryController implements RepositoryController, Documen
     public void actionPerformed(ActionEvent e) {
         if (COMMAND_CHECKCONNECTION.equals(e.getActionCommand())) {
             setChecking(true);
+
+            final String httpUsername;
+            final String httpPassword;
+
+            if (panel.httpAuthEnabled.isSelected()) {
+                httpUsername = panel.httpUserField.getText();
+                httpPassword = panel.httpPwdField.getText();
+            } else {
+                httpUsername = "";
+                httpPassword = "";
+            }
+            
             new SwingWorker<Object, Object>() {
                 private String result = "";
                 private Color resultColor = null;
@@ -192,7 +220,10 @@ public class MantisRepositoryController implements RepositoryController, Documen
                         Version v = MantisRepository.checkConnection(
                                 panel.urlTextField.getText(),
                                 panel.usernameTextField.getText(),
-                                panel.passwordTextField.getText());
+                                panel.passwordTextField.getText(),
+                                httpUsername,
+                                httpPassword
+                        );
                         result = "Successfully connected (version: " + v.getVersionString() + ")";
                         resultColor = goodColor;
                     } catch (ServiceException ex) {
@@ -214,6 +245,12 @@ public class MantisRepositoryController implements RepositoryController, Documen
                     setChecking(false);
                 }
             }.execute();
+        } else if ("httpAuth".equals(e.getActionCommand())) {
+            if(! panel.httpAuthEnabled.isSelected()) {
+                panel.httpUserField.setText("");
+                panel.httpPwdField.setText("");
+            }
+            cs.fireChange();
         }
     }
 
@@ -237,7 +274,25 @@ public class MantisRepositoryController implements RepositoryController, Documen
         if(id == null) {
             id = MantisConnector.ID + System.currentTimeMillis();
         }
-        ri = new RepositoryInfo(id, MantisConnector.ID, url, name, "", username, "", password.toCharArray(), "".toCharArray());
+        
+        String httpUsername = "";
+        String httpPassword = "";
+
+        if(panel.httpAuthEnabled.isSelected()) {
+            httpUsername = panel.httpUserField.getText();
+            httpPassword = panel.httpPwdField.getText();
+        }
+        
+        ri = new RepositoryInfo(id, 
+                MantisConnector.ID, 
+                url, 
+                name, 
+                "", 
+                username, 
+                httpUsername,
+                password.toCharArray(), 
+                httpPassword.toCharArray());
+        
         if (panel.scheduleDateFieldCustom.isSelected()) {
             ri.putValue(MantisRepository.PROP_SCHEDULE_DATE_FIELD, 
                     panel.scheduleDateFieldCustomName.getText());
@@ -246,6 +301,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
            ri.putValue(MantisRepository.PROP_SCHEDULE_LENGTH_FIELD, 
                     panel.scheduleLengthFieldCustomName.getText());
         }
+
         repository.setInfo(ri);
     }
     

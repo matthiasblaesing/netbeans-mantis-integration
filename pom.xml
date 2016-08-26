@@ -193,6 +193,7 @@
                     <serverSide>false</serverSide>
                     <namespaceToPackage>true</namespaceToPackage>
                     <outputDirectory>${project.build.directory}/generated-sources/axistools</outputDirectory>
+                    <sourceDirectory>${project.basedir}/src/main/resources/biz/futureware/mantisconnect/</sourceDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -206,7 +207,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.11.1</version>
+                <version>4.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <author>Matthias Bläsing</author>
@@ -269,7 +270,7 @@
                 <!-- NetBeans 6.9+ requires JDK 6 -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.5.1</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
@@ -289,13 +290,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.1</version>
+                <version>2.5.3</version>
             </plugin>
             
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.7</version>
+                <version>2.8.2</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>

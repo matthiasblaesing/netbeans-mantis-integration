@@ -42,6 +42,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
+import org.apache.axis.client.Call;
+import org.apache.axis.client.Stub;
 import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -95,7 +97,7 @@ public class MantisRepository {
         return issueInfosHandler;
     }
     
-    private static MantisConnectPortType initClient(String baseUrl) throws ServiceException, MalformedURLException {
+    private static MantisConnectPortType initClient(String baseUrl, String httpUsername, String httpPassword) throws ServiceException, MalformedURLException {
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(MantisRepository.class.getClassLoader());
         MantisConnectPortType result = null;
@@ -104,11 +106,17 @@ public class MantisRepository {
                 baseUrl += "/api/soap/mantisconnect.php";
             }
 
-            MantisConnectLocator mcl = new MantisConnectLocator(
-                    baseUrl + "?wsdl",
-                    new QName("http://futureware.biz/mantisconnect", "MantisConnect"));
+            MantisConnectLocator mcl = new MantisConnectLocator();
 
             result = mcl.getMantisConnectPort(new URL(baseUrl));
+            
+            if(httpUsername != null && (!httpUsername.isEmpty())
+                    && httpPassword != null && (!httpPassword.isEmpty())) {
+                // enable Basic HTTP Authentication:
+                ((Stub) result)._setProperty(Call.USERNAME_PROPERTY, httpUsername);
+                ((Stub) result)._setProperty(Call.PASSWORD_PROPERTY, httpPassword);
+            }
+            
             if (MantisRepository.class.desiredAssertionStatus()) {
                 EDTInvocationHandler invocationHandler = new EDTInvocationHandler(result);
                 result = (MantisConnectPortType) Proxy.newProxyInstance(
@@ -123,9 +131,9 @@ public class MantisRepository {
     }
 
     
-    public static Version checkConnection(String url, String username, String password) throws ServiceException, RemoteException {
+    public static Version checkConnection(String url, String username, String password, String httpUser, String httpPassword) throws ServiceException, RemoteException {
         try {
-            MantisConnectPortType mcpt = initClient(url);
+            MantisConnectPortType mcpt = initClient(url, httpUser, httpPassword);
             // Test Authentication information
             mcpt.mc_projects_get_user_accessible(username, password);
             // Return version for user information
@@ -346,11 +354,10 @@ public class MantisRepository {
         if (client == null) {
             String baseUrl = getBaseUrl();
             try {
-                client = initClient(baseUrl);
+                client = initClient(baseUrl, info.getHttpUsername(), new String(info.getHttpPassword()));
             } catch (MalformedURLException ex) {
                 throw new ServiceException("Broken client url:" + baseUrl, ex);
             }
-
         }
         return client;
     }
