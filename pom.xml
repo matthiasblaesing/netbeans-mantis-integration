@@ -3,7 +3,7 @@
 
     <groupId>eu.doppel_helix.netbeans</groupId>
     <artifactId>MantisIntegration</artifactId>
-    <version>1.4</version>
+    <version>1.4.1-SNAPSHOT</version>
     <packaging>nbm</packaging>
 
     <name>MantisIntegration</name>
@@ -24,7 +24,7 @@
         <connection>scm:git:https://github.com/matthiasblaesing/netbeans-mantis-integration.git</connection>
         <developerConnection>scm:git:git@github.com:matthiasblaesing/netbeans-mantis-integration.git</developerConnection>
         <url>https://github.com/matthiasblaesing/netbeans-mantis-integration</url>
-      <tag>MantisIntegration-1.4</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <properties>
@@ -252,8 +252,7 @@
                         } else {
                             value = value.trim() + "";
                         }
-                        for(var i = 0; i < dependencies.length; i++) { if(value != "") { value += ", "; } value += dependencies[i]; } attributes.putValue(entry, value); manifest.write(new java.io.FileOutputStream(filename));
-                        ]]>
+                        for(var i = 0; i < dependencies.length; i++) { if(value != "") { value += ", "; } value += dependencies[i]; } attributes.putValue(entry, value); manifest.write(new java.io.FileOutputStream(filename)); ]]>
                     </script>
                     <passProjectAsProperty>true</passProjectAsProperty>
                 </configuration>
