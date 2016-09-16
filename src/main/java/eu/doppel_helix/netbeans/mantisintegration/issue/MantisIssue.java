@@ -577,10 +577,17 @@ public class MantisIssue {
     }
 
     public CustomFieldValueForIssueData[] getCustom_fields() {
-        return issueData.getCustom_fields();
+        CustomFieldValueForIssueData[] value = issueData.getCustom_fields();
+        if(value == null) {
+            value = new CustomFieldValueForIssueData[0];
+        }
+        return value;
     }
 
     public void setCustom_fields(CustomFieldValueForIssueData[] custom_fields) {
+        if(custom_fields == null) {
+            custom_fields = new CustomFieldValueForIssueData[0];
+        }
         CustomFieldValueForIssueData[] oldValue = issueData.getCustom_fields();
         issueData.setCustom_fields(custom_fields);
         firePropertyChange("custom_fields", oldValue, custom_fields);
