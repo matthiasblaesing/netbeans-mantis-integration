@@ -36,6 +36,11 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
                 }
             }
         });
+        
+        httpUserField.setPreferredSize(httpUserField.getMinimumSize());
+        httpPwdField.setPreferredSize(httpPwdField.getMinimumSize());
+        usernameTextField.setPreferredSize(usernameTextField.getMinimumSize());
+        passwordTextField.setPreferredSize(passwordTextField.getMinimumSize());
     }
 
     /**
