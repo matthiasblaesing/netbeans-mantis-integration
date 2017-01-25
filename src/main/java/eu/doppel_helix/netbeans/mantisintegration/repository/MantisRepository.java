@@ -40,7 +40,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Stub;
@@ -54,6 +53,8 @@ import org.openide.util.lookup.InstanceContent;
 public class MantisRepository {
     public static final String PROP_SCHEDULE_DATE_FIELD = "MantisRepository.scheduleDateField";
     public static final String PROP_SCHEDULE_LENGTH_FIELD = "MantisRepository.scheduleLengthField";
+    public static final String PROP_COMMIT_RESOLUTION_FIELD = "MantisRepository.commitResolution";
+    public static final String PROP_COMMIT_STATUS_FIELD = "MantisRepository.commitStatus";
     private static final String BASE_CONFIG_PATH = "MantisIntegration"; // NOI18N
     private static final Logger logger = Logger.getLogger(MantisRepository.class.getName());
     private static final Image ICON = ImageUtilities.loadImage(
@@ -131,13 +132,18 @@ public class MantisRepository {
     }
 
     
-    public static Version checkConnection(String url, String username, String password, String httpUser, String httpPassword) throws ServiceException, RemoteException {
+    static ConnectionCheckResult checkConnection(String url, String username, String password, String httpUser, String httpPassword) throws ServiceException, RemoteException {
         try {
+            ConnectionCheckResult ccr = new ConnectionCheckResult();
             MantisConnectPortType mcpt = initClient(url, httpUser, httpPassword);
             // Test Authentication information
             mcpt.mc_projects_get_user_accessible(username, password);
-            // Return version for user information
-            return new Version(mcpt.mc_version());
+            
+            ccr.setVersion(new Version(mcpt.mc_version()));
+            ccr.setResolutionList(mcpt.mc_enum_resolutions(username, password));
+            ccr.setStatusList(mcpt.mc_enum_status(username, password));
+            
+            return ccr;
         } catch (MalformedURLException ex) {
             throw new ServiceException("Broken client url:" + url, ex);
         }
@@ -411,18 +417,6 @@ public class MantisRepository {
         issue.refresh();
     }
 
-    public void checkin(MantisIssue issue, String comment, boolean closeAsFixed)
-            throws ServiceException, RemoteException {
-        MantisConnectPortType mcpt = getClient();
-        mcpt.mc_issue_checkin(
-                info.getUsername(),
-                new String(info.getPassword()),
-                issue.getId(),
-                comment,
-                closeAsFixed);
-        issue.refresh();
-    }
-
     public void addComment(MantisIssue issue, String comment, ObjectRef viewState, BigInteger timetracking)
             throws ServiceException, RemoteException {
         MantisConnectPortType mcpt = getClient();
@@ -645,5 +639,39 @@ public class MantisRepository {
             exceptionHandler = new ExceptionHandler(this);
         }
         return exceptionHandler;
+    }
+    
+    public ObjectRef getCommitStatus() {
+        return readObjectRef(info, PROP_COMMIT_STATUS_FIELD);
+    }
+
+    public ObjectRef getCommitResolution() {
+        return readObjectRef(info, PROP_COMMIT_RESOLUTION_FIELD);
+    }
+    
+    static ObjectRef readObjectRef(RepositoryInfo ri, String key) {
+        String fieldString = ri.getValue(key);
+        if (fieldString != null) {
+            String[] parts = fieldString.split("#", 2);
+            if(parts.length == 2) {
+                try {
+                    return new ObjectRef(new BigInteger(parts[0]), parts[1]);
+                } catch (NumberFormatException ex) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+    
+    static void writeObjectRef(RepositoryInfo ri, String key, ObjectRef value) {
+        if(value == null) {
+            ri.putValue(key, null);
+        } else {
+            ri.putValue(key, value.getId() + "#" + value.getName());
+        }
     }
 }

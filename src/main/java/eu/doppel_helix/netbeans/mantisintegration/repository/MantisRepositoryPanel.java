@@ -1,11 +1,15 @@
 package eu.doppel_helix.netbeans.mantisintegration.repository;
 
+import biz.futureware.mantisconnect.ObjectRef;
+import eu.doppel_helix.netbeans.mantisintegration.swing.ObjectRefListCellRenderer;
 import java.awt.TextComponent;
+import java.math.BigInteger;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 public class MantisRepositoryPanel extends javax.swing.JPanel {
+    private static final ObjectRef dummyObjectRef = new ObjectRef(BigInteger.ONE, "ABCDEFGHIJKLMNOPQRS");
     
     /**
      * Creates new form MantisRepositoryPanel
@@ -80,6 +84,11 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
         httpPasswordLabel = new javax.swing.JLabel();
         checkResult = new javax.swing.JLabel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 32767));
+        jPanel1 = new javax.swing.JPanel();
+        resolutionLabel = new javax.swing.JLabel();
+        statusLabel = new javax.swing.JLabel();
+        resolutionComboBox = new javax.swing.JComboBox<>();
+        statusComboBox = new javax.swing.JComboBox<>();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -337,6 +346,55 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 10;
         gridBagConstraints.weighty = 1.0;
         add(filler1, gridBagConstraints);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Update task on commit - Resolve as FIXED"));
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
+        resolutionLabel.setText("Resolution:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        jPanel1.add(resolutionLabel, gridBagConstraints);
+
+        statusLabel.setText("Status:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        jPanel1.add(statusLabel, gridBagConstraints);
+
+        resolutionComboBox.setPrototypeDisplayValue(dummyObjectRef);
+        resolutionComboBox.setRenderer(new ObjectRefListCellRenderer());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        jPanel1.add(resolutionComboBox, gridBagConstraints);
+
+        statusComboBox.setPrototypeDisplayValue(dummyObjectRef);
+        statusComboBox.setRenderer(new ObjectRefListCellRenderer());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.BASELINE_LEADING;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
+        jPanel1.add(statusComboBox, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.ABOVE_BASELINE_LEADING;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(jPanel1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void selectAllOnFocusGain(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_selectAllOnFocusGain
@@ -356,10 +414,13 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
     javax.swing.JPasswordField httpPwdField;
     javax.swing.JTextField httpUserField;
     javax.swing.JLabel httpUserLabel;
+    javax.swing.JPanel jPanel1;
     javax.swing.JLabel nameLabel;
     javax.swing.JTextField nameTextField;
     javax.swing.JLabel passwordLabel;
     javax.swing.JPasswordField passwordTextField;
+    javax.swing.JComboBox<ObjectRef> resolutionComboBox;
+    javax.swing.JLabel resolutionLabel;
     javax.swing.JPanel scheduleConfigPanel;
     private javax.swing.ButtonGroup scheduleDateButtonGroup;
     javax.swing.JRadioButton scheduleDateFieldBuiltIn;
@@ -371,6 +432,8 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
     javax.swing.JRadioButton scheduleLengthFieldCustom;
     javax.swing.JTextField scheduleLengthFieldCustomName;
     javax.swing.JLabel scheduleLengthFieldLabel;
+    javax.swing.JComboBox<ObjectRef> statusComboBox;
+    javax.swing.JLabel statusLabel;
     javax.swing.JLabel urlLabel;
     javax.swing.JTextField urlTextField;
     javax.swing.JLabel usernameLabel;

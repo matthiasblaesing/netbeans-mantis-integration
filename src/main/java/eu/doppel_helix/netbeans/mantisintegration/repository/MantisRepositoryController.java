@@ -1,11 +1,12 @@
 
 package eu.doppel_helix.netbeans.mantisintegration.repository;
 
+import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.MantisConnector;
-import eu.doppel_helix.netbeans.mantisintegration.data.Version;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.rmi.RemoteException;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
@@ -29,6 +32,8 @@ import org.openide.util.Mutex;
 public class MantisRepositoryController implements RepositoryController, DocumentListener, ChangeListener, ActionListener {
     private final static Logger logger = Logger.getLogger(MantisRepositoryController.class.getName());
     private final static String COMMAND_CHECKCONNECTION = "checkConnection";
+    private final static String COMMAND_SELECTSTATUS = "selectStatus";
+    private final static String COMMAND_SELECTRESOLUTION = "selectResolution";
     private final static Color errorColor = new Color( 205, 0, 0);
     private final static Color goodColor = new Color( 7, 155, 0);
     private final MantisRepository repository;
@@ -36,6 +41,10 @@ public class MantisRepositoryController implements RepositoryController, Documen
     private final List<String> errorMessages = new ArrayList<>();
     private final ChangeSupport cs = new ChangeSupport(this);
     private boolean checking = false;
+    private final DefaultComboBoxModel<ObjectRef> resolutionModel = new DefaultComboBoxModel<>();
+    private final DefaultComboBoxModel<ObjectRef> statusModel = new DefaultComboBoxModel<>();
+    private ObjectRef resolution = null;
+    private ObjectRef status = null;
     
     public MantisRepositoryController(MantisRepository repository) {
         this.repository = repository;
@@ -55,6 +64,12 @@ public class MantisRepositoryController implements RepositoryController, Documen
             cs.addChangeListener(this);
             panel.checkButton.addActionListener(this);
             panel.checkButton.setActionCommand(COMMAND_CHECKCONNECTION);
+            panel.resolutionComboBox.setModel(resolutionModel);
+            panel.resolutionComboBox.setActionCommand(COMMAND_SELECTRESOLUTION);
+            panel.resolutionComboBox.addActionListener(this);
+            panel.statusComboBox.setModel(statusModel);
+            panel.statusComboBox.setActionCommand(COMMAND_SELECTSTATUS);
+            panel.statusComboBox.addActionListener(this);
             populate();
         }
         return panel;
@@ -122,6 +137,12 @@ public class MantisRepositoryController implements RepositoryController, Documen
             panel.httpUserField.setEnabled((! checking) && panel.httpAuthEnabled.isSelected());
             panel.httpUserField.setText(ri.getHttpUsername());
             panel.httpPwdField.setText(new String(ri.getHttpPassword()));
+
+            status = MantisRepository.readObjectRef(ri, MantisRepository.PROP_COMMIT_STATUS_FIELD);
+            resolution = MantisRepository.readObjectRef(ri, MantisRepository.PROP_COMMIT_RESOLUTION_FIELD);
+
+            updateModel(statusModel, status);
+            updateModel(resolutionModel, resolution);
         }
     }
 
@@ -196,64 +217,121 @@ public class MantisRepositoryController implements RepositoryController, Documen
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (COMMAND_CHECKCONNECTION.equals(e.getActionCommand())) {
-            setChecking(true);
-
-            final String httpUsername;
-            final String httpPassword;
-
-            if (panel.httpAuthEnabled.isSelected()) {
-                httpUsername = panel.httpUserField.getText();
-                httpPassword = panel.httpPwdField.getText();
-            } else {
-                httpUsername = "";
-                httpPassword = "";
-            }
-            
-            new SwingWorker<Object, Object>() {
-                private String result = "";
-                private Color resultColor = null;
-
-                @Override
-                protected Object doInBackground() throws Exception {
-                    try {
-                        Version v = MantisRepository.checkConnection(
-                                panel.urlTextField.getText(),
-                                panel.usernameTextField.getText(),
-                                panel.passwordTextField.getText(),
-                                httpUsername,
-                                httpPassword
-                        );
-                        result = "Successfully connected (version: " + v.getVersionString() + ")";
-                        resultColor = goodColor;
-                    } catch (ServiceException ex) {
-                        logger.log(Level.INFO, "", ex);
-                        result = "Failed create client - check URL";
-                        resultColor = errorColor;
-                    } catch (RemoteException ex) {
-                        logger.log(Level.INFO, "", ex);
-                        result = "Failed request - check username/password";
-                        resultColor = errorColor;
-                    }
-                    return null;
+        switch (e.getActionCommand()) {
+            case COMMAND_SELECTRESOLUTION:
+                ObjectRef selectedRes = (ObjectRef) panel.resolutionComboBox.getSelectedItem();
+                if(selectedRes == null) {
+                    resolution = null;
+                } else if (selectedRes.getId().compareTo(BigInteger.ZERO) >= 0) {
+                    resolution = selectedRes;
+                } else {
+                    checkConnection();
                 }
-
-                @Override
-                protected void done() {
-                    panel.checkResult.setText(result);
-                    panel.checkResult.setForeground(resultColor);
-                    setChecking(false);
+                break;
+            case COMMAND_SELECTSTATUS:
+                ObjectRef selectedStatus = (ObjectRef) panel.statusComboBox.getSelectedItem();
+                if(selectedStatus == null) {
+                    status = null;
+                } else if (selectedStatus.getId().compareTo(BigInteger.ZERO) >= 0) {
+                    status = selectedStatus;
+                } else {
+                    checkConnection();
                 }
-            }.execute();
-        } else if ("httpAuth".equals(e.getActionCommand())) {
-            if(! panel.httpAuthEnabled.isSelected()) {
-                panel.httpUserField.setText("");
-                panel.httpPwdField.setText("");
-            }
-            cs.fireChange();
+                break;
+            case COMMAND_CHECKCONNECTION:
+                checkConnection();
+                break;
+            case "httpAuth":
+                if (!panel.httpAuthEnabled.isSelected()) {
+                    panel.httpUserField.setText("");
+                    panel.httpPwdField.setText("");
+                }
+                cs.fireChange();
+                break;
         }
     }
 
+    private void checkConnection() {
+        setChecking(true);
+
+        final String httpUsername;
+        final String httpPassword;
+
+        if (panel.httpAuthEnabled.isSelected()) {
+            httpUsername = panel.httpUserField.getText();
+            httpPassword = panel.httpPwdField.getText();
+        } else {
+            httpUsername = "";
+            httpPassword = "";
+        }
+
+        new SwingWorker<Object, Object>() {
+            private String result = "";
+            private Color resultColor = null;
+            ConnectionCheckResult ccr = null;
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                try {
+                    ccr = MantisRepository.checkConnection(
+                            panel.urlTextField.getText(),
+                            panel.usernameTextField.getText(),
+                            panel.passwordTextField.getText(),
+                            httpUsername,
+                            httpPassword
+                    );
+                    result = "Successfully connected (version: "
+                            + ccr.getVersion().getVersionString() + ")";
+                    resultColor = goodColor;
+                } catch (ServiceException ex) {
+                    logger.log(Level.INFO, "", ex);
+                    result = "Failed create client - check URL";
+                    resultColor = errorColor;
+                } catch (RemoteException ex) {
+                    logger.log(Level.INFO, "", ex);
+                    result = "Failed request - check username/password";
+                    resultColor = errorColor;
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                panel.checkResult.setText(result);
+                panel.checkResult.setForeground(resultColor);
+
+                if (ccr != null) {
+                    updateModel(statusModel, status, ccr.getStatusList());
+                    updateModel(resolutionModel, resolution, ccr.getResolutionList());
+                }
+
+                setChecking(false);
+            }
+        }.execute();
+    }
+    
+    private static void updateModel(DefaultComboBoxModel<ObjectRef> targetModel, ObjectRef currentValue, ObjectRef... values) {
+        targetModel.removeAllElements();
+        targetModel.addElement(null);
+        ObjectRef selectedValue = null;
+        for (ObjectRef or : values) {
+            if(or == null) {
+                continue;
+            }
+            targetModel.addElement(or);
+            if(currentValue != null && currentValue.getId().equals(or.getId())) {
+                selectedValue = or;
+            }
+        }
+        if(currentValue != null && selectedValue == null) {
+            targetModel.addElement(currentValue);
+            selectedValue = currentValue;
+        }
+        targetModel.addElement(new ObjectRef(new BigInteger("0"), "--------"));
+        targetModel.addElement(new ObjectRef(new BigInteger("-1"), "Refresh"));
+        targetModel.setSelectedItem(selectedValue);
+    }
+    
     @Override
     public void cancelChanges() {
         this.populate();
@@ -297,11 +375,15 @@ public class MantisRepositoryController implements RepositoryController, Documen
             ri.putValue(MantisRepository.PROP_SCHEDULE_DATE_FIELD, 
                     panel.scheduleDateFieldCustomName.getText());
         }
+        
         if (panel.scheduleLengthFieldCustom.isSelected()) {
            ri.putValue(MantisRepository.PROP_SCHEDULE_LENGTH_FIELD, 
                     panel.scheduleLengthFieldCustomName.getText());
         }
 
+        MantisRepository.writeObjectRef(ri, MantisRepository.PROP_COMMIT_STATUS_FIELD, status);
+        MantisRepository.writeObjectRef(ri, MantisRepository.PROP_COMMIT_RESOLUTION_FIELD, resolution);
+        
         repository.setInfo(ri);
     }
     

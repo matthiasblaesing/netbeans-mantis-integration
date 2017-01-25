@@ -182,7 +182,16 @@ public class MantisIssue {
 
     public void addComment(String comment, boolean closeAsFixed) throws ServiceException, RemoteException {
         try (SafeAutocloseable ac = busy()) {
-            mr.checkin(this, comment, closeAsFixed);
+            mr.addComment(this, comment, null, null);
+            if(closeAsFixed) {
+                if(mr.getCommitStatus() != null) {
+                    this.setStatus(mr.getCommitStatus());
+                }
+                if(mr.getCommitResolution() != null) {
+                    this.setResolution(mr.getCommitResolution());
+                }
+                mr.updateIssue(this, getIssueData());
+            }
         }
     }
 

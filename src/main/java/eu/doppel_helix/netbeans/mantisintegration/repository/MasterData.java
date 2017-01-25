@@ -26,7 +26,7 @@ import javax.xml.rpc.ServiceException;
 public class MasterData {
     private static final Logger LOG = Logger.getLogger(MasterData.class.getName());
 
-    private MantisRepository mr;
+    private final MantisRepository mr;
 
     private ObjectRef[] priorities;
     private ObjectRef[] states;
@@ -83,10 +83,16 @@ public class MasterData {
     public ObjectRef[] getResolutions() throws RemoteException, ServiceException {
         if (resolutions == null) {
             MantisConnectPortType mcpt = mr.getClient();
-            resolutions = mcpt.mc_enum_resolutions(
+            ObjectRef[] resolutionsBuiltin = mcpt.mc_enum_resolutions(
                     mr.getInfo().getUsername(),
                     new String(mr.getInfo().getPassword()));
+            
+            ObjectRef[] res2 = new ObjectRef[resolutionsBuiltin.length + 1];
+            System.arraycopy(resolutionsBuiltin, 0, res2, 0, resolutionsBuiltin.length);
+            res2[resolutionsBuiltin.length] = new ObjectRef(new BigInteger("-1"), "test");
+            resolutions = res2;
         }
+        
         return resolutions;
     }
 
