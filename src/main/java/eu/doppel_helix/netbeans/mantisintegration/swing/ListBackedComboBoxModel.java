@@ -33,8 +33,10 @@ public class ListBackedComboBoxModel<E> implements ComboBoxModel<E> {
             fireIntervalRemoved(0, oldLength - 1);
         }
         backingList.addAll(elements);
-        if(! backingList.contains(selectedItem)) {
-            backingList.add(selectedItem);
+        if (selectedItem != null) {
+            if (!backingList.contains(selectedItem)) {
+                backingList.add(selectedItem);
+            }
         }
         if (backingList.size() > 0) {
             fireIntervalAdded(0, backingList.size() - 1);
