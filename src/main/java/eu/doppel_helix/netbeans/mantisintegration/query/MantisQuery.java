@@ -1,6 +1,7 @@
 package eu.doppel_helix.netbeans.mantisintegration.query;
 
 import biz.futureware.mantisconnect.AccountData;
+import biz.futureware.mantisconnect.FilterSearchData;
 import biz.futureware.mantisconnect.IssueHeaderData;
 import biz.futureware.mantisconnect.ObjectRef;
 import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
@@ -28,10 +29,10 @@ public class MantisQuery {
         ALL,
         ANY
     }
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final MantisRepository mr;
     private QueryProvider.IssueContainer<MantisIssue> issueContainer;
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private MantisQueryController mqc;
-    private MantisRepository mr;
     private String id = UUID.randomUUID().toString();
     private String name = null;
     private BigInteger projectId;
@@ -390,10 +391,9 @@ public class MantisQuery {
                 matches++;
             }
         }
-        if(getProjectId() != null) {
+        if(getProjectId() != null && (! getProjectId().equals(BigInteger.ZERO)) ) {
             checks++;
-            if(getProjectId().equals(BigInteger.ZERO) ||
-                    getProjectId().equals(id.getProject())) {
+            if(getProjectId().equals(id.getProject())) {
                 matches++;
             }
         }
@@ -415,7 +415,7 @@ public class MantisQuery {
             try {
                 p = Pattern.compile(getSummaryFilter());
             } catch (PatternSyntaxException ex) {}
-            if(id.getSummary().contains(getSummaryFilter()) || p.matcher(id.getSummary()).find()) {
+            if(id.getSummary().contains(getSummaryFilter()) || (p != null && p.matcher(id.getSummary()).find())) {
                 matches++;
             }
         }
@@ -427,6 +427,50 @@ public class MantisQuery {
             case ANY:
                 return matches > 0;
         }
+    }
+    
+    /**
+     * Build a prefilter to do pre-filtering on the server side
+     * 
+     * @return 
+     */
+    public FilterSearchData getAsServerFilter() {
+        FilterSearchData fsd = new FilterSearchData();
+
+        if (this.getCombination() == Combination.ALL) {
+            if (getReporter() != null) {
+                fsd.setReporter_id(new BigInteger[]{getReporter().getId()});
+            }
+            if (getAssignedTo() != null) {
+                fsd.setHandler_id(new BigInteger[]{getAssignedTo().getId()});
+            }
+            if (getCategory() != null) {
+                fsd.setCategory(new String[]{getCategory()});
+            }
+            if (getSeverity() != null) {
+                fsd.setSeverity_id(new BigInteger[]{getSeverity().getId()});
+            }
+            if (getResolution() != null) {
+                fsd.setResolution_id(new BigInteger[]{getResolution().getId()});
+            }
+            if (getStatus() != null) {
+                fsd.setStatus_id(new BigInteger[]{getStatus().getId()});
+            }
+            if (getPriority() != null) {
+                fsd.setPriority_id(new BigInteger[]{getPriority().getId()});
+            }
+            if (getViewStatus() != null) {
+                fsd.setView_state_id(new BigInteger[]{getViewStatus().getId()});
+            }
+            if (getProjectId() != null) {
+                fsd.setProject_id(new BigInteger[]{getProjectId()});
+            }
+        } else {
+            if (getProjectId() != null && getProjectId().compareTo(BigInteger.ZERO) != 0) {
+                fsd.setProject_id(new BigInteger[]{getProjectId()});
+            }
+        }
+        return fsd;
     }
 
     @Override

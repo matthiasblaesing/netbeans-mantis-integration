@@ -1,6 +1,7 @@
 package eu.doppel_helix.netbeans.mantisintegration.repository;
 
 import biz.futureware.mantisconnect.AttachmentData;
+import biz.futureware.mantisconnect.FilterSearchData;
 import biz.futureware.mantisconnect.IssueData;
 import biz.futureware.mantisconnect.IssueHeaderData;
 import biz.futureware.mantisconnect.IssueNoteData;
@@ -501,52 +502,51 @@ public class MantisRepository {
     }
 
     public List<MantisIssue> findIssues(MantisQuery mq) throws ServiceException, RemoteException  {
-        BigInteger PAGE_SIZE = BigInteger.valueOf(500);
         MantisConnectPortType mcpt = getClient();
         Set<BigInteger> matchingIds = new HashSet<>();
         if (mq.getServersideFilterId() != null) {
-            for (int i = 0; i < 1000; i++) {
-                IssueHeaderData[] ids = mcpt.mc_filter_get_issue_headers(
-                        info.getUsername(),
-                        new String(info.getPassword()),
-                        mq.getProjectId(),
-                        mq.getServersideFilterId(),
-                        BigInteger.valueOf(i),
-                        PAGE_SIZE);
-                for (IssueHeaderData id : ids) {
-                    if (mq.matchesFilter(id)) {
-                        matchingIds.add(id.getId());
-                    }
-                }
-                if (ids.length < PAGE_SIZE.intValue()) {
-                    break;
+            IssueHeaderData[] ids = mcpt.mc_filter_get_issue_headers(
+                    info.getUsername(),
+                    new String(info.getPassword()),
+                    mq.getProjectId(),
+                    mq.getServersideFilterId(),
+                    BigInteger.valueOf(0),
+                    BigInteger.valueOf(-1));
+            for (IssueHeaderData id : ids) {
+                if (mq.matchesFilter(id)) {
+                    matchingIds.add(id.getId());
                 }
             }
         } else {
-            for (int i = 0; i < 1000; i++) {
-                IssueHeaderData[] ids = mcpt.mc_project_get_issue_headers(
+            IssueHeaderData[] ids;
+            if (getVersion().compareTo(new Version("2.0.0")) >= 0) {
+                // The mc_project_get_issue_headers suppresses configurable
+                // issue states (by default the closed issues). The 
+                // mc_filter_search_issue_headers was added with mantis 2.0.0
+                // and is even useful if no filter is specified, as at least
+                // this method returns the complete list
+                ids = mcpt.mc_filter_search_issue_headers(
+                        info.getUsername(),
+                        new String(info.getPassword()),
+                        mq.getAsServerFilter(), 
+                        BigInteger.valueOf(0), 
+                        BigInteger.valueOf(-1)
+                );
+            } else {
+                ids = mcpt.mc_project_get_issue_headers(
                         info.getUsername(),
                         new String(info.getPassword()),
                         mq.getProjectId(),
-                        BigInteger.valueOf(i),
-                        PAGE_SIZE);
-                for (IssueHeaderData id : ids) {
-                    if (mq.matchesFilter(id)) {
-                        matchingIds.add(id.getId());
-                    }
-                }
-                if (ids.length < PAGE_SIZE.intValue()) {
-                    break;
+                        BigInteger.valueOf(0),
+                        BigInteger.valueOf(-1));
+            }
+            for (IssueHeaderData id : ids) {
+                if (mq.matchesFilter(id)) {
+                    matchingIds.add(id.getId());
                 }
             }
         }
-        String ids[] = new String[matchingIds.size()];
-        int count = 0;
-        for(BigInteger bi: matchingIds) {
-            ids[count] = bi.toString();
-            count++;
-        }
-        return getIssues(false, matchingIds.toArray(new BigInteger[0]));
+        return getIssues(false, matchingIds.toArray(new BigInteger[matchingIds.size()]));
     }
 
 
@@ -625,7 +625,7 @@ public class MantisRepository {
     private static byte[] fileGetContents(File f) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (FileInputStream fis = new FileInputStream(f)) {
-            int read = 0;
+            int read;
             byte[] buffer = new byte[1024];
             while ((read = fis.read(buffer)) > 0) {
                 baos.write(buffer, 0, read);
