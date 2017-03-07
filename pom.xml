@@ -3,7 +3,7 @@
 
     <groupId>eu.doppel_helix.netbeans</groupId>
     <artifactId>MantisIntegration</artifactId>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.6</version>
     <packaging>nbm</packaging>
 
     <name>MantisIntegration</name>
@@ -24,7 +24,7 @@
         <connection>scm:git:https://github.com/matthiasblaesing/netbeans-mantis-integration.git</connection>
         <developerConnection>scm:git:git@github.com:matthiasblaesing/netbeans-mantis-integration.git</developerConnection>
         <url>https://github.com/matthiasblaesing/netbeans-mantis-integration</url>
-      <tag>HEAD</tag>
+      <tag>MantisIntegration-1.6</tag>
   </scm>
 
     <properties>
