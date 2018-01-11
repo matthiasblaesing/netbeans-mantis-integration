@@ -24,14 +24,14 @@
         <connection>scm:git:https://github.com/matthiasblaesing/netbeans-mantis-integration.git</connection>
         <developerConnection>scm:git:git@github.com:matthiasblaesing/netbeans-mantis-integration.git</developerConnection>
         <url>https://github.com/matthiasblaesing/netbeans-mantis-integration</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide />
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
-        <mantisintegration.nbtarget>RELEASE80</mantisintegration.nbtarget>
+        <mantisintegration.nbtarget>RELEASE81</mantisintegration.nbtarget>
     </properties>
 
     <repositories>
@@ -273,6 +273,7 @@
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
+                    <verbose>true</verbose>
                 </configuration>
             </plugin>
 
@@ -305,8 +306,8 @@
     <description>&lt;p&gt;Integrate the Mantis bugtracker system into netbeans&lt;/p&gt;
 
 &lt;p&gt;Note for installation - to make the "Add patch" and "Checking" comment
-functions work correctly the mantis system has to configured correctly
-please check these options, if you encounter problems:&lt;/p&gt;
+        functions work correctly the mantis system has to configured correctly
+        please check these options, if you encounter problems:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;source_control_notes_view_status (default private, integer value 10 -&gt; public)&lt;/li&gt;
 &lt;li&gt;source_control_set_resolution_to (integer value 80-&gt;resolved, 90-&gt;closed)&lt;/li&gt;
@@ -314,5 +315,5 @@ please check these options, if you encounter problems:&lt;/p&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;If a self-signed SSL certificate or an invalid certificate need to be accepted, please install the module 
-"SSL Certificate Exception".&lt;/p&gt;</description>
+        "SSL Certificate Exception".&lt;/p&gt;</description>
 </project>
