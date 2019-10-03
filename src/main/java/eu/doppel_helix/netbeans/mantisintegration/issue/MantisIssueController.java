@@ -49,7 +49,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultCaret;
 import javax.xml.rpc.ServiceException;
-import javax.xml.ws.Holder;
 import org.netbeans.modules.bugtracking.spi.IssueController;
 import org.netbeans.modules.bugtracking.spi.IssueProvider;
 import org.openide.util.HelpCtx;
@@ -599,7 +598,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                         final List<String> categories = new ArrayList<>();
                         final List<AccountData> users = new ArrayList<>();
                         final List<String> versions = new ArrayList<>();
-                        final Holder<CustomFieldDefinitionData[]> customFields = new Holder<>();
+                        final CustomFieldDefinitionData[][] customFields = new CustomFieldDefinitionData[1][];
                         if (fpd != null) {
                             BigInteger projectId = fpd.getProjectData().getId();
                             categories.add(null);
@@ -610,14 +609,14 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                             for (ProjectVersionData vdata : mr.getMasterData().getVersions(projectId)) {
                                 versions.add(vdata.getName());
                             }
-                            customFields.value = mr.getMasterData().getCustomFieldDefinitions(projectId);
+                            customFields[0] = mr.getMasterData().getCustomFieldDefinitions(projectId);
                         } else {
-                            customFields.value = new CustomFieldDefinitionData[0];
+                            customFields[0] = new CustomFieldDefinitionData[0];
                         }
                         
-                        final Holder<UserData> ud = new Holder<>();
+                        final UserData[] ud = new UserData[1];
                         try {
-                            ud.value = mr.getAccount();
+                            ud[0] = mr.getAccount();
                         } catch (ServiceException | RemoteException ex) {
                         };
                         
@@ -639,8 +638,8 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                                     issueData.put(cfvfid.getField().getId(), cfvfid.getValue());
                                 }
                                 panel.clearCustomFields();
-                                for (CustomFieldDefinitionData cfdd : customFields.value) {
-                                    CustomFieldComponent cfc = CustomFieldComponent.create(cfdd, ud.value);
+                                for (CustomFieldDefinitionData cfdd : customFields[0]) {
+                                    CustomFieldComponent cfc = CustomFieldComponent.create(cfdd, ud[0]);
                                     BigInteger id = cfc.getCustomFieldDefinitionData().getField().getId();
                                     if (customFieldValueBackingStore.containsKey(id)) {
                                         cfc.setValue(customFieldValueBackingStore.get(id));

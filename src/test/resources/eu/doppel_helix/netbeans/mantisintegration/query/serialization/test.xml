@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mantisQuery version="1">
+    <id>TestId</id>
+    <name>Dummy Query</name>
+    <projectId>23</projectId>
+    <serversideFilterId>10</serversideFilterId>
+    <reporter>
+        <email>maxine.musterfrau@customer.de</email>
+        <id>43</id>
+        <name>Maxine</name>
+        <real_name>Maxine Musterfrau</real_name>
+    </reporter>
+    <assignedTo>
+        <email>max.mustermann@test.de</email>
+        <id>42</id>
+        <name>Max</name>
+        <real_name>Max Mustermann</real_name>
+    </assignedTo>
+    <category>DemoCategory</category>
+    <severity>
+        <id>3</id>
+        <name>Total loss</name>
+    </severity>
+    <resolution>
+        <id>2</id>
+        <name>All are happy</name>
+    </resolution>
+    <status>
+        <id>4</id>
+        <name>Clearing</name>
+    </status>
+    <priority>
+        <id>1</id>
+        <name>Prio 1</name>
+    </priority>
+    <viewStatus>
+        <id>5</id>
+        <name>Viewing</name>
+    </viewStatus>
+    <lastUpdateAfter>2018-01-01T00:00:00+01:00</lastUpdateAfter>
+    <lastUpdateBefore>2019-01-01T00:00:00+01:00</lastUpdateBefore>
+    <summaryFilter>exception in runtime</summaryFilter>
+    <combination>ALL</combination>
+</mantisQuery>

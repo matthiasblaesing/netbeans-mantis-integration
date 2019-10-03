@@ -33,7 +33,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
 import javax.xml.rpc.ServiceException;
-import javax.xml.ws.Holder;
 import org.netbeans.modules.bugtracking.spi.IssueStatusProvider;
 import org.netbeans.modules.bugtracking.spi.QueryController;
 import org.openide.DialogDisplayer;
@@ -333,10 +332,10 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                             }
                         });
                 
-                final Holder<FilterData[]> filter = new Holder<>();
+                final FilterData[][] filter = new FilterData[1][];
                 
                 if (selected != null) {
-                    filter.value = mr.getMasterData().getFilters(
+                    filter[0] = mr.getMasterData().getFilters(
                             selected.getProjectData().getId());
                 }
                 
@@ -344,7 +343,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     @Override
                     public Void run() {
                         if (filter != null) {
-                            filterModel1.setBackingList(Arrays.asList(filter.value));
+                            filterModel1.setBackingList(Arrays.asList(filter[0]));
                             filterModel1.addElement(0, null);
                         } else {
                             filterModel1.setBackingList(Collections.EMPTY_LIST);

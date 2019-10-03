@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<issueInfos>
+    <issueInfo id="2">
+        <readState>2019-11-01T08:00:00+03:00</readState>
+        <scheduleDate>2019-11-12+02:00</scheduleDate>
+        <scheduleLength>200</scheduleLength>
+    </issueInfo>
+    <issueInfo id="1">
+        <readState>2019-12-01T09:00:00+03:00</readState>
+        <scheduleDate>2019-12-12+00:00</scheduleDate>
+        <scheduleLength>400</scheduleLength>
+    </issueInfo>
+</issueInfos>
