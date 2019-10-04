@@ -182,21 +182,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Bundle JAXB -->
+        <!-- Bundle JAXWS/JAXB -->
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-rt</artifactId>
             <version>2.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.istack</groupId>
-            <artifactId>istack-commons-runtime</artifactId>
-            <version>3.0.9</version>
         </dependency>
     </dependencies>
 
