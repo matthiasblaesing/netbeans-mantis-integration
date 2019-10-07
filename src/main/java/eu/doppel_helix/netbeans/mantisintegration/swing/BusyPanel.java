@@ -29,6 +29,7 @@ public class BusyPanel extends JPanel {
 
     private final NoopListener noopListener = new NoopListener();
 
+    @SuppressWarnings("OverridableMethodCallInConstructor")
     public BusyPanel() {
         super(new BorderLayout());
         JLabel label = new JLabel("Busy");

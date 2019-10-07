@@ -45,7 +45,7 @@ public class IssueInfo implements Cloneable {
     public void setReadState(Date readState) {
         this.readState = readState;
     }
-    
+
     @XmlAttribute
     public BigInteger getId() {
         return id;
@@ -59,7 +59,7 @@ public class IssueInfo implements Cloneable {
     public boolean isEmpty() {
         return scheduleLength == 0 && scheduleDate == null && readState == null;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 7;
@@ -89,7 +89,7 @@ public class IssueInfo implements Cloneable {
         }
         return true;
     }
-    
+
     public Object clone() {
         try {
             return super.clone();

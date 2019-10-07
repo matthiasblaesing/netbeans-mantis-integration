@@ -32,6 +32,7 @@ public class AttachmentDisplay extends DelegatingBaseLineJPanel implements Actio
     private final JXHyperlink downloadButton = new JXHyperlink();
     private final JLabel trailingLabel = new JLabel();
 
+    @SuppressWarnings("LeakingThisInConstructor")
     public AttachmentDisplay(MantisIssue issue, AttachmentData ad) {
         super();
         setOpaque(false);
@@ -73,7 +74,7 @@ public class AttachmentDisplay extends DelegatingBaseLineJPanel implements Actio
                     }
 
                 }
-            }); 
+            });
         }
         if (COMMAND_DOWNLOAD.equals(e.getActionCommand())) {
             try {

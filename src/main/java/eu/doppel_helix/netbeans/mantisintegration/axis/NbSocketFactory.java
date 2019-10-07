@@ -14,6 +14,7 @@ import org.apache.axis.components.net.BooleanHolder;
 import static org.apache.axis.components.net.DefaultSocketFactory.CONNECT_TIMEOUT;
 
 public class NbSocketFactory extends NbBaseSocketFactory implements org.apache.axis.components.net.SocketFactory {
+
     private static final Logger LOG = Logger.getLogger(NbSocketFactory.class.getName());
 
     public NbSocketFactory(Hashtable attributes) {
@@ -45,22 +46,24 @@ public class NbSocketFactory extends NbBaseSocketFactory implements org.apache.a
         if (s == null) {
             for (Proxy p : proxies) {
                 try {
-                    if (null != p.type()) switch (p.type()) {
-                        case DIRECT:
-                            s = new Socket();
-                            s.connect(new InetSocketAddress(host, port), timeout);
-                            break;
-                        case SOCKS:
-                            s = new Socket(p);
-                            s.connect(new InetSocketAddress(host, port), timeout);
-                            break;
-                        case HTTP:
-                            s = new Socket();
-                            s.connect(p.address());
-                            useFullURL.value = true;
-                            addProxyAuthenticationIfPresent(otherHeaders);
-                            break;
-                        default:
+                    if (null != p.type()) {
+                        switch (p.type()) {
+                            case DIRECT:
+                                s = new Socket();
+                                s.connect(new InetSocketAddress(host, port), timeout);
+                                break;
+                            case SOCKS:
+                                s = new Socket(p);
+                                s.connect(new InetSocketAddress(host, port), timeout);
+                                break;
+                            case HTTP:
+                                s = new Socket();
+                                s.connect(p.address());
+                                useFullURL.value = true;
+                                addProxyAuthenticationIfPresent(otherHeaders);
+                                break;
+                            default:
+                        }
                     }
                     break;
                 } catch (IOException | IllegalArgumentException ex) {
@@ -74,10 +77,10 @@ public class NbSocketFactory extends NbBaseSocketFactory implements org.apache.a
 
     private void addProxyAuthenticationIfPresent(StringBuffer otherHeaders) {
         String authorizationHeader = getAuthorizationHeader();
-        if(! authorizationHeader.isEmpty()) {
+        if (!authorizationHeader.isEmpty()) {
             otherHeaders
-                    .append(authorizationHeader)
-                    .append("\r\n");
+                .append(authorizationHeader)
+                .append("\r\n");
         }
     }
 

@@ -18,5 +18,5 @@ public class ProjectVersionDataComparator implements Comparator<ProjectVersionDa
         String referenz2 = obsolete2 + release2 + name2;
         return referenz1.compareToIgnoreCase(referenz2);
     }
-    
+
 }

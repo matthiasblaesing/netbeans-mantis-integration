@@ -15,7 +15,7 @@ import org.jdesktop.swingx.JXHyperlink;
 
 public class RelationshipDisplay extends DelegatingBaseLineJPanel implements ActionListener {
     private static final Logger LOG = Logger.getLogger(RelationshipDisplay.class.getName());
-    
+
     private final String COMMAND_DELETE = "deleteString";
     private final String COMMAND_OPENISSUE = "openIssue";
     private final RelationshipData rd;
@@ -25,6 +25,7 @@ public class RelationshipDisplay extends DelegatingBaseLineJPanel implements Act
     private final JLabel trailingLabel = new JLabel();
     private final JLabel middleLabel = new JLabel();
 
+    @SuppressWarnings("LeakingThisInConstructor")
     public RelationshipDisplay(MantisIssue issue, RelationshipData rd) {
         super();
         setOpaque(false);

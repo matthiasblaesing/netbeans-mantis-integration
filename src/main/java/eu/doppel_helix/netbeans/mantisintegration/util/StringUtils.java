@@ -15,7 +15,7 @@ public class StringUtils {
         }
         return result.toString();
     }
-    
+
     public static String toCustomFieldList(String... list) {
         return toCustomFieldList(Arrays.asList(list));
     }

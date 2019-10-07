@@ -17,5 +17,5 @@ public class FilterDataListCellRenderer extends DefaultListCellRenderer {
         }
         return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
     }
-    
+
 }

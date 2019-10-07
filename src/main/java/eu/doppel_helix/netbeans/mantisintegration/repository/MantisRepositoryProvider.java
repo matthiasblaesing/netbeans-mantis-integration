@@ -14,7 +14,7 @@ import org.netbeans.modules.bugtracking.spi.RepositoryProvider;
 
 public class MantisRepositoryProvider implements RepositoryProvider<MantisRepository,MantisQuery,MantisIssue> {
     private static final Logger LOG = Logger.getLogger(MantisRepositoryProvider.class.getName());
-    
+
     @Override
     public RepositoryInfo getInfo(MantisRepository r) {
         return r.getInfo();

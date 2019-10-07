@@ -11,7 +11,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class MantisCalendarCellRenderer extends DefaultTableCellRenderer {
     private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if(value instanceof Calendar) {

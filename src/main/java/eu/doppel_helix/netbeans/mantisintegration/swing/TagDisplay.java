@@ -6,9 +6,11 @@ import eu.doppel_helix.netbeans.mantisintegration.issue.MantisIssue;
 import eu.doppel_helix.netbeans.mantisintegration.repository.MantisRepository;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import javax.xml.rpc.ServiceException;
 import org.jdesktop.swingx.JXHyperlink;
 
 public class TagDisplay extends DelegatingBaseLineJPanel implements ActionListener {
@@ -20,6 +22,7 @@ public class TagDisplay extends DelegatingBaseLineJPanel implements ActionListen
     private final JXHyperlink deleteButton = new JXHyperlink();
     private final JLabel trailingLabel = new JLabel();
 
+    @SuppressWarnings("LeakingThisInConstructor")
     public TagDisplay(MantisIssue issue, ObjectRef tag) {
         super();
         setOpaque(false);
@@ -47,12 +50,12 @@ public class TagDisplay extends DelegatingBaseLineJPanel implements ActionListen
                 public void run() {
                     try {
                         issue.removeTag(tag);
-                    } catch (Exception ex) {
+                    } catch (RemoteException | ServiceException ex) {
                         mr.getExceptionHandler()
                                 .handleException(LOG, "Failed to remove tag from issue", ex);
                     }
                 }
-            }); 
+            });
         }
     }
 }

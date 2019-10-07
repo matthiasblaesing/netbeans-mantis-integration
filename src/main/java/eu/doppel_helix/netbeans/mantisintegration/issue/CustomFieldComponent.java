@@ -91,12 +91,12 @@ public abstract class CustomFieldComponent extends DelegatingBaseLineJPanel impl
     private CustomFieldComponent(CustomFieldDefinitionData cfdd) {
         this.cfdd = cfdd;
         setOpaque(false);
-        
+
         JMenuItem mi = new JMenuItem("Reset");
         mi.addActionListener(this);
         mi.setActionCommand("reset");
         popup.add(mi);
-        
+
         this.setComponentPopupMenu(popup);
     }
 
@@ -107,7 +107,7 @@ public abstract class CustomFieldComponent extends DelegatingBaseLineJPanel impl
     public CustomFieldDefinitionData getCustomFieldDefinitionData() {
         return cfdd;
     }
-    
+
     public void setDefaultValue() {
         setValue(cfdd.getDefault_value());
     }
@@ -130,10 +130,10 @@ public abstract class CustomFieldComponent extends DelegatingBaseLineJPanel impl
 
     private static class CustomFieldComponentDisplay extends CustomFieldComponent {
 
-        private static DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+        private static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
         private String value;
-        private JLabel outputLabel;
-        private Type type;
+        private final JLabel outputLabel;
+        private final Type type;
 
         public CustomFieldComponentDisplay(CustomFieldDefinitionData cfdd, Type type) {
             super(cfdd);
@@ -154,7 +154,7 @@ public abstract class CustomFieldComponent extends DelegatingBaseLineJPanel impl
         public java.lang.String getValue() {
             return value;
         }
-        
+
         private String toDisplay(String value) {
             if (value == null) {
                 return " ";
@@ -247,7 +247,7 @@ public abstract class CustomFieldComponent extends DelegatingBaseLineJPanel impl
             return line.getText();
         }
     }
-    
+
     private static class CustomFieldComponentList extends CustomFieldComponent {
         private final JList<String> list = new JList<>();
 
@@ -299,7 +299,7 @@ public abstract class CustomFieldComponent extends DelegatingBaseLineJPanel impl
             return result.toString();
         }
     }
-    
+
     private static class CustomFieldComponentCheckbox extends CustomFieldComponent {
         private final Map<String,JCheckBox> checkboxes = new HashMap<>();
 
@@ -337,7 +337,7 @@ public abstract class CustomFieldComponent extends DelegatingBaseLineJPanel impl
             return result.toString();
         }
     }
-    
+
     private static class CustomFieldComponentRadio extends CustomFieldComponent {
         private final Map<String,JRadioButton> radiobuttons = new HashMap<>();
 
@@ -377,7 +377,7 @@ public abstract class CustomFieldComponent extends DelegatingBaseLineJPanel impl
             return result.toString();
         }
     }
-    
+
     private static class CustomFieldComponentEnum extends CustomFieldComponent {
         private final JComboBox<String> combobox = new JComboBox<>();
 

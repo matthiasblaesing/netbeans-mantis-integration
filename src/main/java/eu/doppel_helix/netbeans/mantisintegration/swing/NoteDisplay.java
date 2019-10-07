@@ -29,9 +29,9 @@ public class NoteDisplay extends javax.swing.JPanel {
             maxWidth -= 200;
             noteTextPane.setMaximumSize(new Dimension(maxWidth, Integer.MAX_VALUE));
             noteTextPane.doLayout();
-            return new Dimension(parent.getWidth(), 
+            return new Dimension(parent.getWidth(),
                     (int) Math.max(
-                        getPreferredHeight(), 
+                        getPreferredHeight(),
                         noteTextPane.getMinimumSize().getHeight()));
         }
 
@@ -41,9 +41,9 @@ public class NoteDisplay extends javax.swing.JPanel {
             maxWidth -= 200;
             noteTextPane.setMaximumSize(new Dimension(maxWidth, Integer.MAX_VALUE));
             noteTextPane.doLayout();
-            return new Dimension(parent.getWidth(), 
+            return new Dimension(parent.getWidth(),
                     (int) Math.max(
-                        getMinimumHeight(), 
+                        getMinimumHeight(),
                         noteTextPane.getMinimumSize().getHeight()));
         }
 
@@ -52,7 +52,7 @@ public class NoteDisplay extends javax.swing.JPanel {
             leftPanel.setBounds(0, 0, 200, parent.getHeight());
             noteTextPane.setBounds(202, 0, parent.getWidth() - 202, parent.getHeight());
         }
-        
+
         private int getMinimumHeight() {
             double height = reporterLabel.getMinimumSize().getHeight();
             height += submitDateLabel.getMinimumSize().getHeight();
@@ -62,7 +62,7 @@ public class NoteDisplay extends javax.swing.JPanel {
             height += 20; // Somewhere my calculation is off
             return (int) height;
         }
-        
+
         private int getPreferredHeight() {
             double height = reporterLabel.getPreferredSize().getHeight();
             height += submitDateLabel.getPreferredSize().getHeight();
@@ -73,17 +73,18 @@ public class NoteDisplay extends javax.swing.JPanel {
             return (int) height;
         }
     };
-    
+
     public NoteDisplay() {
         initComponents();
         setLayout(layout);
     }
 
+    @SuppressWarnings("OverridableMethodCallInConstructor")
     public NoteDisplay(IssueNoteData noteData, boolean showTimeTrack) {
         this();
         setNoteData(noteData, showTimeTrack);
     }
-    
+
     public void setNoteData(IssueNoteData noteData, boolean showTimeTrack) {
         reporterLabel.setText(noteData.getReporter().getName());
         submitDateLabel.setText(sdf.format(noteData.getDate_submitted().getTime()));
@@ -112,7 +113,7 @@ public class NoteDisplay extends javax.swing.JPanel {
         dc.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         noteTextPane.setText(noteData.getText());
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

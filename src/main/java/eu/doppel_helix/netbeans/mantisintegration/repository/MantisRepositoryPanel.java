@@ -10,13 +10,13 @@ import javax.swing.text.JTextComponent;
 
 public class MantisRepositoryPanel extends javax.swing.JPanel {
     private static final ObjectRef dummyObjectRef = new ObjectRef(BigInteger.ONE, "ABCDEFGHIJKLMNOPQRS");
-    
+
     /**
      * Creates new form MantisRepositoryPanel
      */
     public MantisRepositoryPanel() {
         initComponents();
-        
+
         scheduleDateFieldCustom.addChangeListener(new ChangeListener() {
 
             @Override
@@ -28,7 +28,7 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
                 }
             }
         });
-      
+
         scheduleLengthFieldCustom.addChangeListener(new ChangeListener() {
 
             @Override
@@ -40,7 +40,7 @@ public class MantisRepositoryPanel extends javax.swing.JPanel {
                 }
             }
         });
-        
+
         httpUserField.setPreferredSize(httpUserField.getMinimumSize());
         httpPwdField.setPreferredSize(httpPwdField.getMinimumSize());
         usernameTextField.setPreferredSize(usernameTextField.getMinimumSize());

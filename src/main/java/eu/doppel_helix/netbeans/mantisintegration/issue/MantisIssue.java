@@ -41,7 +41,7 @@ public class MantisIssue {
             setBusy(false);
         }
     };
-    
+
     public SafeAutocloseable busy() {
         setBusy(true);
         return busyHelper;
@@ -55,7 +55,7 @@ public class MantisIssue {
     public boolean isBusy() {
         return busy != 0;
     }
-    
+
     private void setBusy(boolean busyBool) {
         boolean oldBusy = isBusy();
         synchronized(this) {
@@ -160,7 +160,7 @@ public class MantisIssue {
             }
         });
     }
-    
+
     public MantisIssueController getController() {
         if (mic == null) {
             mic = new MantisIssueController(this);
@@ -261,17 +261,17 @@ public class MantisIssue {
 
     /**
      * Check whether update of issue data and tags is possible
-     * 
+     *
      * @todo: Implement a better strategy to check
      */
     public boolean canUpdate() {
         return mr.getCapabilities().canUpdate(this);
     }
-    
+
     public Permission getTimetracking() {
         return timetracking;
     }
-    
+
     // Property change support
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
@@ -621,7 +621,7 @@ public class MantisIssue {
         issueData.setTags(tags);
         firePropertyChange("tags", oldValue, tags);
     }
-    
+
     public IssueStatusProvider.Status getReadStatus() {
         Date readDate = getReadDate();
         if (readDate == null) {
@@ -632,7 +632,7 @@ public class MantisIssue {
             return IssueStatusProvider.Status.SEEN;
         }
     }
-    
+
     public Date getReadDate() {
         IssueInfo ii = getMantisRepository().getIssueInfosHandler().getIssueInfo(getId());
         if (ii == null) {

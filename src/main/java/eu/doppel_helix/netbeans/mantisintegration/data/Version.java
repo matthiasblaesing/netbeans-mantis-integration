@@ -11,7 +11,7 @@ public class Version implements Comparable<Version> {
     private final static Logger logger = Logger.getLogger(Version.class.getName());
     List<Integer> levels = new ArrayList<>();
     String versionString;
-    
+
     public Version(String versionString) {
         this.versionString = versionString;
         String[] versionParts = versionString.split("\\D+");
@@ -20,7 +20,7 @@ public class Version implements Comparable<Version> {
                 Integer part = Integer.valueOf(versionPart);
                 levels.add(part);
             } catch (NumberFormatException ex) {
-                logger.log(Level.INFO, "Failed to parse part of version string: {1} ({0})", 
+                logger.log(Level.INFO, "Failed to parse part of version string: {1} ({0})",
                         new Object[] {versionString, versionPart});
             }
         }
@@ -29,7 +29,7 @@ public class Version implements Comparable<Version> {
     public String getVersionString() {
         return versionString;
     }
-    
+
     public List<Integer> getVersionParts() {
         return Collections.unmodifiableList(levels);
     }
@@ -42,7 +42,7 @@ public class Version implements Comparable<Version> {
             if(i1 == null) {
                 i1 = 0;
             }
-            if(i2 == null) { 
+            if(i2 == null) {
                 i2 = 0;
             }
             if( ! i1.equals(i2) ) {
@@ -51,7 +51,7 @@ public class Version implements Comparable<Version> {
         }
         return 0;
     }
-    
+
     @Override
     public String toString() {
         return levels.toString() + " (" + versionString + ")";

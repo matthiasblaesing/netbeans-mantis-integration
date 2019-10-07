@@ -32,7 +32,7 @@ public class DirectionalEditorPane extends JTextPane {
         this.trackViewportHeight = trackViewportHeight;
         firePropertyChange("scrollableTracksViewportWidth", oldValue, trackViewportHeight);
     }
-    
+
     @Override
     public boolean getScrollableTracksViewportWidth() {
         return trackViewportWidth;

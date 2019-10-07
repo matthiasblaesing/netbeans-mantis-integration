@@ -64,5 +64,4 @@ public class MantisQueryProvider implements QueryProvider<MantisQuery, MantisIss
     public void setIssueContainer(MantisQuery q, IssueContainer<MantisIssue> ic) {
         q.setIssueContainer(ic);
     }
-    
 }

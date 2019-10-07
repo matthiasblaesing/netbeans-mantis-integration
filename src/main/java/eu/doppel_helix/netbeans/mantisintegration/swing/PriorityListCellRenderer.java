@@ -11,7 +11,7 @@ import javax.swing.JList;
 
 public class PriorityListCellRenderer extends DefaultListCellRenderer {
     private final MantisPriorityProvider mpp = new MantisPriorityProvider();
-    
+
     @Override
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         ObjectRef or = null;
@@ -29,5 +29,4 @@ public class PriorityListCellRenderer extends DefaultListCellRenderer {
         }
         return label;
     }
-    
 }

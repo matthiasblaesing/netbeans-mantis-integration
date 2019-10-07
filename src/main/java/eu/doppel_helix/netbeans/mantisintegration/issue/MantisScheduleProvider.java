@@ -17,14 +17,14 @@ import org.netbeans.modules.bugtracking.spi.RepositoryInfo;
 
 public class MantisScheduleProvider implements IssueScheduleProvider<MantisIssue> {
     private static final Logger LOG = Logger.getLogger(MantisScheduleProvider.class.getName());
-    
+
     @Override
     public void setSchedule(final MantisIssue i, IssueScheduleInfo scheduleInfo) {
         IssueInfo ii = i.getMantisRepository().getIssueInfosHandler().getIssueInfo(i.getId());
         if(ii == null) {
             ii = new IssueInfo(i.getId());
         }
-        
+
         if(scheduleInfo != null) {
             ii.setScheduleDate(scheduleInfo.getDate());
             ii.setScheduleLength(scheduleInfo.getInterval());
@@ -33,15 +33,15 @@ public class MantisScheduleProvider implements IssueScheduleProvider<MantisIssue
             ii.setScheduleLength(0);
         }
         i.getMantisRepository().getIssueInfosHandler().putIssueInfo(ii);
-        
+
         RepositoryInfo ri = i.getMantisRepository().getInfo();
         String dateField = ri.getValue(MantisRepository.PROP_SCHEDULE_DATE_FIELD);
         String lengthField = ri.getValue(MantisRepository.PROP_SCHEDULE_LENGTH_FIELD);
-                boolean dateFieldFound = false;
+        boolean dateFieldFound = false;
         boolean lengthFieldFound = false;
 
         final IssueData id = i.getIssueData();
-        
+
         CustomFieldValueForIssueData[] cfvfids = id.getCustom_fields();
         for (CustomFieldValueForIssueData cfvfid : cfvfids) {
             if (dateField != null
@@ -62,7 +62,7 @@ public class MantisScheduleProvider implements IssueScheduleProvider<MantisIssue
                 lengthFieldFound = true;
             }
         }
-        
+
         if (dateField != null && (!dateFieldFound)) {
             LOG.log(Level.WARNING, String.format(
                     "Mantis-Custom Field for schedule date was not found: %s",
@@ -74,7 +74,7 @@ public class MantisScheduleProvider implements IssueScheduleProvider<MantisIssue
                     "Mantis-Custom Field for schedule length was not found: %s",
                     dateField));
         }
-        
+
         Runnable updater = new Runnable() {
             @Override
             public void run() {
@@ -86,7 +86,7 @@ public class MantisScheduleProvider implements IssueScheduleProvider<MantisIssue
                 }
             }
         };
-        
+
         if(SwingUtilities.isEventDispatchThread()) {
             i.getMantisRepository().getRequestProcessor().execute(updater);
         } else {
@@ -102,22 +102,22 @@ public class MantisScheduleProvider implements IssueScheduleProvider<MantisIssue
     @Override
     public IssueScheduleInfo getSchedule(MantisIssue i) {
         IssueInfo ii = i.getMantisRepository().getIssueInfosHandler().getIssueInfo(i.getId());
-        
+
         Date scheduleDate = null;
         int scheduleLength = 0;
-        
+
         if (ii != null && ii.getScheduleLength() != 0 && ii.getScheduleDate()
                 != null) {
             scheduleDate = ii.getScheduleDate();
             scheduleLength = ii.getScheduleLength();
         }
-        
+
         RepositoryInfo ri = i.getMantisRepository().getInfo();
         String dateField = ri.getValue(MantisRepository.PROP_SCHEDULE_DATE_FIELD);
         String lengthField = ri.getValue(MantisRepository.PROP_SCHEDULE_LENGTH_FIELD);
         boolean dateFieldFound = false;
         boolean lengthFieldFound = false;
-        
+
         CustomFieldValueForIssueData[] cfvfids = i.getCustom_fields();
         for(CustomFieldValueForIssueData cfvfid: cfvfids) {
             if(dateField != null && dateField.equalsIgnoreCase(cfvfid.getField().getName())) {
@@ -134,27 +134,26 @@ public class MantisScheduleProvider implements IssueScheduleProvider<MantisIssue
                 lengthFieldFound = true;
             }
         }
-        
+
         if (dateField != null && (!dateFieldFound)) {
             LOG.log(Level.WARNING, String.format(
                     "Mantis-Custom Field for schedule date was not found: %s",
                     dateField));
         }
-        
+
         if (lengthField != null && (!lengthFieldFound)) {
             LOG.log(Level.WARNING, String.format(
                     "Mantis-Custom Field for schedule length was not found: %s",
                     dateField));
         }
-        
+
         if(scheduleDate == null || scheduleLength == 0) {
             return null;
         } else {
             return new IssueScheduleInfo(scheduleDate, scheduleLength);
         }
     }
-   
-    
+
     private Date extractDate(CustomFieldValueForIssueData cfvfid) {
         if (cfvfid.getValue() == null || "".equals(cfvfid.getValue())) {
             return null;

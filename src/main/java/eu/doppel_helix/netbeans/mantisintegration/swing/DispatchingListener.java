@@ -11,7 +11,7 @@ public class DispatchingListener implements MouseListener {
     public DispatchingListener(Component delegate) {
         this.delegate = delegate;
     }
-    
+
     @Override
     public void mouseClicked(MouseEvent e) {
         e.setSource(delegate);
@@ -41,5 +41,5 @@ public class DispatchingListener implements MouseListener {
         e.setSource(delegate);
         delegate.dispatchEvent(e);
     }
-    
+
 }

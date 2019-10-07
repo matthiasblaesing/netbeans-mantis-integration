@@ -31,7 +31,7 @@ public class TimeFormatterFactory extends AbstractFormatterFactory {
 class TimeFormatter extends AbstractFormatter {
     Pattern patternCompound = Pattern.compile("(\\d+):(\\d+)");
     Pattern pattern = Pattern.compile("(\\d+)");
-    
+
     @Override
     public Object stringToValue(String text) throws ParseException {
         if (text == null) {
@@ -64,6 +64,4 @@ class TimeFormatter extends AbstractFormatter {
             return "00:00";
         }
     }
- 
 }
-        

@@ -18,6 +18,7 @@ public class AddTagDialog extends javax.swing.JDialog implements ActionListener 
     private final static Logger logger = Logger.getLogger(AddTagDialog.class.getName());
     private final MantisIssue issue;
 
+    @SuppressWarnings("LeakingThisInConstructor")
     public AddTagDialog(java.awt.Frame parent, final MantisIssue issue) {
         super(parent, true);
         setLocationByPlatform(true);

@@ -56,8 +56,8 @@ public class FlattenedProjectData {
         }
         return true;
     }
-    
-    /** 
+
+    /**
      * Flatten the supplied ProjectData and Subprojects
      */
     public static List<FlattenedProjectData> buildList(ProjectData pd) {
@@ -65,7 +65,7 @@ public class FlattenedProjectData {
         buildList(pd, 0, result);
         return result;
     }
-    
+
     private static void buildList(ProjectData pd, int level, List<FlattenedProjectData> result) {
         result.add(new FlattenedProjectData(pd, level));
         for(ProjectData pdi: pd.getSubprojects()) {

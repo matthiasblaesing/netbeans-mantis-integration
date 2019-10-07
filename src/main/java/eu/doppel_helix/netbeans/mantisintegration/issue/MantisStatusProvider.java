@@ -42,5 +42,5 @@ public class MantisStatusProvider implements IssueStatusProvider<MantisRepositor
     public void addPropertyChangeListener(MantisIssue i, PropertyChangeListener listener) {
         i.addPropertyChangeListener(listener);
     }
-    
+
 }

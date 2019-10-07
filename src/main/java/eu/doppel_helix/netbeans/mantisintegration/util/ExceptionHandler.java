@@ -16,17 +16,17 @@ public class ExceptionHandler {
     private static final QName clientFault = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Client");
     private static final Pattern customFieldMsgPattern = Pattern.compile("(Invalid custom field value for field )id \\s*(\\d+)\\s*\\.");
     private final MantisRepository repository;
-    
+
     public ExceptionHandler(MantisRepository repository) {
         this.repository = repository;
     }
-    
+
     public void handleException(Logger logger, String message, Exception ex) {
         if (ex instanceof AxisFault) {
             AxisFault af = (AxisFault) ex;
             if (clientFault.equals(af.getFaultCode())) {
                 NotifyDescriptor nd = new NotifyDescriptor.Message(
-                        formatUserMessage(message, af.getFaultString()), 
+                        formatUserMessage(message, af.getFaultString()),
                         NotifyDescriptor.WARNING_MESSAGE);
                 DialogDisplayer.getDefault().notifyLater(nd);
                 logger.log(Level.INFO, message, ex);
@@ -35,7 +35,7 @@ public class ExceptionHandler {
             logger.log(Level.WARNING, message, ex);
         }
     }
-    
+
     private String formatUserMessage(String message, String fault) {
         if(fault == null) {
             fault = "";

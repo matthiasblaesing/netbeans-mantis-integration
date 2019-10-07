@@ -18,12 +18,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class IssueInfos {
     private final Set<IssueInfo> issueInfoBuffer = new HashSet<>();
     private final Map<BigInteger,IssueInfo> issueInfos = new HashMap<>();
-    
+
     @XmlElement
     private Collection<IssueInfo> getIssueInfo() {
         return issueInfoBuffer;
     }
-    
+
     private void beforeMarshal(final Marshaller marshaller) {
         issueInfoBuffer.addAll(issueInfos.values());
     }
@@ -44,11 +44,11 @@ public class IssueInfos {
             this.issueInfos.put(i.getId(), i);
         }
     }
-    
+
     public IssueInfo getIssueInfo(BigInteger id) {
         return this.issueInfos.get(id);
     }
-   
+
     public boolean putIssueInfo(IssueInfo i) {
         boolean isEmpty = i.isEmpty();
         if(isEmpty) {

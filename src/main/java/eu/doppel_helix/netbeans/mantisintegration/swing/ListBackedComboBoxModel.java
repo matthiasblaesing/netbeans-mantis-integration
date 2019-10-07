@@ -14,17 +14,17 @@ import javax.swing.event.ListDataListener;
 public class ListBackedComboBoxModel<E> implements ComboBoxModel<E> {
     private final List<E> backingList = new ArrayList<>();
     private final Class<E> klass;
-    Set<ListDataListener> listener = new HashSet<>();
+    private final Set<ListDataListener> listener = new HashSet<>();
     private E selectedItem = null;
-    
+
     public ListBackedComboBoxModel(Class<E> klass) {
         this.klass = klass;
     }
-    
+
     /**
      * Set the backing List for this ComboBoxModel (the list is copied)
-     * 
-     * @param elements 
+     *
+     * @param elements
      */
     public void setBackingList(final List<E> elements) {
         int oldLength = backingList.size();
@@ -42,28 +42,28 @@ public class ListBackedComboBoxModel<E> implements ComboBoxModel<E> {
             fireIntervalAdded(0, backingList.size() - 1);
         }
     }
-    
+
     public void addElement(final E element) {
         backingList.add(element);
         fireIntervalAdded(backingList.size() - 1, backingList.size() - 1);
     }
-    
+
     public void addElement(final int position, final E element) {
         backingList.add(position, element);
         fireIntervalAdded(position, position);
     }
-    
+
     /**
      * Retrieve an unmodifiable reference to the backing list
-     * 
+     *
      * WARNING: This reference is only unmodifiable for the caller!
-     * 
-     * @return 
+     *
+     * @return
      */
     public List<E> getBackingList() {
         return Collections.unmodifiableList(backingList);
     }
-    
+
     protected void fireIntervalAdded(int start, int end) {
         Iterator<ListDataListener> i = listener.iterator();
         ListDataEvent lde = new ListDataEvent(
@@ -81,7 +81,7 @@ public class ListBackedComboBoxModel<E> implements ComboBoxModel<E> {
             i.next().intervalAdded(lde);
         }
     }
-    
+
     protected void fireContentsChanged(int start, int end) {
         Iterator<ListDataListener> i = listener.iterator();
         ListDataEvent lde = new ListDataEvent(
@@ -90,7 +90,7 @@ public class ListBackedComboBoxModel<E> implements ComboBoxModel<E> {
             i.next().contentsChanged(lde);
         }
     }
-    
+
     @Override
     public void setSelectedItem(Object anItem) {
         if(anItem != null && (! (klass.isAssignableFrom(anItem.getClass())))) {
@@ -133,5 +133,5 @@ public class ListBackedComboBoxModel<E> implements ComboBoxModel<E> {
     public void removeListDataListener(ListDataListener l) {
         listener.remove(l);
     }
-    
+
 }

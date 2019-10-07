@@ -108,7 +108,7 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                 }
 
                 final MantisStatusProvider statusProvider = Mantis.getInstance().getStatusProvider();
-                
+
                 JPopupMenu menu = new JPopupMenu();
                 JMenuItem openItem = new JMenuItem(NbBundle.getMessage(MantisQueryController.class, "MantisQueryPanel.menuOpenIssue"));
                 openItem.setEnabled(issue != null);
@@ -331,14 +331,14 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                                 return (FlattenedProjectData) projectModel1.getSelectedItem();
                             }
                         });
-                
+
                 final FilterData[][] filter = new FilterData[1][];
-                
+
                 if (selected != null) {
                     filter[0] = mr.getMasterData().getFilters(
                             selected.getProjectData().getId());
                 }
-                
+
                 Mutex.EVENT.writeAccess(new Mutex.Action<Void>() {
                     @Override
                     public Void run() {
@@ -352,7 +352,6 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
                     }
                 });
 
-                
             } catch (Exception ex) {
                 mq.getMantisRepository()
                         .getExceptionHandler()
@@ -368,103 +367,110 @@ public class MantisQueryController implements ActionListener, PropertyChangeList
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (null != e.getActionCommand()) switch (e.getActionCommand()) {
-            case COMMAND_OPEN_ISSUE:
-                gotoIssue();
-                break;
-            case COMMAND_SELECT_PROJECT1:
-                mr.getRequestProcessor().execute(updateProjectDependendLists);
-                break;
-            case COMMAND_SAVE_QUERY:
-                if (mq.getName() == null || mq.getName().isEmpty()) {
-                    NotifyDescriptor.InputLine nd = new NotifyDescriptor.InputLine(
+        if (null != e.getActionCommand()) {
+            switch (e.getActionCommand()) {
+                case COMMAND_OPEN_ISSUE:
+                    gotoIssue();
+                    break;
+                case COMMAND_SELECT_PROJECT1:
+                    mr.getRequestProcessor().execute(updateProjectDependendLists);
+                    break;
+                case COMMAND_SAVE_QUERY:
+                    if (mq.getName() == null || mq.getName().isEmpty()) {
+                        NotifyDescriptor.InputLine nd = new NotifyDescriptor.InputLine(
                             "Name", "Save query");
-                    DialogDisplayer.getDefault().notify(nd);
-                    mq.setName((String) nd.getInputText());
-                }   new SwingWorker<Collection<MantisIssue>, Object>() {
-                    @Override
-                    protected Collection<MantisIssue> doInBackground() throws Exception {
-                        try (SafeAutocloseable ac = mq.busy()) {
-                            mq.save();
-                            mq.refresh();
-                            return mq.getIssues();
+                        DialogDisplayer.getDefault().notify(nd);
+                        mq.setName((String) nd.getInputText());
+                    }
+                    new SwingWorker<Collection<MantisIssue>, Object>() {
+                        @Override
+                        protected Collection<MantisIssue> doInBackground() throws Exception {
+                            try (SafeAutocloseable ac = mq.busy()) {
+                                mq.save();
+                                mq.refresh();
+                                return mq.getIssues();
+                            }
                         }
-                    }
-                    
-                    @Override
-                    protected void done() {
-                        try {
-                            getComponent(QueryMode.VIEW).getQueryListModel().setIssues(get());
-                        } catch (InterruptedException | ExecutionException ex) {
-                            logger.log(Level.WARNING, "Failed to save query", ex);
+
+                        @Override
+                        protected void done() {
+                            try {
+                                getComponent(QueryMode.VIEW).getQueryListModel().setIssues(get());
+                            } catch (InterruptedException | ExecutionException ex) {
+                                logger.log(Level.WARNING, "Failed to save query", ex);
+                            }
                         }
-                    }
-                }.execute();
-                break;
-            case COMMAND_DELETE_QUERY:
-                new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        mq.remove();
-                        return null;
-                    }
-                    
-                    @Override
-                    protected void done() {
-                        try {
-                            get();
-                        } catch (InterruptedException | ExecutionException ex) {
-                            logger.log(Level.WARNING, "Failed to delete query", ex);
+                    }.execute();
+                    break;
+                case COMMAND_DELETE_QUERY:
+                    new SwingWorker() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            mq.remove();
+                            return null;
                         }
-                    }
-                }.execute();
-                break;
-            case COMMAND_EXECUTE_QUERY:
-                if (projectModel1.getSelectedItem() != null) {
-                    mq.setProjectId(
+
+                        @Override
+                        protected void done() {
+                            try {
+                                get();
+                            } catch (InterruptedException | ExecutionException ex) {
+                                logger.log(Level.WARNING, "Failed to delete query", ex);
+                            }
+                        }
+                    }.execute();
+                    break;
+                case COMMAND_EXECUTE_QUERY:
+                    if (projectModel1.getSelectedItem() != null) {
+                        mq.setProjectId(
                             ((FlattenedProjectData) projectModel1.getSelectedItem()).getProjectData().getId());
-                } else {
-                    mq.setProjectId(null);
-                }   if (filterModel1.getSelectedItem() != null) {
-                    mq.setServersideFilterId(
+                    } else {
+                        mq.setProjectId(null);
+                    }
+                    if (filterModel1.getSelectedItem() != null) {
+                        mq.setServersideFilterId(
                             ((FilterData) filterModel1.getSelectedItem()).getId());
-                } else {
-                    mq.setServersideFilterId(null);
-                }   mq.setReporter((AccountData) reporterModel.getSelectedItem());
-                mq.setAssignedTo((AccountData) assignedToModel.getSelectedItem());
-                mq.setCategory((String) categoryModel.getSelectedItem());
-                mq.setSeverity((ObjectRef) severityModel.getSelectedItem());
-                mq.setResolution((ObjectRef) resolutionModel.getSelectedItem());
-                mq.setStatus((ObjectRef) statusModel.getSelectedItem());
-                mq.setPriority((ObjectRef) priorityModel.getSelectedItem());
-                mq.setViewStatus((ObjectRef) viewstatusModel.getSelectedItem());
-                mq.setLastUpdateAfter(mqp.lastUpdateAfterDatePicker.getDate());
-                mq.setLastUpdateBefore(mqp.lastUpdateBeforeDatePicker.getDate());
-                if (mqp.matchTypeComboBox.getSelectedIndex() == 1) {
-                    mq.setCombination(MantisQuery.Combination.ANY);
-                } else {
-                    mq.setCombination(MantisQuery.Combination.ALL);
-                }   mq.setSummaryFilter(mqp.summaryTextField.getText());
-                SwingWorker sw = new SwingWorker<Collection<MantisIssue>,Object>() {
-                    @Override
-                    protected Collection<MantisIssue> doInBackground() throws Exception {
-                        try (SafeAutocloseable ac = mq.busy()) {
-                            mq.refresh();
-                            return mq.getIssues();
-                        }
+                    } else {
+                        mq.setServersideFilterId(null);
                     }
-                    
-                    @Override
-                    protected void done() {
-                        try {
-                            getComponent(QueryMode.VIEW).getQueryListModel().setIssues(get());
-                        } catch (InterruptedException | ExecutionException ex) {
-                            Exceptions.printStackTrace(ex);
-                        }
+                    mq.setReporter((AccountData) reporterModel.getSelectedItem());
+                    mq.setAssignedTo((AccountData) assignedToModel.getSelectedItem());
+                    mq.setCategory((String) categoryModel.getSelectedItem());
+                    mq.setSeverity((ObjectRef) severityModel.getSelectedItem());
+                    mq.setResolution((ObjectRef) resolutionModel.getSelectedItem());
+                    mq.setStatus((ObjectRef) statusModel.getSelectedItem());
+                    mq.setPriority((ObjectRef) priorityModel.getSelectedItem());
+                    mq.setViewStatus((ObjectRef) viewstatusModel.getSelectedItem());
+                    mq.setLastUpdateAfter(mqp.lastUpdateAfterDatePicker.getDate());
+                    mq.setLastUpdateBefore(mqp.lastUpdateBeforeDatePicker.getDate());
+                    if (mqp.matchTypeComboBox.getSelectedIndex() == 1) {
+                        mq.setCombination(MantisQuery.Combination.ANY);
+                    } else {
+                        mq.setCombination(MantisQuery.Combination.ALL);
                     }
-                };  sw.execute();
-                break;
-            default:
+                    mq.setSummaryFilter(mqp.summaryTextField.getText());
+                    SwingWorker sw = new SwingWorker<Collection<MantisIssue>, Object>() {
+                        @Override
+                        protected Collection<MantisIssue> doInBackground() throws Exception {
+                            try (SafeAutocloseable ac = mq.busy()) {
+                                mq.refresh();
+                                return mq.getIssues();
+                            }
+                        }
+
+                        @Override
+                        protected void done() {
+                            try {
+                                getComponent(QueryMode.VIEW).getQueryListModel().setIssues(get());
+                            } catch (InterruptedException | ExecutionException ex) {
+                                Exceptions.printStackTrace(ex);
+                            }
+                        }
+                    };
+                    sw.execute();
+                    break;
+                default:
+            }
         }
     }
 

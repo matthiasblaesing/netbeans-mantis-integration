@@ -31,25 +31,25 @@ public class Capabilities {
     public Capabilities(MantisRepository mr) {
         this.mr = mr;
     }
-    
+
     public boolean canUpdate(MantisIssue mi) {
         // While updating MantisIssue could be not update and project not yet assigned
         if(mi == null || mi.getProject() == null) {
             return false;
         }
-        
+
         BigInteger projectId = mi.getProject().getId();
-        
+
         // Try project specific variant first (will fail on large resultsets)
-        
+
         // Check cached value -- BEWARE! NULL _is_ a valid user => unknown
         if(projectUpdater.containsKey(projectId) && projectUpdater.get(projectId) != null) {
             return projectUpdater.get(projectId);
         }
-        
+
         // 40 is the access level for "updater"
         final BigInteger requiredAccesslevel = BigInteger.valueOf(40);
-        
+
         // Only try this once => takes potentially extremely long
         if (! projectUpdater.containsKey(projectId)) {
             try {
@@ -73,18 +73,16 @@ public class Capabilities {
                 projectUpdater.put(projectId, null);
             }
         }
-        
-        
-        
+
         // Fallback to user role
         if(userIsUpdaterChecked && userIsUpdater != null) {
             return userIsUpdater;
         }
-        
+
         // Try this only once ...
         if(! userIsUpdaterChecked) {
             userIsUpdaterChecked = true;
-            
+
             BigInteger userAccessLevel;
             try {
                 userAccessLevel = mr.getAccount().getAccess_level();
@@ -99,24 +97,23 @@ public class Capabilities {
                 userIsUpdater = null;
             }
         }
-            
+
         // *arg* -> we can't know so asume the developer (our targetgroup)
         // knows what he is doing and allowed
         return true;
     }
-    
-    
+
     public boolean isTagSupport() throws ServiceException, RemoteException {
         return mr.getVersion().compareTo(tagVersion) >= 0;
     }
-    
+
     public Permission getTrackTime(MantisIssue mi) throws RemoteException {
         // While updating MantisIssue could be not update and project not yet assigned
         // Fallback to WRITE permission
         if(mi == null || mi.getProject() == null) {
             return Permission.WRITE;
         }
-        
+
         BigInteger projectId = mi.getProject().getId();
 
         // Try project specific variant first (will fail on large resultsets)
@@ -196,7 +193,7 @@ public class Capabilities {
                         return Permission.WRITE;
                     }
                 }
-                
+
                 // Check for READ access
                 validUsers = mr.getClient().mc_project_get_users(
                         mr.getInfo().getUsername(),
@@ -209,9 +206,9 @@ public class Capabilities {
                         return Permission.READ;
                     }
                 }
-                
+
                 projectTimetracker.put(projectId, Permission.NONE);
-                
+
                 return Permission.NONE;
             } catch (Exception ex) {
                 logger.log(Level.INFO, MessageFormat.format(

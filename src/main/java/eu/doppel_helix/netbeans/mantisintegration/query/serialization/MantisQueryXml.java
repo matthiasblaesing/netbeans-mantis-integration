@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * V1 Version of the serialized data format
- * 
+ *
  * @author matthias
  */
 @XmlRootElement(name = "mantisQuery")
@@ -41,11 +41,12 @@ public class MantisQueryXml {
     private String summaryFilter;
     @XmlJavaTypeAdapter(MantisQueryCombinationAdapter.class)
     private MantisQuery.Combination combination;
+    @SuppressWarnings("FieldMayBeFinal")
     private Set<String> matchingIssues = new HashSet<>();
 
     public MantisQueryXml() {
     }
-    
+
     public MantisQueryXml(MantisQuery mq) {
         this.id = mq.getId();
         this.name = mq.getName();
@@ -66,7 +67,7 @@ public class MantisQueryXml {
         this.matchingIssues.clear();
         this.matchingIssues.addAll(mq.getMatchingIds());
     }
-    
+
     public void toMantisQuery(MantisQuery target) {
         target.setId(this.id);
         target.setName(this.name);
@@ -285,5 +286,5 @@ public class MantisQueryXml {
             return false;
         }
         return true;
-    }    
+    }
 }

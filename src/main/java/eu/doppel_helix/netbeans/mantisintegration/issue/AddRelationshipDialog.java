@@ -15,14 +15,14 @@ import javax.xml.rpc.ServiceException;
 
 public class AddRelationshipDialog extends javax.swing.JDialog {
     private static final Logger LOG = Logger.getLogger(AddRelationshipDialog.class.getName());
-    
+
     private ActionListener okEnabler = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             okButton.setEnabled(checkValidity());
         }
     };
-    
+
     private DocumentListener okEnabler2 = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
@@ -39,7 +39,7 @@ public class AddRelationshipDialog extends javax.swing.JDialog {
             okButton.setEnabled(checkValidity());
         }
     };
-    
+
     public AddRelationshipDialog(java.awt.Frame parent, final MantisIssue issue) {
         super(parent, true);
         setLocationByPlatform(true);

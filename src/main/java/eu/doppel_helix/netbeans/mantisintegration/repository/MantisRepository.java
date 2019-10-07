@@ -60,10 +60,10 @@ public class MantisRepository {
     private static final Logger logger = Logger.getLogger(MantisRepository.class.getName());
     private static final Image ICON = ImageUtilities.loadImage(
             "eu/doppel_helix/netbeans/mantisintegration/icon.png");
-    
+
     private final transient InstanceContent ic;
     private final transient Capabilities capabilities = new Capabilities(this);
-    
+
     private final IssueCache cache = new IssueCache();
     private final RequestProcessor requestProzessor = new RequestProcessor(MantisRepository.class);
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -76,13 +76,13 @@ public class MantisRepository {
     private UserData account = null;
     private MantisRepositoryQueryStore queryStore;
     private ExceptionHandler exceptionHandler;
-    
+
     private final transient MasterData masterData = new MasterData(this);
 
     String getBaseConfigPath() {
         return String.format("%s/%s", BASE_CONFIG_PATH, getInfo().getID());
     }
-    
+
     FileObject getBaseConfigFileObject() {
         FileObject root = FileUtil.getConfigRoot();
         try {
@@ -91,14 +91,14 @@ public class MantisRepository {
             throw new RuntimeException(ex);
         }
     }
-    
+
     public synchronized IssueInfosHandler getIssueInfosHandler() {
         if(issueInfosHandler == null) {
             issueInfosHandler = new IssueInfosHandler(this);
         }
         return issueInfosHandler;
     }
-    
+
     private static MantisConnectPortType initClient(String baseUrl, String httpUsername, String httpPassword) throws ServiceException, MalformedURLException {
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(MantisRepository.class.getClassLoader());
@@ -111,14 +111,14 @@ public class MantisRepository {
             MantisConnectLocator mcl = new MantisConnectLocator();
 
             result = mcl.getMantisConnectPort(new URL(baseUrl));
-            
+
             if(httpUsername != null && (!httpUsername.isEmpty())
                     && httpPassword != null && (!httpPassword.isEmpty())) {
                 // enable Basic HTTP Authentication:
                 ((Stub) result)._setProperty(Call.USERNAME_PROPERTY, httpUsername);
                 ((Stub) result)._setProperty(Call.PASSWORD_PROPERTY, httpPassword);
             }
-            
+
             if (MantisRepository.class.desiredAssertionStatus()) {
                 EDTInvocationHandler invocationHandler = new EDTInvocationHandler(result);
                 result = (MantisConnectPortType) Proxy.newProxyInstance(
@@ -132,24 +132,23 @@ public class MantisRepository {
         return result;
     }
 
-    
     static ConnectionCheckResult checkConnection(String url, String username, String password, String httpUser, String httpPassword) throws ServiceException, RemoteException {
         try {
             ConnectionCheckResult ccr = new ConnectionCheckResult();
             MantisConnectPortType mcpt = initClient(url, httpUser, httpPassword);
             // Test Authentication information
             mcpt.mc_projects_get_user_accessible(username, password);
-            
+
             ccr.setVersion(new Version(mcpt.mc_version()));
             ccr.setResolutionList(mcpt.mc_enum_resolutions(username, password));
             ccr.setStatusList(mcpt.mc_enum_status(username, password));
-            
+
             return ccr;
         } catch (MalformedURLException ex) {
             throw new ServiceException("Broken client url:" + url, ex);
         }
     }
-    
+
     public MantisRepository() {
         ic = new InstanceContent();
         init(null);
@@ -159,7 +158,7 @@ public class MantisRepository {
         this();
         init(ri);
     }
-    
+
     private void init(RepositoryInfo ri) {
         if(ri == null) {
             ri = new RepositoryInfo(
@@ -232,7 +231,7 @@ public class MantisRepository {
         }
         return results;
     }
-    
+
     public Collection<MantisIssue> simpleSearch(String criteria) throws ServiceException, RemoteException {
         int pageSize = 1000;
         List<MantisIssue> result = new ArrayList<>();
@@ -289,11 +288,11 @@ public class MantisRepository {
     public MantisQuery getQuery(String id) {
         return queryStore.getMantisQuery(id);
     }
-    
+
     public void saveQuery(MantisQuery mq, boolean createIfNotExists) {
         queryStore.saveMantisQuery(mq, createIfNotExists);
     }
-   
+
     public MantisIssue createIssue() {
         return new MantisIssue(this);
     }
@@ -301,7 +300,7 @@ public class MantisRepository {
     public Collection<MantisQuery> getQueries() {
         return queryStore.getQueries();
     }
-    
+
     public void deleteQuery(String id) {
         queryStore.removeMantisQuery(id);
     }
@@ -344,10 +343,10 @@ public class MantisRepository {
 
     /**
      * Note! Only present in mantis 1.2.12 or later
-     * 
+     *
      * @return
      * @throws ServiceException
-     * @throws RemoteException 
+     * @throws RemoteException
      */
     public UserData getAccount() throws ServiceException, RemoteException {
         if (account == null) {
@@ -356,7 +355,7 @@ public class MantisRepository {
         }
         return account;
     }
-    
+
     protected synchronized MantisConnectPortType getClient() throws ServiceException {
         if (client == null) {
             String baseUrl = getBaseUrl();
@@ -429,7 +428,7 @@ public class MantisRepository {
         } else {
             ind.setTime_tracking(timetracking);
         }
-        
+
         mcpt.mc_issue_note_add(
                 info.getUsername(),
                 new String(info.getPassword()),
@@ -521,15 +520,15 @@ public class MantisRepository {
             IssueHeaderData[] ids;
             if (getVersion().compareTo(new Version("2.0.0")) >= 0) {
                 // The mc_project_get_issue_headers suppresses configurable
-                // issue states (by default the closed issues). The 
+                // issue states (by default the closed issues). The
                 // mc_filter_search_issue_headers was added with mantis 2.0.0
                 // and is even useful if no filter is specified, as at least
                 // this method returns the complete list
                 ids = mcpt.mc_filter_search_issue_headers(
                         info.getUsername(),
                         new String(info.getPassword()),
-                        mq.getAsServerFilter(), 
-                        BigInteger.valueOf(0), 
+                        mq.getAsServerFilter(),
+                        BigInteger.valueOf(0),
                         BigInteger.valueOf(-1)
                 );
             } else {
@@ -606,14 +605,10 @@ public class MantisRepository {
         issue.refresh();
     }
 
-
-
     public Capabilities getCapabilities() {
         return capabilities;
     }
-    
 
-    
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
     }
@@ -640,7 +635,7 @@ public class MantisRepository {
         }
         return exceptionHandler;
     }
-    
+
     public ObjectRef getCommitStatus() {
         return readObjectRef(info, PROP_COMMIT_STATUS_FIELD);
     }
@@ -648,7 +643,7 @@ public class MantisRepository {
     public ObjectRef getCommitResolution() {
         return readObjectRef(info, PROP_COMMIT_RESOLUTION_FIELD);
     }
-    
+
     static ObjectRef readObjectRef(RepositoryInfo ri, String key) {
         String fieldString = ri.getValue(key);
         if (fieldString != null) {
@@ -666,7 +661,7 @@ public class MantisRepository {
             return null;
         }
     }
-    
+
     static void writeObjectRef(RepositoryInfo ri, String key, ObjectRef value) {
         if(value == null) {
             ri.putValue(key, null);

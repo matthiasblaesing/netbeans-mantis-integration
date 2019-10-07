@@ -11,7 +11,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class PriorityCellRenderer extends DefaultTableCellRenderer {
     private final MantisPriorityProvider mpp = new MantisPriorityProvider();
-    
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         String id = null;

@@ -46,5 +46,5 @@ public class VerticalScrollPane extends JPanel implements Scrollable {
     public boolean getScrollableTracksViewportHeight() {
         return false;
     }
-    
+
 }

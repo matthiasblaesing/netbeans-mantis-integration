@@ -20,13 +20,13 @@ public class MantisPriorityProvider implements IssuePriorityProvider<MantisIssue
             new IssuePriorityInfo("40", "high", ImageUtilities.loadImage("eu/doppel_helix/netbeans/mantisintegration/issue/priority_1.gif", false)),
             new IssuePriorityInfo("50", "urgent", ImageUtilities.loadImage("eu/doppel_helix/netbeans/mantisintegration/issue/priority_2.gif", false)),
             new IssuePriorityInfo("60", "immediate", ImageUtilities.loadImage("eu/doppel_helix/netbeans/mantisintegration/issue/priority_3.gif", false)),
-        };   
+        };
         issuePriorityMap = new HashMap<>();
         for(IssuePriorityInfo ipi: issuePriorities) {
             issuePriorityMap.put(ipi.getID(), ipi);
         }
     }
-    
+
     public Image getImageById(String id) {
         try {
             return issuePriorityMap.get(id).getIcon();
@@ -34,7 +34,7 @@ public class MantisPriorityProvider implements IssuePriorityProvider<MantisIssue
             return fallback;
         }
     }
-    
+
     @Override
     public String getPriorityID(MantisIssue i) {
         return i.getPriority().getId().toString();
@@ -44,5 +44,4 @@ public class MantisPriorityProvider implements IssuePriorityProvider<MantisIssue
     public IssuePriorityInfo[] getPriorityInfos() {
         return issuePriorities;
     }
-    
 }

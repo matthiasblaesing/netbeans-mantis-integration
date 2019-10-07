@@ -33,7 +33,7 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
     private static final Logger LOG = Logger.getLogger(MantisRepositoryQueryStore.class.getName());
     private static final JAXBContext jaxbContext;
     private final Map<String,WeakReference<MantisQuery>> openQueries = new HashMap<>();
-    
+
     static {
         JAXBContext tempJaxbContext = null;
         try {
@@ -45,22 +45,22 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
         }
         jaxbContext = tempJaxbContext;
     }
-    
+
     private static final String QUERY_BASE_PATH = "Query";
-    
+
     private final PropertyChangeSupport pcs;
-    
+
     /**
      * MantisRepority instance this QueryStore handles queries for
      */
     private final MantisRepository mr;
-    
+
     private final String queryStorageDir;
-    
+
     private FileObject storage;
-    
+
     private final Map<String,FileObject> backingFileMap = new HashMap<>();
-    
+
     public MantisRepositoryQueryStore(MantisRepository mr, PropertyChangeSupport pcs) {
         this.mr = mr;
         this.pcs = pcs;
@@ -71,7 +71,7 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
         storage = FileUtil.getConfigFile(queryStorageDir);
         initFileListener();
     }
-    
+
     private synchronized FileObject getStorage() {
         if(storage == null) {
             try {
@@ -85,7 +85,7 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
         }
         return storage;
     }
-    
+
     public void removeMantisQuery(String id) {
         FileObject fo = backingFileMap.get(id);
         if (fo != null) {
@@ -97,7 +97,7 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
             }
         }
     }
-    
+
     public synchronized MantisQuery getMantisQuery(String id) {
         MantisQuery cachedEntry = null;
         WeakReference<MantisQuery> ref = openQueries.get(id);
@@ -124,7 +124,6 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
                 } catch (IOException ex) {
                     LOG.log(Level.WARNING, "Could not open file: {0}", fo);
                 }
-                
             }
         }
         return result;
@@ -168,7 +167,7 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
         }
         return queries;
     }
-    
+
     private synchronized void initFileListener() {
         if (storage != null) {
             storage.removeFileChangeListener(this); // Make sure we are only connected once
@@ -176,7 +175,7 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
             refreshBackingFileMap();
         }
     }
-    
+
     private synchronized void refreshBackingFileMap() {
         if (storage != null) {
             Unmarshaller unmarshaller = null;
@@ -201,10 +200,10 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
             }
         }
     }
-    
+
     @Override
     public void fileFolderCreated(FileEvent fe) {
-}
+    }
 
     @Override
     public void fileDataCreated(FileEvent fe) {

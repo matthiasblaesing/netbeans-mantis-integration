@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.JComponent;
@@ -95,13 +96,13 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
             try(SafeAutocloseable ac = issue.busy()) {
                 MantisRepository mr = issue.getMantisRepository();
                 viewStates = Arrays.asList(mr.getMasterData().getViewStates());
-                
+
                 projects = new ArrayList<>();
                 projects.add(null);
                 for(ProjectData pd: mr.getMasterData().getProjects()) {
                     projects.addAll(FlattenedProjectData.buildList(pd));
                 }
-                
+
                 severities = Arrays.asList(mr.getMasterData().getSeverities());
                 reproducibilities = Arrays.asList(mr.getMasterData().getReproducibilities());
                 resolutions = Arrays.asList(mr.getMasterData().getResolutions());
@@ -113,7 +114,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 return null;
             }
         }
-        
+
         @Override
         protected void done() {
             try {
@@ -130,14 +131,15 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 etasModel.setBackingList(etas);
                 projectionsModel.setBackingList(projections);
                 updateInfo(null);
-            } catch (Exception ex) {
+            } catch (InterruptedException | ExecutionException | RuntimeException ex) {
                 issue.getMantisRepository()
                         .getExceptionHandler()
                         .handleException(logger, "Failed to update", ex);
             }
         }
     };
-    
+
+    @SuppressWarnings("LeakingThisInConstructor")
     public MantisIssueController(final MantisIssue issue) {
         this.issue = issue;
         issue.addPropertyChangeListener(this);
@@ -222,7 +224,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
             }
         }
     };
-    
+
     private void setUpdateEnabledFields(boolean enabled) {
         panel.projectComboBox.setEnabled(enabled);
         panel.viewStatusComboBox.setEnabled(enabled);
@@ -482,7 +484,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
         if (pd == null) {
             updateData.setProject(null);
         } else {
-            ObjectRef project = new ObjectRef(pd.getProjectData().getId(), 
+            ObjectRef project = new ObjectRef(pd.getProjectData().getId(),
                     pd.getProjectData().getName());
             updateData.setProject(project);
         }
@@ -582,7 +584,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                 public void run() {
                     try {
                         issue.addComment(comment, viewState, timetracking);
-                    } catch (Exception ex) {
+                    } catch (RemoteException | ServiceException | RuntimeException ex) {
                         mr
                                 .getExceptionHandler()
                                 .handleException(logger, "Failed to comment to issue", ex);
@@ -613,13 +615,13 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                         } else {
                             customFields[0] = new CustomFieldDefinitionData[0];
                         }
-                        
+
                         final UserData[] ud = new UserData[1];
                         try {
                             ud[0] = mr.getAccount();
                         } catch (ServiceException | RemoteException ex) {
                         };
-                        
+
                         Mutex.EVENT.writeAccess(new Mutex.Action<Void>() {
                             public Void run() {
                                 categoriesModel.setBackingList(categories);
@@ -667,7 +669,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                     public void run() {
                         try {
                             issue.refresh();
-                        } catch (Exception ex) {
+                        } catch (RemoteException | ServiceException | RuntimeException ex) {
                             mr
                                     .getExceptionHandler()
                                     .handleException(logger, "Failed to refresh issue", ex);
@@ -697,7 +699,7 @@ public class MantisIssueController implements PropertyChangeListener, ActionList
                     public void run() {
                         try {
                             issue.addFile(fileChooser.getSelectedFile(), null);
-                        } catch (Exception ex) {
+                        } catch (IOException | ServiceException | RuntimeException ex) {
                             mr
                                     .getExceptionHandler()
                                     .handleException(logger, "Failed to add file to issue", ex);

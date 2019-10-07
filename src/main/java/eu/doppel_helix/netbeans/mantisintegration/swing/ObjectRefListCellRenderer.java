@@ -11,7 +11,7 @@ import javax.swing.JSeparator;
 
 public class ObjectRefListCellRenderer extends DefaultListCellRenderer {
     private final JSeparator seperator = new JSeparator(JSeparator.HORIZONTAL);
-    
+
     @Override
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         boolean negativeValue = false;
@@ -28,7 +28,7 @@ public class ObjectRefListCellRenderer extends DefaultListCellRenderer {
             value = " ";
         }
         Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-        
+
         if(negativeValue) {
             c.setFont(c.getFont().deriveFont(Font.ITALIC));
         } else {
@@ -36,5 +36,5 @@ public class ObjectRefListCellRenderer extends DefaultListCellRenderer {
         }
         return c;
     }
-    
+
 }

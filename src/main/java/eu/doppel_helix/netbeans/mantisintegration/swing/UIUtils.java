@@ -5,7 +5,7 @@ import java.awt.Color;
 import javax.swing.UIManager;
 
 public class UIUtils {
-    // The color accessors are copied here for compatibility 
+    // The color accessors are copied here for compatibility
     public static Color getTaskNewColor () {
         Color c = UIManager.getColor("nb.bugtracking.new.color"); //NOI18N
         if (c == null) {

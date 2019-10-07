@@ -35,5 +35,5 @@ class ConnectionCheckResult {
     public void setResolutionList(ObjectRef[] resolutionList) {
         this.resolutionList = resolutionList;
     }
-    
+
 }

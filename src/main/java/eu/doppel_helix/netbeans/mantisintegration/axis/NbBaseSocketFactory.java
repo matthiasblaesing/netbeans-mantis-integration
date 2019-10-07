@@ -1,7 +1,5 @@
 package eu.doppel_helix.netbeans.mantisintegration.axis;
 
-
-
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.util.Hashtable;
@@ -25,15 +23,15 @@ abstract class NbBaseSocketFactory implements org.apache.axis.components.net.Soc
         Preferences p = NbPreferences.root().node("/org/netbeans/core");
         if (p.getBoolean("useProxyAuthentication", false)) {
             PasswordAuthentication pa = Authenticator.requestPasswordAuthentication(
-                    null, null, -1, "HTTP", "", "http", null, Authenticator.RequestorType.PROXY);
+                null, null, -1, "HTTP", "", "http", null, Authenticator.RequestorType.PROXY);
             if (pa != null) {
                 buffer
-                        .append(HTTPConstants.HEADER_PROXY_AUTHORIZATION)
-                        .append(": Basic ")
-                        .append(Base64.encode(String.format("%s:%s",
-                                                pa.getUserName(),
-                                                new String(pa.getPassword())
-                                        ).getBytes()));
+                    .append(HTTPConstants.HEADER_PROXY_AUTHORIZATION)
+                    .append(": Basic ")
+                    .append(Base64.encode(String.format("%s:%s",
+                        pa.getUserName(),
+                        new String(pa.getPassword())
+                    ).getBytes()));
             }
         }
         return buffer.toString();

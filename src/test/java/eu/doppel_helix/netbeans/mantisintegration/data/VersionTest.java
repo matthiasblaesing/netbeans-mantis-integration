@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class VersionTest {
-    
+
     public VersionTest() {
     }
 
@@ -19,7 +19,7 @@ public class VersionTest {
         assertEquals((int) 1, (int) v.getVersionParts().get(0));
         assertEquals((int) 2, (int) v.getVersionParts().get(1));
     }
-    
+
     @Test
     public void testCorrectComparison() {
         Version v1 = new Version("1.20");
@@ -31,7 +31,7 @@ public class VersionTest {
         assertEquals(v2, versions.get(0));
         assertEquals(v1, versions.get(1));
     }
-    
+
     @Test
     public void testBrokenVersion() {
         Version v1 = new Version("1.20-SNAPSHOT");

@@ -86,13 +86,13 @@ public class MasterData {
             ObjectRef[] resolutionsBuiltin = mcpt.mc_enum_resolutions(
                     mr.getInfo().getUsername(),
                     new String(mr.getInfo().getPassword()));
-            
+
             ObjectRef[] res2 = new ObjectRef[resolutionsBuiltin.length + 1];
             System.arraycopy(resolutionsBuiltin, 0, res2, 0, resolutionsBuiltin.length);
             res2[resolutionsBuiltin.length] = new ObjectRef(new BigInteger("-1"), "test");
             resolutions = res2;
         }
-        
+
         return resolutions;
     }
 
@@ -350,7 +350,7 @@ public class MasterData {
         Collections.sort(list);
         return StringUtils.toCustomFieldList(list);
     }
-    
+
     private void initTags(boolean enforceUpdate) throws ServiceException, RemoteException {
         if (enforceUpdate) {
             tags = null;
@@ -374,7 +374,7 @@ public class MasterData {
             }
         }
     }
-    
+
     public TagData getTag(BigInteger id) throws ServiceException, RemoteException {
         initTags(false);
         return tags.get(id);
@@ -384,7 +384,7 @@ public class MasterData {
         initTags(false);
         return new ArrayList<>(tags.values());
     }
-    
+
     public TagData addTag(String tagName) throws ServiceException, RemoteException {
         for (TagData td : getTags()) {
             if (td.getName().equals(tagName)) {

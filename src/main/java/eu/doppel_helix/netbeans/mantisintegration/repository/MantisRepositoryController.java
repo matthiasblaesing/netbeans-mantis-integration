@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
@@ -45,11 +44,11 @@ public class MantisRepositoryController implements RepositoryController, Documen
     private final DefaultComboBoxModel<ObjectRef> statusModel = new DefaultComboBoxModel<>();
     private ObjectRef resolution = null;
     private ObjectRef status = null;
-    
+
     public MantisRepositoryController(MantisRepository repository) {
         this.repository = repository;
     }
-    
+
     @Override
     public JComponent getComponent() {
         if(panel == null) {
@@ -87,21 +86,21 @@ public class MantisRepositoryController implements RepositoryController, Documen
         String url = panel.urlTextField.getText();
         String username = panel.usernameTextField.getText();
         String password = panel.passwordTextField.getText();
-        
+
         if(name.isEmpty()) {
             errorMessages.add("No name specified");
         }
-        
+
         try {
             URI.create(url).toURL();
         } catch (IllegalArgumentException | MalformedURLException ex) {
             errorMessages.add("Invalid URL provided");
         }
-        
+
         if(username.trim().isEmpty() || password.trim().isEmpty()) {
             errorMessages.add("Username or password empty");
         }
-        
+
         return errorMessages.isEmpty() && (! checking);
     }
 
@@ -158,7 +157,6 @@ public class MantisRepositoryController implements RepositoryController, Documen
         return message.toString();
     }
 
-    
     @Override
     public void addChangeListener(ChangeListener l) {
         cs.addChangeListener(l);
@@ -192,7 +190,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
         this.checking = checking;
         cs.fireChange();
     }
-    
+
     @Override
     public void stateChanged(ChangeEvent e) {
         Mutex.EVENT.readAccess(new Runnable() {
@@ -309,7 +307,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
             }
         }.execute();
     }
-    
+
     private static void updateModel(DefaultComboBoxModel<ObjectRef> targetModel, ObjectRef currentValue, ObjectRef... values) {
         targetModel.removeAllElements();
         targetModel.addElement(null);
@@ -331,7 +329,7 @@ public class MantisRepositoryController implements RepositoryController, Documen
         targetModel.addElement(new ObjectRef(new BigInteger("-1"), "Refresh"));
         targetModel.setSelectedItem(selectedValue);
     }
-    
+
     @Override
     public void cancelChanges() {
         this.populate();
@@ -348,11 +346,11 @@ public class MantisRepositoryController implements RepositoryController, Documen
         if( ri != null && ri.getID() != null) {
             id = ri.getID();
         }
-          
+
         if(id == null) {
             id = MantisConnector.ID + System.currentTimeMillis();
         }
-        
+
         String httpUsername = "";
         String httpPassword = "";
 
@@ -360,31 +358,31 @@ public class MantisRepositoryController implements RepositoryController, Documen
             httpUsername = panel.httpUserField.getText();
             httpPassword = panel.httpPwdField.getText();
         }
-        
-        ri = new RepositoryInfo(id, 
-                MantisConnector.ID, 
-                url, 
-                name, 
-                "", 
-                username, 
+
+        ri = new RepositoryInfo(id,
+                MantisConnector.ID,
+                url,
+                name,
+                "",
+                username,
                 httpUsername,
-                password.toCharArray(), 
+                password.toCharArray(),
                 httpPassword.toCharArray());
-        
+
         if (panel.scheduleDateFieldCustom.isSelected()) {
-            ri.putValue(MantisRepository.PROP_SCHEDULE_DATE_FIELD, 
+            ri.putValue(MantisRepository.PROP_SCHEDULE_DATE_FIELD,
                     panel.scheduleDateFieldCustomName.getText());
         }
-        
+
         if (panel.scheduleLengthFieldCustom.isSelected()) {
-           ri.putValue(MantisRepository.PROP_SCHEDULE_LENGTH_FIELD, 
-                    panel.scheduleLengthFieldCustomName.getText());
+            ri.putValue(MantisRepository.PROP_SCHEDULE_LENGTH_FIELD,
+                panel.scheduleLengthFieldCustomName.getText());
         }
 
         MantisRepository.writeObjectRef(ri, MantisRepository.PROP_COMMIT_STATUS_FIELD, status);
         MantisRepository.writeObjectRef(ri, MantisRepository.PROP_COMMIT_RESOLUTION_FIELD, resolution);
-        
+
         repository.setInfo(ri);
     }
-    
+
 }

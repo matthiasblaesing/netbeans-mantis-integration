@@ -17,7 +17,7 @@ import javax.swing.table.AbstractTableModel;
 import org.openide.util.WeakListeners;
 
 public class QueryListModel extends AbstractTableModel implements PropertyChangeListener {
-    
+
     private List<MantisIssue> issues = new ArrayList<>();
     private final Map<BigInteger,PropertyChangeListener> listener = new HashMap<>();
 
@@ -36,11 +36,11 @@ public class QueryListModel extends AbstractTableModel implements PropertyChange
         }
         fireTableDataChanged();
     }
-    
+
     public MantisIssue getIssue(int pos) {
         return issues.get(pos);
     }
-    
+
     @Override
     public int getRowCount() {
         return issues.size();
@@ -58,7 +58,7 @@ public class QueryListModel extends AbstractTableModel implements PropertyChange
                 return BigInteger.class;
             case 1:
                 return Integer.class;
-            case 2: 
+            case 2:
                 return String.class;
             case 3:
                 return ObjectRef.class;
@@ -76,7 +76,7 @@ public class QueryListModel extends AbstractTableModel implements PropertyChange
                 return null;
         }
     }
-    
+
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         MantisIssue mi = getIssue(rowIndex);
@@ -85,7 +85,7 @@ public class QueryListModel extends AbstractTableModel implements PropertyChange
                 return mi.getId();
             case 1:
                 return mi.getNoteCount();
-            case 2: 
+            case 2:
                 return mi.getCategory();
             case 3:
                 return mi.getSeverity();
@@ -108,5 +108,5 @@ public class QueryListModel extends AbstractTableModel implements PropertyChange
     public void propertyChange(PropertyChangeEvent evt) {
         this.fireTableDataChanged();
     }
-    
+
 }

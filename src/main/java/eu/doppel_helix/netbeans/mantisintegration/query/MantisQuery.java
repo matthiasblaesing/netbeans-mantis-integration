@@ -58,7 +58,7 @@ public class MantisQuery {
             setBusy(false);
         }
     };
-    
+
     public SafeAutocloseable busy() {
         setBusy(true);
         return busyHelper;
@@ -95,12 +95,12 @@ public class MantisQuery {
     public void setSaved(boolean saved) {
         this.saved = saved;
     }
-    
+
     public void save() {
         mr.saveQuery(this, true);
         setSaved(true);
     }
-    
+
     public void remove() {
         matchingIds.clear();
         mr.deleteQuery(id);
@@ -109,11 +109,11 @@ public class MantisQuery {
     public Collection<MantisIssue> getIssues() throws ServiceException, RemoteException {
         return mr.getIssues(true, matchingIds.toArray(new String[matchingIds.size()]));
     }
-    
+
     /**
      * DO NOT USE THIS! It is only here for serialization!
-     * 
-     * @return 
+     *
+     * @return
      */
     public Set<String> getMatchingIds() {
         return matchingIds;
@@ -133,11 +133,11 @@ public class MantisQuery {
             for (MantisIssue mi : mr.findIssues(this)) {
                 matchingIds.add(mi.getIdAsString());
             }
-            
+
             if(isSaved()) {
                 mr.saveQuery(this, false);
             }
-            
+
             // Assumption: this is called off the EDT and should do the heavy
             // lifting, while getIssues is called on the EDT and needs to be
             // lightweight
@@ -174,7 +174,7 @@ public class MantisQuery {
     public synchronized boolean isBusy() {
         return busy != 0;
     }
-    
+
     private synchronized void setBusy(boolean busyBool) {
         boolean oldBusy = isBusy();
         if (busyBool) {
@@ -338,11 +338,11 @@ public class MantisQuery {
     public void setIssueContainer(QueryProvider.IssueContainer<MantisIssue> issueContainer) {
         this.issueContainer = issueContainer;
     }
-    
+
     public boolean matchesFilter(IssueHeaderData id) {
         int matches = 0;
         int checks = 0;
-        
+
         if(getReporter() != null) {
             checks++;
             if(getReporter().getId().equals(id.getReporter())) {
@@ -419,7 +419,7 @@ public class MantisQuery {
                 matches++;
             }
         }
-        
+
         switch (combination) {
             default:
             case ALL:
@@ -428,11 +428,11 @@ public class MantisQuery {
                 return matches > 0;
         }
     }
-    
+
     /**
      * Build a prefilter to do pre-filtering on the server side
-     * 
-     * @return 
+     *
+     * @return
      */
     public FilterSearchData getAsServerFilter() {
         FilterSearchData fsd = new FilterSearchData();
@@ -494,6 +494,4 @@ public class MantisQuery {
         }
         return true;
     }
-    
-    
 }

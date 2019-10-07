@@ -27,5 +27,5 @@ public class DelegatingBaseLineJPanel extends javax.swing.JPanel {
         } else {
             return super.getBaseline(width, height);
         }
-    }  
+    }
 }

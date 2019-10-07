@@ -44,54 +44,54 @@ public class MantisQueryPanel extends javax.swing.JPanel {
     public QueryListModel getQueryListModel() {
         return queryListModel;
     }
-    
+
     public MantisQueryPanel() {
         initComponents();
-        
+
         issuePopup = new JPopupMenu();
-        
+
         waitPanel = new BusyPanel();
         innerQuery.add(waitPanel, JLayeredPane.MODAL_LAYER);
         innerQuery.setLayout(new FullSizeLayout());
-        
+
         DefaultTableColumnModelExt  tcm = new DefaultTableColumnModelExt();
-        
+
         ColumnFactory cf = issueTable.getColumnFactory();
-        
+
         TableColumnExt tce;
-        
+
         tce = cf.createTableColumn(0);
         tce.setTitle("ID");
         tce.setToolTipText("Identifier");
         tce.setPreferredWidth(40);
         tcm.addColumn(tce);
-        
+
         tce = cf.createTableColumn(1);
         tce.setTitle("#");
         tce.setToolTipText("Note count");
         tce.setPreferredWidth(40);
         tcm.addColumn(tce);
-        
+
         tce = cf.createTableColumn(2);
         tce.setTitle("Category");
         tce.setToolTipText("Category");
         tce.setPreferredWidth(80);
         tcm.addColumn(tce);
-        
+
         tce = cf.createTableColumn(3);
         tce.setTitle("Severity");
         tce.setToolTipText("Severity");
         tce.setCellRenderer(new MantisObjectRefCellRenderer());
         tce.setPreferredWidth(80);
         tcm.addColumn(tce);
-        
+
         tce = cf.createTableColumn(4);
         tce.setTitle("Priority");
         tce.setToolTipText("Priority");
         tce.setCellRenderer(new PriorityCellRenderer());
         tce.setPreferredWidth(80);
         tcm.addColumn(tce);
-        
+
         tce = cf.createTableColumn(5);
         tce.setTitle("Status");
         tce.setToolTipText("Status");
@@ -99,14 +99,14 @@ public class MantisQueryPanel extends javax.swing.JPanel {
         tce.setHighlighters(new MantisStatusHighlighter());
         tce.setPreferredWidth(80);
         tcm.addColumn(tce);
-        
+
         tce = cf.createTableColumn(6);
         tce.setTitle("Updated");
         tce.setToolTipText("Updated");
         tce.setCellRenderer(new MantisCalendarCellRenderer());
         tce.setPreferredWidth(80);
         tcm.addColumn(tce);
-        
+
         tce = cf.createTableColumn(7);
         tce.setTitle("Summary");
         tce.setToolTipText("Summary");

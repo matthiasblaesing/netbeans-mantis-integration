@@ -52,8 +52,8 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
     private final static int CUSTOM_ROW_START = 8;
     private final static int CUSTOM_ROW_END = 17;
     private final List<CustomFieldComponent> customFields = new ArrayList<>();
-    
-    public MantisIssuePanel() {        
+
+    public MantisIssuePanel() {
         initComponents();
         scrollablePane.getVerticalScrollBar().setUnitIncrement(20);
         waitPanel = new BusyPanel();
@@ -77,7 +77,7 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         }
         customFields.clear();
     }
-    
+
     public void addCustomField(CustomFieldComponent cfc) {
         int row = CUSTOM_ROW_START + customFields.size();
         if(row > CUSTOM_ROW_END) {
@@ -93,17 +93,17 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(2, 2, 2, 2);
         gbc.weightx = 0;
-        
+
         innerPanel.add(cfc.getLabel(), gbc);
-        
+
         gbc.weightx = 1;
         gbc.gridx = 1;
         gbc.gridwidth = 7;
-        
+
         innerPanel.add(cfc, gbc);
         customFields.add(cfc);
     }
-    
+
     public CustomFieldComponent getCustomFieldById(BigInteger id) {
         for(CustomFieldComponent cfc: customFields) {
             if(cfc.getCustomFieldDefinitionData().getField().getId().equals(id)) {
@@ -112,11 +112,11 @@ public class MantisIssuePanel extends javax.swing.JLayeredPane {
         }
         return null;
     }
-    
+
     public List<CustomFieldComponent> getCustomFields() {
         return Collections.unmodifiableList(customFields);
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

@@ -26,5 +26,5 @@ public class ProjectListCellRenderer extends DefaultListCellRenderer {
         }
         return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
     }
-    
+
 }

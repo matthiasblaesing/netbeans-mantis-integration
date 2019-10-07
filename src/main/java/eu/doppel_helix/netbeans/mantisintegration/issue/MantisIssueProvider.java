@@ -3,6 +3,7 @@ package eu.doppel_helix.netbeans.mantisintegration.issue;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -47,7 +48,7 @@ public class MantisIssueProvider implements IssueProvider<MantisIssue> {
     public boolean refresh(MantisIssue data) {
         try {
             return data.refresh();
-        } catch (Exception ex) {
+        } catch (RemoteException | ServiceException | RuntimeException ex) {
             data.getMantisRepository()
                     .getExceptionHandler()
                     .handleException(LOG, "Failed to refresh issue", ex);
@@ -90,7 +91,7 @@ public class MantisIssueProvider implements IssueProvider<MantisIssue> {
     public void attachFile(MantisIssue data, File file, String description, boolean isPatch) {
         try {
             data.attachFile(file, description);
-        } catch (Exception ex) {
+        } catch (IOException | ServiceException | RuntimeException ex) {
             data.getMantisRepository()
                     .getExceptionHandler()
                     .handleException(LOG, "Failed to add patch to issue", ex);

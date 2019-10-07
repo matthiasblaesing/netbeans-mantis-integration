@@ -17,9 +17,9 @@ public class StatusListCellRenderer extends DefaultListCellRenderer {
 
     private final Map<BigInteger,Color> colorMap = Mantis.getInstance().getStatusColorMap();
     private final JPanel protectionPanel = new JPanel(new BorderLayout());
-    
+
     private final DefaultListCellRenderer fallback = new DefaultListCellRenderer();
-    
+
     @Override
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         Color foreground = null;
@@ -34,21 +34,19 @@ public class StatusListCellRenderer extends DefaultListCellRenderer {
         } else if (value == null) {
             return fallback.getListCellRendererComponent(list, " ", index, isSelected, cellHasFocus);
         }
-        
+
         Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-        
+        assert c != null;
+
         if(c instanceof JComponent) {
             ((JComponent)c).setOpaque(true);
         }
         c.setBackground(foreground);
         c.setForeground(background);
-        
+
         protectionPanel.removeAll();
         protectionPanel.add(c);
-        
+
         return protectionPanel;
     }
-    
-    
-    
 }
