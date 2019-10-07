@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -31,7 +32,7 @@ import org.openide.filesystems.FileUtil;
 public class MantisRepositoryQueryStore implements FileChangeListener {
     private static final Logger LOG = Logger.getLogger(MantisRepositoryQueryStore.class.getName());
     private static final JAXBContext jaxbContext;
-    private final Map<String,WeakReference<MantisQuery>> openIssues = new HashMap<>();
+    private final Map<String,WeakReference<MantisQuery>> openQueries = new HashMap<>();
     
     static {
         JAXBContext tempJaxbContext = null;
@@ -89,8 +90,8 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
         FileObject fo = backingFileMap.get(id);
         if (fo != null) {
             try {
+                openQueries.remove(id);
                 fo.delete();
-                openIssues.remove(id);
             } catch (IOException ex) {
                 LOG.warning(String.format("Failed to delete: %s", fo.getPath()));
             }
@@ -99,7 +100,7 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
     
     public synchronized MantisQuery getMantisQuery(String id) {
         MantisQuery cachedEntry = null;
-        WeakReference<MantisQuery> ref = openIssues.get(id);
+        WeakReference<MantisQuery> ref = openQueries.get(id);
         if(ref != null) {
             cachedEntry = ref.get();
         }
@@ -130,7 +131,7 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
     }
 
     public synchronized void saveMantisQuery(final MantisQuery mq, final boolean createIfNotExists) {
-        openIssues.put(mq.getId(), new WeakReference<>(mq));
+        openQueries.put(mq.getId(), new WeakReference<>(mq));
         try {
             getStorage().getFileSystem().runAtomicAction(new FileSystem.AtomicAction() {
                 @Override
@@ -208,8 +209,9 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
     @Override
     public void fileDataCreated(FileEvent fe) {
         refreshBackingFileMap();
-        pcs.firePropertyChange(RepositoryProvider.EVENT_QUERY_LIST_CHANGED, null,
-                null);
+        SwingUtilities.invokeLater(() -> {
+            pcs.firePropertyChange(RepositoryProvider.EVENT_QUERY_LIST_CHANGED, null, null);
+        });
     }
 
     @Override
@@ -219,8 +221,9 @@ public class MantisRepositoryQueryStore implements FileChangeListener {
     @Override
     public void fileDeleted(FileEvent fe) {
         refreshBackingFileMap();
-        pcs.firePropertyChange(RepositoryProvider.EVENT_QUERY_LIST_CHANGED, null,
-                null);
+        SwingUtilities.invokeLater(() -> {
+            pcs.firePropertyChange(RepositoryProvider.EVENT_QUERY_LIST_CHANGED, null, null);
+        });
     }
 
     @Override
