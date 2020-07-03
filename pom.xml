@@ -1,12 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>eu.doppel_helix.netbeans</groupId>
+    <groupId>eu.doppel-helix.netbeans.plugin</groupId>
     <artifactId>MantisIntegration</artifactId>
     <version>1.6.1-SNAPSHOT</version>
     <packaging>nbm</packaging>
 
     <name>MantisIntegration</name>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
 
     <developers>
         <developer>
@@ -31,28 +38,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide />
         <netbeans.run.params>${netbeans.run.params.ide}</netbeans.run.params>
-        <mantisintegration.nbtarget>RELEASE81</mantisintegration.nbtarget>
+        <mantisintegration.nbtarget>RELEASE90</mantisintegration.nbtarget>
     </properties>
 
     <repositories>
-        <!--
-        Repository hosting NetBeans modules, especially APIs.
-        Versions are based on IDE releases, e.g.: RELEASE691
-        To create your own repository, use: nbm:populate-repository
-        -->
-        <repository>
-            <id>netbeans</id>
-            <name>NetBeans</name>
-            <url>http://bits.netbeans.org/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>netbeans-snapshot</id>
-            <name>NetBeans Snapshots</name>
-            <url>http://bits.netbeans.org/netbeans/trunk/maven-snapshot/</url>
-        </repository>
         <repository>
             <id>repo</id>
             <releases>
@@ -65,6 +54,17 @@
             <url>file://${project.basedir}/repo</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>oss.sonatype.org</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>oss.sonatype.org</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -365,4 +365,56 @@
 
 &lt;p&gt;If a self-signed SSL certificate or an invalid certificate need to be accepted, please install the module 
         "SSL Certificate Exception".&lt;/p&gt;</description>
+
+     <profiles>
+        <profile>
+            <id>release-profile</id>
+
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>3.0.0-M2</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-versions</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireJavaVersion>
+                                            <version>[1.8,9)</version>
+                                        </requireJavaVersion>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+     </profiles>
 </project>
