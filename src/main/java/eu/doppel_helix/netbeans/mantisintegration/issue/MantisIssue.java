@@ -261,10 +261,9 @@ public class MantisIssue {
 
     /**
      * Check whether update of issue data and tags is possible
-     *
-     * @todo: Implement a better strategy to check
      */
     public boolean canUpdate() {
+        // @todo: Implement a better strategy to check
         return mr.getCapabilities().canUpdate(this);
     }
 

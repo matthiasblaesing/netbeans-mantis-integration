@@ -7,9 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * @todo Implement a sane implementation (on-disk!)
  * @author matthias
  */
+// @todo Implement a sane implementation (on-disk!)
 public class IssueCache {
     private final int CAPACITY = 200;
 
