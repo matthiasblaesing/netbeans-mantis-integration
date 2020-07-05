@@ -3,7 +3,7 @@
 
     <groupId>eu.doppel-helix.netbeans.plugin</groupId>
     <artifactId>MantisIntegration</artifactId>
-    <version>1.6.1-SNAPSHOT</version>
+    <version>1.7</version>
     <packaging>nbm</packaging>
 
     <name>MantisIntegration</name>
@@ -31,7 +31,7 @@
         <connection>scm:git:https://github.com/matthiasblaesing/netbeans-mantis-integration.git</connection>
         <developerConnection>scm:git:git@github.com:matthiasblaesing/netbeans-mantis-integration.git</developerConnection>
         <url>https://github.com/matthiasblaesing/netbeans-mantis-integration</url>
-        <tag>HEAD</tag>
+        <tag>MantisIntegration-1.7</tag>
     </scm>
 
     <properties>
@@ -334,17 +334,17 @@
                     <sourceDirectories>src</sourceDirectories>
                     <checkstyleRules>
                         <module name="Checker">
-                            <module name="FileTabCharacter"/>
+                            <module name="FileTabCharacter" />
                             <module name="RegexpSingleline">
-                                <property name="format" value="\s+$"/>
-                                <property name="message" value="Line has trailing spaces."/>
+                                <property name="format" value="\s+$" />
+                                <property name="message" value="Line has trailing spaces." />
                             </module>
                             <module name="RegexpMultiline">
-                                <property name="format" value="\r"/>
-                                <property name="message" value="Contains carriage return \r"/>
+                                <property name="format" value="\r" />
+                                <property name="message" value="Contains carriage return \r" />
                             </module>
                             <module name="TreeWalker">
-                                <module name="Indentation"/>
+                                <module name="Indentation" />
                             </module>
                         </module>
                     </checkstyleRules>
